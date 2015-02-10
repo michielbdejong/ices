@@ -196,7 +196,16 @@ then
   rm -fr "${dir_final}${lang}"
 fi
 
-cat $tmp_conf | $doxygen - > /tmp/salida.dox 2> $errors_log
+# Run doxygen
+if [ $debug == 1 ]
+then
+  echo
+  echo Run doxygen.
+  echo
+  cat $tmp_conf | $doxygen - 2> $errors_log
+else
+  cat $tmp_conf | $doxygen - > /tmp/salida.dox 2> $errors_log
+fi
 
 if [ $debug == 1 ] ; then
   echo

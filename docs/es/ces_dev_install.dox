@@ -2,7 +2,7 @@
 
 @page install Instalación
 
-@section entorno_desarrollo Entorno de desarrollo
+@section dev_enviroment Entorno de desarrollo
 
 A continuación se explica detalladamente como establecer el entorno adecuado
 para desarrollar el proyecto IntegralCES. Siguiendo estas instrucciones
