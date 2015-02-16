@@ -27,43 +27,36 @@ function ces_import4ces_parse_wants($import_id, $data, $row, &$context, $width_a
 
     $category_id = ces_import4ces_get_category('general', $import);
 
-    /*
-    [ID] => 2
-    [UID] => HORA0024
-    [Keep] => 0
-    [DateAdded] => 2011/05/14 23:47:45
-    [Title] => Classes d'harmonia (musical, de moment)
-    [Description] => Busquem qui ens pugui donar classes d'harmonia.
-    */
+    $state = ( $data['Hidden'] == 0 ) ? 1 : 0 ;
 
     $want = array(
       'type' => 'want',
-      'user' => $data['UID'],
+      'user' => $data['Advertiser'],
       'title' => $data['Title'],
       'body' => $data['Description'],
       'category' => $category_id,
       'keywords' => '',
-      'state' => 1,
+      'state' => $state,
       'created' => strtotime($data['DateAdded']),
-      'modified' => strtotime($data['DateAdded']),
+      'modified' => strtotime($data['DateEdited']),
       // Add 150 days more of DateAdded (need something).
-      'expire' => (strtotime($data['DateAdded']) + (60 * 60 * 24 * 150)),
+      //'expire' => (strtotime($data['DateAdded']) + (60 * 60 * 24 * 150)),
+      'expire' => strtotime($data['DateExpires']),
       // 'rate'       => $data['Rate'],
       // 'image'      => $data['Image'],
     );
 
     $extra_info = array(
-      'ID' => $data['ID'],
-      'UID' => $data['UID'],
+      'DateStarts' => $data['DateStarts'],
     );
 
     // Find uid from user.
-    $query = db_query('SELECT uid FROM {users} where name=:name', array(':name' => $data['UID']));
+    $query = db_query('SELECT uid FROM {users} where name=:name', array(':name' => $data['Advertiser']));
     $want_user_id = $query->fetchColumn(0);
 
     if (empty($want_user_id)) {
       $m = t('The user @user was not found in want import row @row. It may be a
-      user from another exchange not yet imported.', array('@user' => $data['UID'], '@row' => $row));
+      user from another exchange not yet imported.', array('@user' => $data['Advertiser'], '@row' => $row));
 
       throw new Exception($m);
     }
