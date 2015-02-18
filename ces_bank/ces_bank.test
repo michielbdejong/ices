@@ -148,6 +148,7 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->checkVisibilityOptions();
     // Admin accounts.
     $this->adminAccounts();
+    $this->checkOtherAccountsPage();
   }
   /**
    * Creates two exchanges.
@@ -922,6 +923,19 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->drupalPost(NULL, NULL, t('Close account'));
     $this->drupalPost(NULL, NULL, t('Confirm'));
     $this->assertText(t('The account BCNA9001 has been closed'));
+    $this->drupalLogout();
+  }
+  /**
+   * Check the other echanges page.
+   */
+  protected function checkOtherAccountsPage() {
+    $this->drupalLogin($this->accountUser($this->account11));
+    $this->drupalGet('ces/bank/exchange/accounts/otherexchanges');
+    $this->assertText('BCNA - Ecoxarxa de Barcelona');
+    $this->assertText('ecos (10.00ECO = 1.00ℏ)');
+    $this->assertText('0.10');
+    $this->assertText('0.50');
+    $this->assertText('+0.40');
     $this->drupalLogout();
   }
 }

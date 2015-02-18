@@ -31,6 +31,12 @@ function ces_bank_help($path, $arg) {
       $msg .= '</p>';
       return $msg;
 
+    case 'ces/bank/exchange/otherexchanges':
+      $msg = '<p>';
+      $msg .= t('Balance of trade and currency value of other exchanges.');
+      $msg .= '</p>';
+      return $msg;
+
     case 'ces/bank/account/transaction':
       $msg  = '<p>';
       $msg .= t('Showing your transactions. Set the "From" and "To" dates to see a specific time range.');
@@ -417,7 +423,7 @@ function ces_bank_menu() {
   );
   $menu['ces/bank/exchange/accounts'] = array(
     'title' => 'Accounts',
-    'description' => 'Vieu exchange accounts list',
+    'description' => 'View exchange accounts list',
     'page callback' => 'ces_bank_exchange_accounts_page',
     'file' => 'ces_bank.pages.inc',
     'file path' => drupal_get_path('module', 'ces_bank'),
@@ -426,6 +432,23 @@ function ces_bank_menu() {
     'access arguments' => array('view', 'exchange accounts',
       CES_BANK_CURRENT_EXCHANGE),
     'weight' => 240,
+  );
+  $menu['ces/bank/exchange/accounts/list'] = array(
+    'title' => 'Accounts',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 0
+  );
+  $menu['ces/bank/exchange/accounts/otherexchanges'] = array(
+    'title' => 'Other exchanges',
+    'description' => 'View trade balances with other exchanges',
+    'page callback' => 'ces_bank_other_exchanges_page',
+    'file' => 'ces_bank.pages.inc',
+    'file path' => drupal_get_path('module', 'ces_bank'),
+    'type' => MENU_LOCAL_TASK,
+    'access callback' => 'ces_bank_access',
+    'access arguments' => array('view', 'exchange accounts',
+      CES_BANK_CURRENT_EXCHANGE),
+    'weight' => 100,
   );
   $menu['ces/bank/exchange/list/%'] = array(
     'title' => 'Exchanges in your country',

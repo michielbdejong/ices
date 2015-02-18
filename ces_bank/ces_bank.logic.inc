@@ -628,7 +628,7 @@ class CesBank {
     $s = new IcesSerializer('CesBankLocalAccount');
     $account = $s->load($id);
     $st = new IcesSerializer('CesBankBasicTransaction');
-    $result = $st->selectFunctionField('SUM', 'amount',
+    $result = (double) $st->selectFunctionField('SUM', 'amount',
       array(
         array($field, $account->id),
         array('created', $from, '>='),

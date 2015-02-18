@@ -216,12 +216,16 @@ function ces_bank_exchange_list_page($country) {
   return $page;
 }
 /**
- * TODO: document.
+ * Page with a table of all accounts with the user name and balance.
  */
 function ces_bank_exchange_accounts_page() {
   $bank = new CesBank();
   $exchange = ces_bank_get_current_exchange();
-  $accounts = $bank->getAllAccounts(array('exchange' => $exchange['id']));
+  $accounts = $bank->getAllAccounts(array(
+    'exchange' => $exchange['id'],
+    'state' => 1,
+    'kind' => array(0,1,2,3,4),
+  ));
   $page = array();
   $page['table'] = array(
     '#theme' => 'table',
@@ -246,23 +250,31 @@ function ces_bank_exchange_accounts_page() {
       ),
     ),
   );
+  // Load all users with a single database select.
+  $uids = array();
+  foreach ($accounts as $account) {
+    foreach ($account['users'] as $user) {
+      $uids[] = $user['user'];
+    }
+  }
+  $uids = array_unique($uids);
+  $users = user_load_multiple($uids);
+  // Fill table rows.
   $rows = array();
   foreach ($accounts as $account) {
     $accountsperuser = $account['name'];
-    $balancesperuser = number_format($account['balance'], 2);
     $users_out = '';
     $count = 0;
     foreach ($account['users'] as $user) {
       $count++;
-      $user = user_load($user['user']);
+      $user = $users[$user['user']];
       $uo = ces_bank_get_full_username($user);
       if ($count > 1) {
         $users_out .= '<br/>';
       }
       // First cell begins with 8 chars of the name user in capital letters
       // only for sort case insensitive proposals.
-      $users_out .= '            <p style="display: none;">' .
-      strtoupper(sprintf("%8.8s", $uo)) . '</p>' .
+      $users_out .= strtoupper(sprintf('%8.8s', $uo)) .
       '<div class="ces-user-column"> <div class="user-picture">' .
       theme('user_picture', array('account' => $user)) . '</div>' .
       l(ucfirst($uo), 'user/' . $user->uid) .
@@ -271,19 +283,120 @@ function ces_bank_exchange_accounts_page() {
     $row = array(
       $users_out,
       $accountsperuser,
-      $balancesperuser,
+      $account['balance']
     );
     $rows[] = $row;
   }
   _ces_bank_sort_table($page['table']['#header'], $rows);
+  // Format amounts after sort the table.
   $lenghtrows = count($rows);
   for ($i = 0; $i < $lenghtrows; $i++) {
     $rows[$i][0] = substr($rows[$i][0], 8);
+    $rows[$i][2] = $bank->formatAmount($rows[$i][2], $exchange, TRUE);
   }
   $page['table']['#rows'] = $rows;
   return $page;
 }
-
+/**
+ * Balances with other exchanges and currency exchange rates.
+ */
+function ces_bank_other_exchanges_page() {
+  $bank = new CesBank();
+  $exchange = ces_bank_get_current_exchange();
+  // Get virtual accounts
+  $accounts = $bank->getAllAccounts(array(
+    'exchange' => $exchange['id'],
+    'state' => 1,
+    'kind' => 5,
+  ));
+  $page = array();
+  $page['table'] = array(
+    '#theme' => 'table',
+    '#attributes' => array(
+      'class' => array('ces-table'),
+    ),
+    '#header' => array(
+      array(
+        'data' => t('Exchange'),
+        'field' => 'exchange',
+        'sort' => 'asc',
+      ),
+      array(
+        'data' => t('Currency'),
+      ),
+      array(
+        'data' => t('Imports'),
+        'field' => 'import',
+        'sort' => 'asc',
+      ),
+      array(
+        'data' => t('Exports'),
+        'field' => 'export',
+        'sort' => 'asc',
+      ),
+      array(
+        'data' => t('Balance'),
+        'field' => 'balance',
+        'sort' => 'asc',
+      ),
+    ),
+  );
+  $rows = array();
+  $imports = 0;
+  $exports = 0;
+  foreach ($accounts as $account) {
+    $import = $bank->getAccountHistoricSales($account['id'], 0);
+    $export = $bank->getAccountHistoricPurchases($account['id'], 0);
+    if ($import != 0 || $export != 0) {
+      $row = array();
+      $code = drupal_substr($account['name'], 4);
+      $exc = $bank->getExchangeByName($code);
+      if ($exc !== FALSE) {
+        // Exchange name.
+        $row[0] = $code . ' - ' . $exc['name'];
+        // Currency value.
+        if ($exc['currencyvalue'] > $exchange['currencyvalue']) {
+          $valuea = 1;
+          $valueb = $exc['currencyvalue'] / $exchange['currencyvalue'];
+        }
+        else {
+          $valuea = $exchange['currencyvalue'] / $exc['currencyvalue'];
+          $valueb = 1;
+        }
+        $row[1] = $exc['currenciesname'] . ' (' . $bank->formatAmount($valuea, $exc, TRUE)
+          . ' = ' . $bank->formatAmount($valueb, $exchange, TRUE) . ')';
+      }
+      else {
+        // This a remote exchange. We don't know the name nor the currency value.
+        $row[0] = $code . ' (' . t('Remote') . ')';
+        $row[1] = '';
+      }
+      $row[2] = $import;
+      $imports += $import;
+      $row[3] = $export;
+      $exports += $export;
+      // Balance.
+      $row[4] = $export - $import;
+      $rows[] = $row;
+    }
+  }
+  _ces_bank_sort_table($page['table']['#header'], $rows);
+  // Format amounts after sort the table.
+  foreach ($rows as $i => $row) {
+    $rows[$i][2] = $bank->formatAmount($row[2], $exchange, TRUE);
+    $rows[$i][3] = $bank->formatAmount($row[3], $exchange, TRUE);
+    $rows[$i][4] = $bank->formatAmount($row[4], $exchange, TRUE, TRUE);
+  }
+  $rows[] = array(
+    t('TOTAL'),
+    '',
+    $bank->formatAmount($imports, $exchange, TRUE),
+    $bank->formatAmount($exports, $exchange, TRUE),
+    $bank->formatAmount($exports - $imports, $exchange, TRUE, TRUE),
+  );
+  $page['table']['#rows'] = $rows;
+  return $page;
+}
 /**
  * TODO: document.
  */
@@ -656,7 +769,7 @@ function _ces_bank_sort_table(array $headers, array &$rows) {
   // Find the column number to sort.
   $i = 0;
   foreach ($headers as $header) {
-    if ($header['field'] == $order['sql']) {
+    if (isset($header['field']) && ($header['field'] == $order['sql'])) {
       $_ces_bank_sort_table_column = $i;
       break;
     }
