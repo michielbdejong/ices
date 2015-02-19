@@ -50,7 +50,8 @@ function ces_user_access($user_edit) {
   // Check user to edit is from actual exchange.
   $bank = new CesBank();
   $accounts = $bank->getUserAccounts($user_edit->uid);
-  $current_exchange = ces_bank_get_current_exchange()['id'];
+  $exchange = ces_bank_get_current_exchange();
+  $current_exchange = $exchange['id'];
   foreach ($accounts as $account) {
     if ($account['exchange'] == $current_exchange) {
       return TRUE;
