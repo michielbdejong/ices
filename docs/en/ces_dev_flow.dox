@@ -26,7 +26,7 @@ we will also respond.
 * **Issue queue on drupal.org**. We use the list of _issues_ on drupal.org to 
 keep organized the remaining tasks, who is responsible for working on it, etc.
 This content is in English generally. There are separate issue queues for the
-modules ( https://drupal.org/project/issues/1367140 ) and the greences theme 
+modules ( https://drupal.org/project/issues/ices ) and the greences theme 
 ( https://www.drupal.org/project/issues/1866046 ). Any minimally relevant
 development needs to have its _issue_ associated.
 
@@ -65,7 +65,7 @@ We have the following considerations:
 ### Example of development workflow
 
 We collect an incident (issue) of the project or we create as necessary in
-queue:  https://drupal.org/project/issues/1367140
+queue:  https://drupal.org/project/issues/ices
 
 We make a branch referencing the incident:
 

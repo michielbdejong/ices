@@ -128,12 +128,12 @@ for correct file upload handling.
 
 ### Installing ces module for development
 
-Follow the Drupal instructions with the project here: https://drupal.org/project/1367140/git-instructions
+Follow the Drupal instructions with the project here: https://drupal.org/project/ices/git-instructions
 
 We get the module from git:
 
     
-    $git clone --branch 7.x-1.x TU_USUARIO_DRUPAL@git.drupal.org:sandbox/esteve/1367140.git ces
+    $git clone --branch 7.x-1.x TU_USUARIO_DRUPAL@git.drupal.org:project/ices.git ces
     
     
     Cloning into 'ces'...
@@ -211,7 +211,7 @@ That completes development setup. Standard development modules are also handy, f
   * **coder**: Provides code checks and linters to help with Drupal style coding
 
 Happy development! To see all issues filed, visit the issue queue at 
-https://www.drupal.org/project/issues/1367140?status=All&categories=All
+https://www.drupal.org/project/issues/ices?status=All&categories=All
 
 ### Other components of IntegralCES
 

@@ -51,7 +51,7 @@ If you want to translate a page in another language just copy the appropriate
 file in the folder "es" to the folder of the language translated.
 
 To take a file in the "docs/" folder, you can get it from 
-http://cgit.drupalcode.org/sandbox-esteve-1367140/tree/docs/
+http://cgit.drupalcode.org/ices/tree/docs
 
 and send the translation to webmaster@integralces.net.
 

@@ -13,7 +13,7 @@ define('CES_USER_ABOUT_URL', 'ces_user_about_url');
 
 define('CES_USER_NEW_EXCHANGE_URL_DEF', 'ces/bank/exchange/new?lang=@langcode');
 define('CES_USER_DOCUMENTATION_URL_DEF', 'http://docs.integrales.net');
-define('CES_USER_DEVELOPERS_URL_DEF', 'http://drupal.org/sandbox/esteve/1367140');
+define('CES_USER_DEVELOPERS_URL_DEF', 'https://www.drupal.org/project/ices');
 define('CES_USER_DONATE_URL_DEF', 'https://www.coopfunding.net/campaigns/integralces');
 define('CES_USER_TERMS_OF_SERVICE_URL_DEF', '');
 define('CES_USER_ABOUT_URL_DEF', '');

@@ -130,13 +130,13 @@ Solo nos faltará dar permisos de escritura en `sites/default/files/`
 
 ### Instalando módulo ces para desarrollo
 
-Seguimos instrucciones de drupal https://drupal.org/project/1367140/git-
+Seguimos instrucciones de drupal https://drupal.org/project/ices/git-
 instructions.
 
 Nos bajamos módulo desde git:
 
     
-    $git clone --branch 7.x-1.x TU_USUARIO_DRUPAL@git.drupal.org:sandbox/esteve/1367140.git ces
+    $git clone --branch 7.x-1.x TU_USUARIO_DRUPAL@git.drupal.org:project/ices.git ces
     
     
     Cloning into 'ces'...
