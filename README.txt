@@ -53,8 +53,14 @@ http://en.wikipedia.org/wiki/Community_Exchange_System
 Software site:
 http://www.integralces.net
 
-Drupal project sandbox page:
-http://drupal.org/sandbox/esteve/1367140
+Drupal project page:
+https://www.drupal.org/project/ices
+
+Documentation for developers:
+http://docs.integralces.net
+
+Demonstration site:
+http://demo.integralces.net
 
 Contact mail:
 info@integralces.net
