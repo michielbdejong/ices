@@ -813,7 +813,7 @@ function ces_interop_transaction_form_validate($form, &$form_state) {
   if ($form_state['values']['fromexchange'] == 'cenip') {
     // Check the form of NID.
     $nid = $form_state['values']['fromcenexchange'];
-    if (strlen($nid) != 7 || substr($nid, 0, 3) != 'cen' || !is_numeric(substr($nid, 3))) {
+    if (strlen($nid) != 7 || substr($nid, 0, 3) != 'cen' || !ctype_digit(substr($nid, 3))) {
       form_set_error('fromcenexchange', t('The Network Id must be the three leters "cen" plus four numbers.'));
     }
   }
