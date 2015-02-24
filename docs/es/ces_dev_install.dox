@@ -108,8 +108,8 @@ En 10 segundos tenemos la instalación realizada.
 Bajamos traducciones:
 
     
-    $wget http://ftp.drupal.org/files/translations/7.x/drupal/drupal-7.0-alpha1.ca.po
-    $wget http://ftp.drupal.org/files/translations/7.x/drupal/drupal-7.0-alpha1.es.po
+    $wget http://ftp.drupal.org/files/translations/7.x/drupal/drupal-7.34.ca.po
+    $wget http://ftp.drupal.org/files/translations/7.x/drupal/drupal-7.34.es.po
     
 
 Movemos las traducciones a su directorio:

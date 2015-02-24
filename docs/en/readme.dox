@@ -238,9 +238,9 @@ may have distinct names. However, the architectural essence is correct.
 ### Other components of IntegralCES
 
 - @subpage install
-- @subpage flujo_trabajo
+- @subpage dev_flow
 - @subpage ces_permissions_doc
 - @subpage external_transactions_doc
-- @subpage traducciones_doc
+- @subpage translations_doc
 
 */

@@ -105,9 +105,9 @@ We have made the installation in 10 seconds.
 We get translations: This covers Spanish (ES) and Catalan (CA).
 
     
-    $wget http://ftp.drupal.org/files/translations/7.x/drupal/drupal-7.0-alpha1.ca.po
-    $wget http://ftp.drupal.org/files/translations/7.x/drupal/drupal-7.0-alpha1.es.po
-    
+    $wget http://ftp.drupal.org/files/translations/7.x/drupal/drupal-7.34.ca.po
+    $wget http://ftp.drupal.org/files/translations/7.x/drupal/drupal-7.34.es.po
+
 
 Move the translations to your directory:
 
@@ -133,11 +133,11 @@ Follow the Drupal instructions with the project here: https://drupal.org/project
 We get the module from git:
 
     
-    $git clone --branch 7.x-1.x TU_USUARIO_DRUPAL@git.drupal.org:project/ices.git ces
+    $git clone --branch 7.x-1.x YOUR_DRUPAL_USERNAME@git.drupal.org:project/ices.git ces
     
     
     Cloning into 'ces'...
-    TU_USUARIO_DRUPAL@git.drupal.org's password: 
+    YOUR_DRUPAL_USERNAME@git.drupal.org's password: 
     remote: Counting objects: 643, done.
     remote: Compressing objects: 100% (639/639), done.
     remote: Total 643 (delta 455), reused 0 (delta 0)
@@ -148,8 +148,8 @@ We get the module from git:
 Add our email to git configuration: This associates our Drupal user to commits correctly.
 
     
-    $git config user.email "TU_EMAIL"
-    $git config user.name "TU_USUARIO_DRUPAL"
+    $git config user.email "YOUR_EMAIL"
+    $git config user.name "YOUR DRUPAL USERNAME"
     
 
 We activate the modules from drush:
@@ -174,7 +174,7 @@ We activate the modules from drush:
 You are missing the theme by default, so clone it:
     
 
-    $git clone --branch 7.x-1.x TU_USUARIO_DRUPAL@git.drupal.org:sandbox/esteve/1866046.git greences
+    $git clone --branch 7.x-1.x YOUR_DRUPAL_USERNAME@git.drupal.org:sandbox/esteve/1866046.git greences
     
 
 Activate theme:
@@ -215,9 +215,9 @@ https://www.drupal.org/project/issues/ices?status=All&categories=All
 
 ### Other components of IntegralCES
 
-- @subpage flujo_trabajo
-- @subpage ces_permissions_doc
-- @subpage external_transactions_doc
-- @subpage traducciones_doc
+- @see dev_flow
+- @see ces_permissions_doc
+- @see external_transactions_doc
+- @see translations_doc
 
 @} */
