@@ -426,11 +426,18 @@ function ces_message_mail($key, &$message, $params) {
     drupal_goto('');
   }
 
-  $replyto = token_replace('[notify:user:mail]', $params);
   $message['subject'] .= token_replace($template->subject, $params);
   $message['body'][] = token_replace($template->body, $params);
-  $message['Reply-to'] = $replyto;
-  $message['headers']['Reply-To'] = $replyto;
+
+  // Reply-to user offer or want.
+  if ( $message['key'] == 'ces_message send_offerwant_notify' ) {
+    $replyto = token_replace('[notify:user:mail]', $params);
+    if ( $replyto !== '[notify:user:mail]' ) {
+      $message['Reply-to'] = $replyto;
+      $message['headers']['Reply-To'] = $replyto;
+    }
+  }
+
 }
 /**
  * Provides a test. 
