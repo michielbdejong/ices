@@ -1158,9 +1158,20 @@ function ces_bank_get_exchange_by_name($name) {
 /**
  * Returns all exchanges.
  */
-function ces_bank_get_exchanges() {
-  $bank = new CesBank();
-  $exchanges = $bank->getAllExchanges();
+function ces_bank_get_exchanges($country = NULL) {
+  $cachekey = 'ces_bank_all_exchanges' . ($country ? '_' . $country : '');
+  if (($cache = cache_get($cachekey)) !== FALSE) {
+    $exchanges = $cache->data;
+  }
+  else {
+    $bank = new CesBank();
+    $conditions = array('state' => 1);
+    if ($country) {
+      $conditions['country'] = $country;
+    }
+    $exchanges = $bank->getAllExchanges($conditions);
+    cache_set($cachekey, $exchanges, 'cache', REQUEST_TIME + 60 * 60);
+  }
   return $exchanges;
 }
 /**
@@ -1343,19 +1354,12 @@ function ces_bank_form_user_profile_submit($form, &$form_state) {
  * Returns the list of countries having at least one exchange.
  */
 function ces_bank_country_get_list() {
-  if (($cache = cache_get('ces_bank_countries')) !== FALSE) {
-    $countries = $cache->data;
-  }
-  else {
-    require_once DRUPAL_ROOT . '/includes/locale.inc';
-    $allcountries = country_get_list();
-    $bank = new CesBank();
-    $exchanges = $bank->getAllExchanges();
-    $countries = array();
-    foreach ($exchanges as $exchange) {
-      $countries[$exchange['country']] = $allcountries[$exchange['country']];
-    }
-    cache_set('ces_bank_countries', $countries, 'cache', REQUEST_TIME + 60 * 60);
+  require_once DRUPAL_ROOT . '/includes/locale.inc';
+  $allcountries = country_get_list();
+  $exchanges = ces_bank_get_exchanges();
+  $countries = array();
+  foreach ($exchanges as $exchange) {
+    $countries[$exchange['country']] = $allcountries[$exchange['country']];
   }
   return $countries;
 }

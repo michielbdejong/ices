@@ -379,7 +379,8 @@ function ces_bank_exchange_form_submit($form, &$form_state) {
       $admin->status = 1;
       user_save($admin);
       // Clear cache so register block includes the new exchange.
-      cache_clear_all('ces_bank_countries', 'cache');
+      cache_clear_all('ces_bank_all_exchanges', 'cache');
+      cache_clear_all('ces_bank_all_exchanges_' . $form_state['values']['country'], 'cache');
       drupal_set_message(t('Exchange %code successfully activated. There has been sent an email to the new exchange administrator.', array('%code' => $form_state['values']['code'])));
     }
   }
@@ -1533,7 +1534,7 @@ function ces_bank_transaction_form($form, &$form_state, $op, $arg, $to_account_i
     global  $user;
     $bank = new CesBank();
     // Exchange options for selects.
-    $exchanges = $bank->getAllExchanges();
+    $exchanges = ces_bank_get_exchanges();
     if (empty($exchanges)) {
       return array(
         'message' => array(

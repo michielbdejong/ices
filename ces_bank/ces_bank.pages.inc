@@ -146,12 +146,7 @@ function ces_bank_accounts_admin($exchange_id) {
  * Page with the list of all exchanges organized by country.
  */
 function ces_bank_exchange_list_page($country) {
-  $bank = new CesBank();
-  $conditions = array(
-    'state' => 1,
-    'country' => $country,
-  );
-  $exchanges = $bank->getAllExchanges($conditions);
+  $exchanges = ces_bank_get_exchanges($country);
   $page = array();
   if (empty($exchanges)) {
     require_once DRUPAL_ROOT . '/includes/locale.inc';
