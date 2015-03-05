@@ -27,12 +27,12 @@
 #  ces_bank/ces_bank.pages.account_users.inc: n/a
 #  ces_message/includes/ces_message.templates.inc: n/a
 #  ces_offerswants/ces_offerswants.module: n/a
+#  ces_interop/ces_interop.module: n/a
 #  ces_user/ces_user.install: n/a
 #  ces_message/views/ces_message.views_default.inc: n/a
 #  ces_import4ces/ces_import4ces.module: n/a
 #  ces_message/views/ces_message.views.inc: n/a
 #  ces_statistics/ces_statistics.module: n/a
-#  ces_interop/ces_interop.module: n/a
 #  ces_offerswants/includes/ces_offerswants_send_notify.inc: n/a
 #  ces_bank/ces_bank.logic.inc: n/a
 #  ces_summaryblock/ces_summaryblock.module: n/a
@@ -54,7 +54,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2014-12-17 18:09+0000\n"
+"POT-Creation-Date: 2015-03-05 19:28+0000\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -71,7 +71,7 @@ msgstr ""
 msgid "Impossible to get the database lock %lock"
 msgstr ""
 
-#: ices.module:22 ces_user/ces_user.module:340
+#: ices.module:22 ces_user/ces_user.module:383
 msgid "About"
 msgstr ""
 
@@ -135,7 +135,7 @@ msgstr ""
 msgid "ices"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.account_users.inc:46 ces_bank/ces_bank.forms.inc:2087;2269;2510;2533 ces_bank/ces_bank.pages.inc:75;238;299;308;865 ces_bank/ces_bank.module:804 ces_message/ces_message.module:457
+#: ces_bank/ces_bank.forms.account_users.inc:46 ces_bank/ces_bank.forms.inc:2119;2301;2542;2565 ces_bank/ces_bank.pages.inc:75;237;407;416;973 ces_bank/ces_bank.module:834 ces_message/ces_message.module:466
 msgid "Account"
 msgstr ""
 
@@ -147,11 +147,11 @@ msgstr ""
 msgid "Edit user in account"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.account_users.inc:71 ces_bank/ces_bank.module:364;635
+#: ces_bank/ces_bank.forms.account_users.inc:71 ces_bank/ces_bank.module:377;665
 msgid "Add user in account"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.account_users.inc:98 ces_bank/ces_bank.forms.inc:1042 ces_bank/ces_bank.theme.inc:49
+#: ces_bank/ces_bank.forms.account_users.inc:98 ces_bank/ces_bank.forms.inc:1043 ces_bank/ces_bank.theme.inc:49
 msgid "Username"
 msgstr ""
 
@@ -167,55 +167,63 @@ msgstr ""
 msgid "Add administrator privileges."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.account_users.inc:117 ces_bank/ces_bank.forms.inc:1108 ces_message/includes/ces_message.templates.inc:384 ces_offerswants/ces_offerswants.module:667;1010
+#: ces_bank/ces_bank.forms.account_users.inc:117 ces_bank/ces_bank.forms.inc:1109 ces_message/includes/ces_message.templates.inc:384 ces_offerswants/ces_offerswants.module:670;1022
 msgid "Save"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.account_users.inc:121;239 ces_bank/ces_bank.forms.inc:610;1415;1749
+#: ces_bank/ces_bank.forms.account_users.inc:121;252 ces_bank/ces_bank.forms.inc:611;1445;1779 ces_interop/ces_interop.module:751
 msgid "Cancel"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.account_users.inc:166
+#: ces_bank/ces_bank.forms.account_users.inc:133
+msgid "The user not exist"
+msgstr ""
+
+#: ces_bank/ces_bank.forms.account_users.inc:136
+msgid "The user is required"
+msgstr ""
+
+#: ces_bank/ces_bank.forms.account_users.inc:179
 msgid "Users account successfully update."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.account_users.inc:176
+#: ces_bank/ces_bank.forms.account_users.inc:189
 msgid "Duplicate entry"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.account_users.inc:179;271
+#: ces_bank/ces_bank.forms.account_users.inc:192;284
 msgid "An error occurred while saving the user account record. Details: %msg"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.account_users.inc:200 ces_bank/ces_bank.module:375;376;646;647
+#: ces_bank/ces_bank.forms.account_users.inc:213 ces_bank/ces_bank.module:388;389;676;677
 msgid "Delete account user"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.account_users.inc:231
+#: ces_bank/ces_bank.forms.account_users.inc:244
 msgid "Delete user"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.account_users.inc:231
+#: ces_bank/ces_bank.forms.account_users.inc:244
 msgid "of"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.account_users.inc:231
+#: ces_bank/ces_bank.forms.account_users.inc:244
 msgid "account"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.account_users.inc:232
+#: ces_bank/ces_bank.forms.account_users.inc:245
 msgid "Confirm delete user of account."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.account_users.inc:236 ces_bank/ces_bank.forms.inc:604;817;826;1411
+#: ces_bank/ces_bank.forms.account_users.inc:249 ces_bank/ces_bank.forms.inc:605;818;827;1441
 msgid "Confirm"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.account_users.inc:262
+#: ces_bank/ces_bank.forms.account_users.inc:275
 msgid "Users account successfully delete."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:43;408;418;1524
+#: ces_bank/ces_bank.forms.inc:43;409;419;1554
 msgid "Invalid exchange id."
 msgstr ""
 
@@ -235,7 +243,7 @@ msgstr ""
 msgid "Four numbers or uppercase letters identifying this exchange."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:85;1016 ces_bank/ces_bank.pages.inc:172 ces_bank/ces_bank.theme.inc:21
+#: ces_bank/ces_bank.forms.inc:85;1017 ces_bank/ces_bank.pages.inc:167 ces_bank/ces_bank.theme.inc:21
 msgid "Code"
 msgstr ""
 
@@ -295,7 +303,7 @@ msgstr ""
 msgid "Region within the country."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:158 ces_bank/ces_bank.pages.inc:182
+#: ces_bank/ces_bank.forms.inc:158 ces_bank/ces_bank.pages.inc:177
 msgid "Region"
 msgstr ""
 
@@ -303,7 +311,7 @@ msgstr ""
 msgid "Main city or town."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:166 ces_bank/ces_bank.pages.inc:187 ces_bank/ces_bank.theme.inc:27 ces_user/ces_user.install:154
+#: ces_bank/ces_bank.forms.inc:166 ces_bank/ces_bank.pages.inc:182 ces_bank/ces_bank.theme.inc:27 ces_user/ces_user.install:154
 msgid "Town"
 msgstr ""
 
@@ -323,7 +331,7 @@ msgstr ""
 msgid "Default language"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:198 ces_bank/ces_bank.pages.inc:197 ces_bank/ces_bank.theme.inc:29
+#: ces_bank/ces_bank.forms.inc:198 ces_bank/ces_bank.pages.inc:192;320 ces_bank/ces_bank.theme.inc:29
 msgid "Currency"
 msgstr ""
 
@@ -343,7 +351,7 @@ msgstr ""
 msgid "Name for a single unit of this currency."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:214 ces_bank/ces_bank.pages.account_users.inc:33 ces_bank/ces_bank.pages.inc:177;484 ces_message/views/ces_message.views_default.inc:407;445
+#: ces_bank/ces_bank.forms.inc:214 ces_bank/ces_bank.pages.account_users.inc:33 ces_bank/ces_bank.pages.inc:172;592 ces_message/views/ces_message.views_default.inc:407;445
 msgid "Name"
 msgstr ""
 
@@ -371,19 +379,19 @@ msgstr ""
 msgid "Scale"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:248 ces_offerswants/ces_offerswants.module:1854;1868
+#: ces_bank/ces_bank.forms.inc:248 ces_offerswants/ces_offerswants.module:1869;1883
 msgid "1"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:249 ces_offerswants/ces_offerswants.module:1855;1869
+#: ces_bank/ces_bank.forms.inc:249 ces_offerswants/ces_offerswants.module:1870;1884
 msgid "2"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:250 ces_offerswants/ces_offerswants.module:1856;1870
+#: ces_bank/ces_bank.forms.inc:250 ces_offerswants/ces_offerswants.module:1871;1885
 msgid "3"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:251 ces_offerswants/ces_offerswants.module:1857;1871
+#: ces_bank/ces_bank.forms.inc:251 ces_offerswants/ces_offerswants.module:1872;1886
 msgid "4"
 msgstr ""
 
@@ -419,7 +427,7 @@ msgstr ""
 msgid "The limit chain for new accounts."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:294 ces_bank/ces_bank.module:534;535
+#: ces_bank/ces_bank.forms.inc:294 ces_bank/ces_bank.module:564;565
 msgid "Activate exchange"
 msgstr ""
 
@@ -459,819 +467,839 @@ msgstr ""
 msgid "Exchange %code successfully updated."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:383
+#: ces_bank/ces_bank.forms.inc:384
 msgid "Exchange %code successfully activated. There has been sent an email to the new exchange administrator."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:387
+#: ces_bank/ces_bank.forms.inc:388
 msgid "An error occurred while saving the exchange record. Details: %msg"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:424;1006;2260;2507;2534 ces_bank/ces_bank.pages.inc:303;370 ces_bank/ces_bank.theme.inc:45;73 ces_bank/ces_bank.module:800;399 ces_import4ces/ces_import4ces.module:102 ces_message/includes/ces_message.templates.inc:123 ces_message/views/ces_message.views.inc:148 ces_message/views/ces_message.views_default.inc:116;168;202;346;361;441 ces_offerswants/ces_offerswants.module:1479
+#: ces_bank/ces_bank.forms.inc:425;1007;2292;2539;2566 ces_bank/ces_bank.pages.inc:315;411;478 ces_bank/ces_bank.theme.inc:45;73 ces_bank/ces_bank.module:830;412 ces_import4ces/ces_import4ces.module:102 ces_message/includes/ces_message.templates.inc:123 ces_message/views/ces_message.views.inc:148 ces_message/views/ces_message.views_default.inc:116;168;202;346;361;441 ces_offerswants/ces_offerswants.module:1491
 msgid "Exchange"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:503
+#: ces_bank/ces_bank.forms.inc:504
 msgid "Total number of accounts:"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:504
+#: ces_bank/ces_bank.forms.inc:505
 msgid "Accounts to be deleted:"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:506
+#: ces_bank/ces_bank.forms.inc:507
 msgid "These accounts"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:507
+#: ces_bank/ces_bank.forms.inc:508
 msgid "depend on other exchange/s in the system, so they CANNOT be deleted:<br /><i>"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:513
+#: ces_bank/ces_bank.forms.inc:514
 msgid "No accounts depend on other exchanges in the system, so all of them can be deleted."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:517 ces_bank/ces_bank.pages.inc:192;388;492 ces_bank/ces_bank.module:190;412
+#: ces_bank/ces_bank.forms.inc:518 ces_bank/ces_bank.pages.inc:187;496;600 ces_bank/ces_bank.module:203;425;437
 msgid "Accounts"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:524
+#: ces_bank/ces_bank.forms.inc:525
 msgid "Total number of users:"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:525
+#: ces_bank/ces_bank.forms.inc:526
 msgid "Users to be deleted:"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:527
+#: ces_bank/ces_bank.forms.inc:528
 msgid "These users"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:528
+#: ces_bank/ces_bank.forms.inc:529
 msgid "have accounts that depen on other exchanges in the system, so they CANNOT be deleted:"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:532
+#: ces_bank/ces_bank.forms.inc:533
 msgid "All users have accounts that belongs only to this exchange, so they can be deleted."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:536;1275
+#: ces_bank/ces_bank.forms.inc:537;1305
 msgid "Users"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:546 ces_statistics/ces_statistics.module:293
+#: ces_bank/ces_bank.forms.inc:547 ces_statistics/ces_statistics.module:293
 msgid "Number of transactions:"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:549;1235 ces_bank/ces_bank.pages.inc:389 ces_bank/ces_bank.module:256
+#: ces_bank/ces_bank.forms.inc:550;1265 ces_bank/ces_bank.pages.inc:497 ces_bank/ces_bank.module:269
 msgid "Transactions"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:560
+#: ces_bank/ces_bank.forms.inc:561
 msgid "Sorry, it is not possible to delete the exchange."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:567
+#: ces_bank/ces_bank.forms.inc:568
 msgid "Proceed to delete the exchange"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:585
+#: ces_bank/ces_bank.forms.inc:586
 msgid "Delete accounts:"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:587
+#: ces_bank/ces_bank.forms.inc:588
 msgid "Delete users:"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:589
+#: ces_bank/ces_bank.forms.inc:590
 msgid "Delete transactions:"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:594
+#: ces_bank/ces_bank.forms.inc:595
 msgid "Confirm actions for exchange"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:605
+#: ces_bank/ces_bank.forms.inc:606
 msgid "Do you really want to delete the exchange?"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:606;1407;2387 ces_offerswants/ces_offerswants.module:758;1055
+#: ces_bank/ces_bank.forms.inc:607;1437;2419 ces_offerswants/ces_offerswants.module:761;1067
 msgid "This action cannot be undone."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:625
+#: ces_bank/ces_bank.forms.inc:626
 msgid "%trans transactions have been deleted."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:633;1430
+#: ces_bank/ces_bank.forms.inc:634;1460
 msgid "The account %account has been deleted."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:638
+#: ces_bank/ces_bank.forms.inc:639
 msgid "An error occurred while deleting the account %account. Details: %msg"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:658
+#: ces_bank/ces_bank.forms.inc:659
 msgid "The exchange %exchg has been deleted."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:662
+#: ces_bank/ces_bank.forms.inc:663
 msgid "An error occurred while deleting the exchange %exchg. Details: %msg"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:690;985 ces_bank/ces_bank.pages.inc:63;470
+#: ces_bank/ces_bank.forms.inc:691;986 ces_bank/ces_bank.pages.inc:63;578
 msgid "Invalid current exchange"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:705;1084
+#: ces_bank/ces_bank.forms.inc:706;1085
 msgid "Limit chain"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:729
+#: ces_bank/ces_bank.forms.inc:730
 msgid "Name for this account limit"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:730
+#: ces_bank/ces_bank.forms.inc:731
 msgid "name"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:737
+#: ces_bank/ces_bank.forms.inc:738
 msgid "Account limits"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:738
+#: ces_bank/ces_bank.forms.inc:739
 msgid "List of account limits currently belonging to this chain."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:749
+#: ces_bank/ces_bank.forms.inc:750
 msgid "Add account limit"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:750
+#: ces_bank/ces_bank.forms.inc:751
 msgid "Add a new account limit to this limit chain."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:754
+#: ces_bank/ces_bank.forms.inc:755
 msgid "Limit class"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:756
+#: ces_bank/ces_bank.forms.inc:757
 msgid "The type of limit to add. Each class limits a different aspect of the account balance or in a different way. Once added, you will be able to configure its parameters."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:773
+#: ces_bank/ces_bank.forms.inc:774
 msgid "Add limit"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:779
+#: ces_bank/ces_bank.forms.inc:780
 msgid "Create limit chain"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:779
+#: ces_bank/ces_bank.forms.inc:780
 msgid "Update limit chain"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:798
+#: ces_bank/ces_bank.forms.inc:799
 msgid "Delete Limit Chain"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:810 ces_bank/ces_bank.pages.inc:489 ces_bank/ces_bank.theme.inc:135 ces_bank/ces_bank.module:457
+#: ces_bank/ces_bank.forms.inc:811 ces_bank/ces_bank.pages.inc:597 ces_bank/ces_bank.theme.inc:135 ces_bank/ces_bank.module:487
 msgid "Limits"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:834
+#: ces_bank/ces_bank.forms.inc:835
 msgid "An error occurred while delete the limitchain record. Details: %msg"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:868 ces_bank/ces_bank.theme.inc:177
+#: ces_bank/ces_bank.forms.inc:869 ces_bank/ces_bank.theme.inc:177
 msgid "Block"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:869
+#: ces_bank/ces_bank.forms.inc:870
 msgid "Block transactions when account reaches the limit vaule."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:874
+#: ces_bank/ces_bank.forms.inc:875
 msgid "Limit value"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:875
+#: ces_bank/ces_bank.forms.inc:876
 msgid "Value for this limit class"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:881;2388 ces_bank/ces_bank.pages.account_users.inc:67 ces_bank/ces_bank.pages.inc:137;387;455;517 ces_bank/ces_bank.module:244;510;609 ces_import4ces/ces_import4ces.module:124;67 ces_message/includes/ces_message.templates.inc:389 ces_offerswants/ces_offerswants.module:761;884;1057;1286
+#: ces_bank/ces_bank.forms.inc:882;2420 ces_bank/ces_bank.pages.account_users.inc:67 ces_bank/ces_bank.pages.inc:137;495;563;625 ces_bank/ces_bank.module:257;540;639 ces_import4ces/ces_import4ces.module:124;67 ces_message/includes/ces_message.templates.inc:389 ces_offerswants/ces_offerswants.module:764;887;1069;1298
 msgid "Delete"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:929
+#: ces_bank/ces_bank.forms.inc:930
 msgid "The limit amount must be numeric."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:933
+#: ces_bank/ces_bank.forms.inc:934
 msgid "The credit limit must not be negative."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:938
+#: ces_bank/ces_bank.forms.inc:939
 msgid "The debit limit must not be positive."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:953
+#: ces_bank/ces_bank.forms.inc:954
 msgid "Limit chain %name successfully created."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:958
+#: ces_bank/ces_bank.forms.inc:959
 msgid "Limit chain %name successfully updated."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:962;2613
+#: ces_bank/ces_bank.forms.inc:963;2645
 msgid "An error occurred while saving the record. Details: %msg"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1015
+#: ces_bank/ces_bank.forms.inc:1016
 msgid "Four digits code."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1043
+#: ces_bank/ces_bank.forms.inc:1044
 msgid "The username of the owner of this account."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1057 ces_bank/ces_bank.pages.inc:107;586
+#: ces_bank/ces_bank.forms.inc:1058 ces_bank/ces_bank.pages.inc:107;694
 msgid "Individual"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1058 ces_bank/ces_bank.pages.inc:108;587
+#: ces_bank/ces_bank.forms.inc:1059 ces_bank/ces_bank.pages.inc:108;695
 msgid "Shared"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1059 ces_bank/ces_bank.pages.inc:109;588
+#: ces_bank/ces_bank.forms.inc:1060 ces_bank/ces_bank.pages.inc:109;696
 msgid "Organization"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1060 ces_bank/ces_bank.pages.inc:110;589
+#: ces_bank/ces_bank.forms.inc:1061 ces_bank/ces_bank.pages.inc:110;697
 msgid "Company"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1061 ces_bank/ces_bank.pages.inc:111;590
+#: ces_bank/ces_bank.forms.inc:1062 ces_bank/ces_bank.pages.inc:111;698
 msgid "Public"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1064 ces_bank/ces_bank.pages.inc:112;591
+#: ces_bank/ces_bank.forms.inc:1065 ces_bank/ces_bank.pages.inc:112;699
 msgid "Virtual"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1068 ces_bank/ces_bank.pages.inc:80 ces_bank/ces_bank.theme.inc:51;145 ces_bank/ces_bank.module:870 ces_message/views/ces_message.views.inc:78 ces_message/views/ces_message.views_default.inc:334;391;440;444
+#: ces_bank/ces_bank.forms.inc:1069 ces_bank/ces_bank.pages.inc:80 ces_bank/ces_bank.theme.inc:51;145 ces_bank/ces_bank.module:900 ces_message/views/ces_message.views.inc:78 ces_message/views/ces_message.views_default.inc:334;391;440;444
 msgid "Type"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1069
+#: ces_bank/ces_bank.forms.inc:1070
 msgid "Select \"Individual\" for personal use, \"Shared\" if several people share this account, \"Organization\" for a non-profit organization, \"Company\" for a profit-pursuing company and \"Public\" for a public account."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1085
+#: ces_bank/ces_bank.forms.inc:1086
 msgid "The limit chain to apply to this account"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1093 ces_bank/ces_bank.pages.inc:85;746;861 ces_bank/ces_bank.theme.inc:55;107 ces_message/views/ces_message.views.inc:100
+#: ces_bank/ces_bank.forms.inc:1094 ces_bank/ces_bank.pages.inc:85;854;969 ces_bank/ces_bank.theme.inc:55;107 ces_message/views/ces_message.views.inc:100
 msgid "State"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1094
+#: ces_bank/ces_bank.forms.inc:1095
 msgid "Active is the common state."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1096 ces_bank/ces_bank.pages.inc:115;594 ces_offerswants/ces_offerswants.module:865
+#: ces_bank/ces_bank.forms.inc:1097 ces_bank/ces_bank.pages.inc:115;702 ces_offerswants/ces_offerswants.module:868
 msgid "Hidden"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1097 ces_bank/ces_bank.pages.inc:116;595
+#: ces_bank/ces_bank.forms.inc:1098 ces_bank/ces_bank.pages.inc:116;703
 msgid "Active"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1098 ces_bank/ces_bank.pages.inc:117;596
+#: ces_bank/ces_bank.forms.inc:1099 ces_bank/ces_bank.pages.inc:117;704
 msgid "Closed"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1099 ces_bank/ces_bank.pages.inc:118;597
+#: ces_bank/ces_bank.forms.inc:1100 ces_bank/ces_bank.pages.inc:118;705
 msgid "Locked"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1123
+#: ces_bank/ces_bank.forms.inc:1124
 msgid "Username %name does not exist."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1135
+#: ces_bank/ces_bank.forms.inc:1142
+msgid "The name of the administrator account can not be changed"
+msgstr ""
+
+#: ces_bank/ces_bank.forms.inc:1150
 msgid "Account number %name already exists."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1154
+#: ces_bank/ces_bank.forms.inc:1157
+msgid "The first four carecteres should be the network (%code)."
+msgstr ""
+
+#: ces_bank/ces_bank.forms.inc:1163
+msgid "The last four digits must be a number. (%number)."
+msgstr ""
+
+#: ces_bank/ces_bank.forms.inc:1183
 msgid "Account successfully created."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1156
+#: ces_bank/ces_bank.forms.inc:1185
 msgid "The account will not be available until it is being activated by this exchange's administrator. You will receive an email when this is done."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1180
+#: ces_bank/ces_bank.forms.inc:1209
 msgid "Account successfully activated."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1184
+#: ces_bank/ces_bank.forms.inc:1213
 msgid "An error occurred while saving the account record. Details: %msg"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1202
+#: ces_bank/ces_bank.forms.inc:1215
+msgid "Account successfully update."
+msgstr ""
+
+#: ces_bank/ces_bank.forms.inc:1232
 msgid "Invalid account."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1210
+#: ces_bank/ces_bank.forms.inc:1240
 msgid "This account depends on other exchanges in the system, so the account will not be deleted, nor closed"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1214;1307;1368 ces_bank/ces_bank.module:245
+#: ces_bank/ces_bank.forms.inc:1244;1337;1398 ces_bank/ces_bank.module:258
 msgid "Delete account"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1227
+#: ces_bank/ces_bank.forms.inc:1257
 msgid "These transactions"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1228
+#: ces_bank/ces_bank.forms.inc:1258
 msgid "refer to this account, so the account can only be closed, not deleted."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1231
+#: ces_bank/ces_bank.forms.inc:1261
 msgid "No transaction refers to this account."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1255;2532 ces_bank/ces_bank.pages.inc:233 ces_message/views/ces_message.views.inc:125 ces_message/views/ces_message.views_default.inc:352;442 ces_offerswants/ces_offerswants.module:1508
+#: ces_bank/ces_bank.forms.inc:1285;2564 ces_bank/ces_bank.pages.inc:232 ces_message/views/ces_message.views.inc:125 ces_message/views/ces_message.views_default.inc:352;442 ces_offerswants/ces_offerswants.module:1520
 msgid "User"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1256
+#: ces_bank/ces_bank.forms.inc:1286
 msgid "has other accounts and cannot be deleted nor canceled:"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1267
+#: ces_bank/ces_bank.forms.inc:1297
 msgid "This user doesn't have more accounts."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1268
+#: ces_bank/ces_bank.forms.inc:1298
 msgid "These users doesn't have more accounts."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1270
+#: ces_bank/ces_bank.forms.inc:1300
 msgid "The account belongs to a single user"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1271
+#: ces_bank/ces_bank.forms.inc:1301
 msgid "The account belongs to"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1271
+#: ces_bank/ces_bank.forms.inc:1301
 msgid "users"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1285
+#: ces_bank/ces_bank.forms.inc:1315
 msgid "Delete user (The user will no longer exist in the system)"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1286;1288
+#: ces_bank/ces_bank.forms.inc:1316;1318
 msgid "Cancel user (The user will not be able to login in the system)"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1287;1289
+#: ces_bank/ces_bank.forms.inc:1317;1319
 msgid "Do nothing"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1293
+#: ces_bank/ces_bank.forms.inc:1323
 msgid "Action with user"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1296
+#: ces_bank/ces_bank.forms.inc:1326
 msgid "Select the action you want to do with this user."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1311;1372
+#: ces_bank/ces_bank.forms.inc:1341;1402
 msgid "Close account"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1315
+#: ces_bank/ces_bank.forms.inc:1345
 msgid "It is NOT possible to delete nor to close the account."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1346
+#: ces_bank/ces_bank.forms.inc:1376
 msgid "Hey! That's not a valid option!"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1376
+#: ces_bank/ces_bank.forms.inc:1406
 msgid "Do nothing with account"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1384
+#: ces_bank/ces_bank.forms.inc:1414
 msgid "Delete user (and all content: offers, wants, comments...)"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1388
+#: ces_bank/ces_bank.forms.inc:1418
 msgid "Cancel user"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1392
+#: ces_bank/ces_bank.forms.inc:1422
 msgid "Do nothing with user"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1400
+#: ces_bank/ces_bank.forms.inc:1430
 msgid "Confirm actions for account"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1435
+#: ces_bank/ces_bank.forms.inc:1465
 msgid "An error occurred while deleting the account. Details: %msg"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1445
+#: ces_bank/ces_bank.forms.inc:1475
 msgid "The account %account has been closed."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1449
+#: ces_bank/ces_bank.forms.inc:1479
 msgid "An error occurred while closing the account. Details: %msg"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1455
+#: ces_bank/ces_bank.forms.inc:1485
 msgid "The account %account remains as before. No action has done to this account."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1469
+#: ces_bank/ces_bank.forms.inc:1499
 msgid "The user %user remains as before. No action has done to this user."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1511
+#: ces_bank/ces_bank.forms.inc:1541
 msgid "There are no exchanges yet."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1557
+#: ces_bank/ces_bank.forms.inc:1587
 msgid "Seller exchange"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1558
+#: ces_bank/ces_bank.forms.inc:1588
 msgid "The seller's account exchange."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1585 ces_bank/ces_bank.module:895 ces_interop/ces_interop.module:172;853
+#: ces_bank/ces_bank.forms.inc:1615 ces_bank/ces_bank.module:925 ces_interop/ces_interop.module:174;870
 msgid "Seller account"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1586
+#: ces_bank/ces_bank.forms.inc:1616
 msgid "The recipient of the transaction. The Exchange four letters code plus four numbers."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1600;1657;2056
+#: ces_bank/ces_bank.forms.inc:1630;1687;2088
 msgid "Account id %id does not exist, is not active yet, or does not belong to exchange %ex"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1616
+#: ces_bank/ces_bank.forms.inc:1646
 msgid "Buyer exchange"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1617
+#: ces_bank/ces_bank.forms.inc:1647
 msgid "The buyer's account exchange."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1641 ces_bank/ces_bank.module:890 ces_interop/ces_interop.module:159;863
+#: ces_bank/ces_bank.forms.inc:1671 ces_bank/ces_bank.module:920 ces_interop/ces_interop.module:161;880
 msgid "Buyer account"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1642
+#: ces_bank/ces_bank.forms.inc:1672
 msgid "The payer of the transaction. The Exchange four letters code plus four numbers."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1672 ces_bank/ces_bank.pages.inc:758;869 ces_bank/ces_bank.theme.inc:102 ces_bank/ces_bank.module:904 ces_interop/ces_interop.module:187;868 ces_offerswants/ces_offerswants.module:628;969;1233 ces_offerswants/includes/ces_offerswants_send_notify.inc:25
+#: ces_bank/ces_bank.forms.inc:1702 ces_bank/ces_bank.pages.inc:866;977 ces_bank/ces_bank.theme.inc:102 ces_bank/ces_bank.module:934 ces_interop/ces_interop.module:189;885 ces_offerswants/ces_offerswants.module:631;981;1245 ces_offerswants/includes/ces_offerswants_send_notify.inc:25
 msgid "Description"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1673
+#: ces_bank/ces_bank.forms.inc:1703
 msgid "Enter the concept of the transference."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1681
+#: ces_bank/ces_bank.forms.inc:1711
 msgid "Amount in @currenciesname"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1682
+#: ces_bank/ces_bank.forms.inc:1712
 msgid "The amount to be transferred."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1696 ces_interop/ces_interop.module:886
+#: ces_bank/ces_bank.forms.inc:1726
 msgid "Create transaction"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1696;1889
+#: ces_bank/ces_bank.forms.inc:1726;1920
 msgid "Update transaction"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1716
+#: ces_bank/ces_bank.forms.inc:1746
 msgid "Authorize transaction"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1727
+#: ces_bank/ces_bank.forms.inc:1757
 msgid "Do you accept the following transaction from your account?"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1739 ces_bank/ces_bank.module:585
+#: ces_bank/ces_bank.forms.inc:1769 ces_bank/ces_bank.module:615
 msgid "Accept"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1744
+#: ces_bank/ces_bank.forms.inc:1774
 msgid "Reject"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1833
+#: ces_bank/ces_bank.forms.inc:1863
 msgid "No transaction provided."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1837;1985
+#: ces_bank/ces_bank.forms.inc:1867;2016
 msgid "Operation not permitted or not implemented yet."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1855;2382
+#: ces_bank/ces_bank.forms.inc:1885;2414
 msgid "Are you sure you want to delete the transaction?"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1856;2383
+#: ces_bank/ces_bank.forms.inc:1886;2415
 msgid "Transaction details:"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1871;2313 ces_interop/ces_interop.module:879
+#: ces_bank/ces_bank.forms.inc:1901;2345 ces_interop/ces_interop.module:896
 msgid "Back"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1881
+#: ces_bank/ces_bank.forms.inc:1911
 msgid "Confirm transaction"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1885
+#: ces_bank/ces_bank.forms.inc:1912
+msgid "Confirm the transaction to end the process"
+msgstr ""
+
+#: ces_bank/ces_bank.forms.inc:1916
 msgid "Trigger transaction"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1921;2193
+#: ces_bank/ces_bank.forms.inc:1952;2225
 msgid "Seller account %acc is incorrect."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1926;2209
+#: ces_bank/ces_bank.forms.inc:1957;2241
 msgid "Buyer account %acc is incorrect."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1930;2212
+#: ces_bank/ces_bank.forms.inc:1961;2244
 msgid "Buyer account cannot be the same as seller account."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1935;2202
+#: ces_bank/ces_bank.forms.inc:1966;2234
 msgid "The amount entered is not a numeric value. Use the dot \".\" character for the decimal point and do not use any thousands separator."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1939;2204
+#: ces_bank/ces_bank.forms.inc:1970;2236
 msgid "The amount must be positive."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:1952;2225
+#: ces_bank/ces_bank.forms.inc:1983;2257
 msgid "You don't have permission to apply this transaction."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2004
+#: ces_bank/ces_bank.forms.inc:2035
 msgid "Transaction successfully applied."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2008
+#: ces_bank/ces_bank.forms.inc:2039
 msgid "Transaction successfully updated."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2012
+#: ces_bank/ces_bank.forms.inc:2043
 msgid "Transaction has been rejected and will NOT be applied."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2018
+#: ces_bank/ces_bank.forms.inc:2051
 msgid "The transaction has NOT been applied."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2021
+#: ces_bank/ces_bank.forms.inc:2054
 msgid "Details:"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2048
+#: ces_bank/ces_bank.forms.inc:2080
 msgid "Invalid exchange or account."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2087;2269
+#: ces_bank/ces_bank.forms.inc:2119;2301
 msgid "Concept"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2130
+#: ces_bank/ces_bank.forms.inc:2162
 msgid "Create transactions"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2215
+#: ces_bank/ces_bank.forms.inc:2247
 msgid "You must specify the concept of this transaction."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2265
+#: ces_bank/ces_bank.forms.inc:2297
 msgid "Seller account and user"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2321
+#: ces_bank/ces_bank.forms.inc:2353
 msgid "Confirm all transactions"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2371
+#: ces_bank/ces_bank.forms.inc:2403
 msgid "All transactions have been properly registered. For more information, see"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2372
+#: ces_bank/ces_bank.forms.inc:2404
 msgid "your account statement"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2397
+#: ces_bank/ces_bank.forms.inc:2429
 msgid "Transaction %concept has been deleted."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2439
+#: ces_bank/ces_bank.forms.inc:2471
 msgid "From"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2444
+#: ces_bank/ces_bank.forms.inc:2476
 msgid "To"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2448 ces_offerswants/ces_offerswants.module:1427;1472;1552
+#: ces_bank/ces_bank.forms.inc:2480 ces_offerswants/ces_offerswants.module:1439;1484;1564
 msgid "Filter"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2487 ces_bank/ces_bank.pages.inc:414
+#: ces_bank/ces_bank.forms.inc:2519 ces_bank/ces_bank.pages.inc:522
 msgid "Permission type"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2490 ces_bank/ces_bank.pages.inc:135;511 ces_bank/ces_bank.module:220;485;574
+#: ces_bank/ces_bank.forms.inc:2522 ces_bank/ces_bank.pages.inc:135;619 ces_bank/ces_bank.module:233;515;604
 msgid "View"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2491
+#: ces_bank/ces_bank.forms.inc:2523
 msgid "Use"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2492 ces_bank/ces_bank.pages.account_users.inc:67 ces_bank/ces_bank.pages.inc:136;322;386;454;514 ces_bank/ces_bank.module:232;498;597 ces_message/ces_message.module:262 ces_offerswants/ces_offerswants.module:883;1285
+#: ces_bank/ces_bank.forms.inc:2524 ces_bank/ces_bank.pages.account_users.inc:67 ces_bank/ces_bank.pages.inc:136;430;494;562;622 ces_bank/ces_bank.module:245;528;627 ces_message/ces_message.module:262 ces_offerswants/ces_offerswants.module:886;1297
 msgid "Edit"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2493
+#: ces_bank/ces_bank.forms.inc:2525
 msgid "Admin"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2500 ces_bank/ces_bank.pages.inc:419
+#: ces_bank/ces_bank.forms.inc:2532 ces_bank/ces_bank.pages.inc:527
 msgid "Object type"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2501
+#: ces_bank/ces_bank.forms.inc:2533
 msgid "The type of the piece of data on which the permission is set."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2504;2535
+#: ces_bank/ces_bank.forms.inc:2536;2567
 msgid "Global"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2505
+#: ces_bank/ces_bank.forms.inc:2537
 msgid "Global statistics"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2506
+#: ces_bank/ces_bank.forms.inc:2538
 msgid "Global exchange creation"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2508
+#: ces_bank/ces_bank.forms.inc:2540
 msgid "Exchange configuration details"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2509
+#: ces_bank/ces_bank.forms.inc:2541
 msgid "Exchange account creation"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2511 ces_bank/ces_bank.theme.inc:43
+#: ces_bank/ces_bank.forms.inc:2543 ces_bank/ces_bank.theme.inc:43
 msgid "Account details"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2512
+#: ces_bank/ces_bank.forms.inc:2544
 msgid "Account transactions"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2513
+#: ces_bank/ces_bank.forms.inc:2545
 msgid "Account seller"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2514
+#: ces_bank/ces_bank.forms.inc:2546
 msgid "Account buyer"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2523 ces_bank/ces_bank.pages.inc:424
+#: ces_bank/ces_bank.forms.inc:2555 ces_bank/ces_bank.pages.inc:532
 msgid "Object identifier"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2529 ces_bank/ces_bank.pages.inc:428
+#: ces_bank/ces_bank.forms.inc:2561 ces_bank/ces_bank.pages.inc:536
 msgid "Scope type"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2530
+#: ces_bank/ces_bank.forms.inc:2562
 msgid "The group of users who have this permission."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2544 ces_bank/ces_bank.pages.inc:433
+#: ces_bank/ces_bank.forms.inc:2576 ces_bank/ces_bank.pages.inc:541
 msgid "Scope identifier"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2550
+#: ces_bank/ces_bank.forms.inc:2582
 msgid "Create permission"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2550
+#: ces_bank/ces_bank.forms.inc:2582
 msgid "Update permission"
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2587
+#: ces_bank/ces_bank.forms.inc:2619
 msgid "You are not authorized to modify permissions on this object."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2590
+#: ces_bank/ces_bank.forms.inc:2622
 msgid "Object with given id does not exist."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2593
+#: ces_bank/ces_bank.forms.inc:2625
 msgid "Scope with given id does not exist."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2605
+#: ces_bank/ces_bank.forms.inc:2637
 msgid "Permission successfully created."
 msgstr ""
 
-#: ces_bank/ces_bank.forms.inc:2609
+#: ces_bank/ces_bank.forms.inc:2641
 msgid "Permission successfully updated."
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:516
+#: ces_bank/ces_bank.logic.inc:531
 msgid "Transaction id %id is invalid"
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:859
+#: ces_bank/ces_bank.logic.inc:874
 msgid "%offrs offers and wants of user %usr have been deleted."
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:869
+#: ces_bank/ces_bank.logic.inc:884
 msgid "%offrs offers and wants of user %usr have been hidden."
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:878
+#: ces_bank/ces_bank.logic.inc:893
 msgid "%offrcomm offer comments and ratings of user %usr have been deleted."
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:969
+#: ces_bank/ces_bank.logic.inc:984
 msgid "CES Debug: getDefaultAccount: No exchangeId."
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:973
+#: ces_bank/ces_bank.logic.inc:988
 msgid "CES Debug: getDefaultAccount: exchange is false."
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:1040
+#: ces_bank/ces_bank.logic.inc:1055
 msgid "There has been an error applying the transaction."
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:1263
+#: ces_bank/ces_bank.logic.inc:1278
 msgid "Object of type %classname with id %id does not exist."
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:1293;1302
+#: ces_bank/ces_bank.logic.inc:1308;1317
 msgid "Seller account not set."
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:1305
+#: ces_bank/ces_bank.logic.inc:1320
 msgid "Error loading seller account."
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:1308
+#: ces_bank/ces_bank.logic.inc:1323
 msgid "Error loading buyer account."
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:1885
+#: ces_bank/ces_bank.logic.inc:1900
 msgid "User %user cannot accept transactions because it is not active."
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:1937
+#: ces_bank/ces_bank.logic.inc:1952
 msgid "The transaction must be manually authorized."
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:2214
+#: ces_bank/ces_bank.logic.inc:2229
 msgid "Account %account exceeds the debit limit of %limit."
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:2243
+#: ces_bank/ces_bank.logic.inc:2258
 msgid "Account %account exceeds the credit limit of %limit."
 msgstr ""
 
-#: ces_bank/ces_bank.logic.inc:2574
+#: ces_bank/ces_bank.logic.inc:2590
 msgid "Invalid state transition for transaction %trans."
 msgstr ""
 
@@ -1283,7 +1311,7 @@ msgstr ""
 msgid "Mail"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.account_users.inc:45 ces_bank/ces_bank.pages.inc:100;375;437;495 ces_import4ces/ces_import4ces.module:105 ces_offerswants/ces_offerswants.module:1245
+#: ces_bank/ces_bank.pages.account_users.inc:45 ces_bank/ces_bank.pages.inc:100;483;545;603 ces_import4ces/ces_import4ces.module:105 ces_offerswants/ces_offerswants.module:1257
 msgid "Actions"
 msgstr ""
 
@@ -1311,131 +1339,147 @@ msgstr ""
 msgid "Administer limit chains"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:90 ces_bank/ces_bank.theme.inc:53 ces_bank/ces_bank.module:1196
+#: ces_bank/ces_bank.pages.inc:90 ces_bank/ces_bank.theme.inc:53 ces_bank/ces_bank.module:1237
 msgid "Limit"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:95;243;313;877 ces_bank/ces_bank.module:1173 ces_summaryblock/ces_summaryblock.module:123
+#: ces_bank/ces_bank.pages.inc:95;242;333;421;985 ces_bank/ces_bank.module:1214 ces_summaryblock/ces_summaryblock.module:129
 msgid "Balance"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:161
+#: ces_bank/ces_bank.pages.inc:156
 msgid "There are no active exchanges in %country."
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:207
+#: ces_bank/ces_bank.pages.inc:202
 msgid "Click to open an account in this exchange"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:318
+#: ces_bank/ces_bank.pages.inc:323
+msgid "Imports"
+msgstr ""
+
+#: ces_bank/ces_bank.pages.inc:328
+msgid "Exports"
+msgstr ""
+
+#: ces_bank/ces_bank.pages.inc:366
+msgid "Remote"
+msgstr ""
+
+#: ces_bank/ces_bank.pages.inc:386
+msgid "TOTAL"
+msgstr ""
+
+#: ces_bank/ces_bank.pages.inc:426
 msgid "Statement"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:326
+#: ces_bank/ces_bank.pages.inc:434
 msgid "Charge a sale"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:340
+#: ces_bank/ces_bank.pages.inc:448
 msgid "Exchange requests"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:356
+#: ces_bank/ces_bank.pages.inc:464
 msgid "No requests for new exchanges."
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:361
+#: ces_bank/ces_bank.pages.inc:469
 msgid "Active exchanges"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:397
+#: ces_bank/ces_bank.pages.inc:505
 msgid "No exchanges activated yet."
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:506
+#: ces_bank/ces_bank.pages.inc:614
 msgid "block"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:557
+#: ces_bank/ces_bank.pages.inc:665
 msgid "You don't belong to any exchange yet."
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:716
+#: ces_bank/ces_bank.pages.inc:824
 msgid "Invalid exchange"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:741;856 ces_bank/ces_bank.theme.inc:109 ces_import4ces/ces_import4ces.module:101 ces_message/views/ces_message.views_default.inc:150;204
+#: ces_bank/ces_bank.pages.inc:849;964 ces_bank/ces_bank.theme.inc:109 ces_import4ces/ces_import4ces.module:101 ces_message/views/ces_message.views_default.inc:150;204
 msgid "Date"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:750 ces_bank/ces_bank.theme.inc:80
+#: ces_bank/ces_bank.pages.inc:858 ces_bank/ces_bank.theme.inc:80
 msgid "Buyer"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:754 ces_bank/ces_bank.theme.inc:93
+#: ces_bank/ces_bank.pages.inc:862 ces_bank/ces_bank.theme.inc:93
 msgid "Seller"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:762;873 ces_bank/ces_bank.theme.inc:105 ces_bank/ces_bank.module:900 ces_interop/ces_interop.module:181;874
+#: ces_bank/ces_bank.pages.inc:870;981 ces_bank/ces_bank.theme.inc:105 ces_bank/ces_bank.module:930 ces_interop/ces_interop.module:183;891
 msgid "Amount"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:826
+#: ces_bank/ces_bank.pages.inc:934
 msgid "You don't have any exchange account yet."
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:889
+#: ces_bank/ces_bank.pages.inc:997
 msgid "No Transaction"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:954 ces_bank/ces_bank.module:208;274;473 ces_import4ces/ces_import4ces.module:49
+#: ces_bank/ces_bank.pages.inc:1062 ces_bank/ces_bank.module:221;287;503 ces_import4ces/ces_import4ces.module:49
 msgid "New"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:955
+#: ces_bank/ces_bank.pages.inc:1063
 msgid "Triggered"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:956
+#: ces_bank/ces_bank.pages.inc:1064
 msgid "Accepted"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:957
+#: ces_bank/ces_bank.pages.inc:1065
 msgid "Committed"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:958
+#: ces_bank/ces_bank.pages.inc:1066
 msgid "Archived"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:959
+#: ces_bank/ces_bank.pages.inc:1067
 msgid "Rejected"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:960
+#: ces_bank/ces_bank.pages.inc:1068
 msgid "Discarded"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:961
+#: ces_bank/ces_bank.pages.inc:1069
 msgid "Revoke triggered"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:962
+#: ces_bank/ces_bank.pages.inc:1070
 msgid "Revoke accepted"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:963
+#: ces_bank/ces_bank.pages.inc:1071
 msgid "Revoke rejected"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:964
+#: ces_bank/ces_bank.pages.inc:1072
 msgid "Revoked"
 msgstr ""
 
-#: ces_bank/ces_bank.pages.inc:965
+#: ces_bank/ces_bank.pages.inc:1073
 msgid "Error"
 msgstr ""
 
-#: ces_bank/ces_bank.theme.inc:31 ces_bank/ces_bank.module:855
+#: ces_bank/ces_bank.theme.inc:31 ces_bank/ces_bank.module:885
 msgid "Currency value"
 msgstr ""
 
@@ -1467,7 +1511,7 @@ msgstr ""
 msgid "No limits."
 msgstr ""
 
-#: ces_bank/ces_bank.theme.inc:145 ces_message/ces_message.module:128;143;455 ces_message/includes/ces_message.templates.inc:120;182;228;229;253;254;342
+#: ces_bank/ces_bank.theme.inc:145 ces_message/ces_message.module:128;143;464 ces_message/includes/ces_message.templates.inc:120;182;228;229;253;254;342
 msgid "Action"
 msgstr ""
 
@@ -1488,426 +1532,446 @@ msgid "All users and banking accounts of your exchange."
 msgstr ""
 
 #: ces_bank/ces_bank.module:36
+msgid "Balance of trade and currency value of other exchanges."
+msgstr ""
+
+#: ces_bank/ces_bank.module:42
 msgid "Showing your transactions. Set the \"From\" and \"To\" dates to see a specific time range."
 msgstr ""
 
-#: ces_bank/ces_bank.module:40
+#: ces_bank/ces_bank.module:46
 msgid "Click on the exchange you want to join."
 msgstr ""
 
-#: ces_bank/ces_bank.module:759
+#: ces_bank/ces_bank.module:50
+msgid "You can add users to this account."
+msgstr ""
+
+#: ces_bank/ces_bank.module:52
+msgid "If you give them privileges, they can manage the account in addition to making transactions."
+msgstr ""
+
+#: ces_bank/ces_bank.module:789
 msgid "Absolute credit limit"
 msgstr ""
 
-#: ces_bank/ces_bank.module:760
+#: ces_bank/ces_bank.module:790
 msgid "Absolute debit limit"
 msgstr ""
 
-#: ces_bank/ces_bank.module:801
+#: ces_bank/ces_bank.module:831
 msgid "Tokens for bank exchanges."
 msgstr ""
 
-#: ces_bank/ces_bank.module:805
+#: ces_bank/ces_bank.module:835
 msgid "Tokens for bank accounts."
 msgstr ""
 
-#: ces_bank/ces_bank.module:808
+#: ces_bank/ces_bank.module:838
 msgid "Transaction"
 msgstr ""
 
-#: ces_bank/ces_bank.module:809
+#: ces_bank/ces_bank.module:839
 msgid "Tokens for bank transactions."
 msgstr ""
 
-#: ces_bank/ces_bank.module:815
+#: ces_bank/ces_bank.module:845
 msgid "Exchange code"
 msgstr ""
 
-#: ces_bank/ces_bank.module:816
+#: ces_bank/ces_bank.module:846
 msgid "The 4 letter exchange code."
 msgstr ""
 
-#: ces_bank/ces_bank.module:819
+#: ces_bank/ces_bank.module:849
 msgid "Exchange short name"
 msgstr ""
 
-#: ces_bank/ces_bank.module:820
+#: ces_bank/ces_bank.module:850
 msgid "Exchange short name."
 msgstr ""
 
-#: ces_bank/ces_bank.module:823
+#: ces_bank/ces_bank.module:853
 msgid "Exchange full name"
 msgstr ""
 
-#: ces_bank/ces_bank.module:824
+#: ces_bank/ces_bank.module:854
 msgid "Exchange full name."
 msgstr ""
 
-#: ces_bank/ces_bank.module:827
+#: ces_bank/ces_bank.module:857
 msgid "Exchange country"
 msgstr ""
 
-#: ces_bank/ces_bank.module:828
+#: ces_bank/ces_bank.module:858
 msgid "Exchange country."
 msgstr ""
 
-#: ces_bank/ces_bank.module:831
+#: ces_bank/ces_bank.module:861
 msgid "Exchange town"
 msgstr ""
 
-#: ces_bank/ces_bank.module:832
+#: ces_bank/ces_bank.module:862
 msgid "Exchange town."
 msgstr ""
 
-#: ces_bank/ces_bank.module:835
+#: ces_bank/ces_bank.module:865
 msgid "Exchange region"
 msgstr ""
 
-#: ces_bank/ces_bank.module:836
+#: ces_bank/ces_bank.module:866
 msgid "Exchange region within the country."
 msgstr ""
 
-#: ces_bank/ces_bank.module:839
+#: ces_bank/ces_bank.module:869
 msgid "Exchange website"
 msgstr ""
 
-#: ces_bank/ces_bank.module:840
+#: ces_bank/ces_bank.module:870
 msgid "Exchange website."
 msgstr ""
 
-#: ces_bank/ces_bank.module:843
+#: ces_bank/ces_bank.module:873
 msgid "Currency symbol"
 msgstr ""
 
-#: ces_bank/ces_bank.module:844
+#: ces_bank/ces_bank.module:874
 msgid "Exchange currency symbol."
 msgstr ""
 
-#: ces_bank/ces_bank.module:847
+#: ces_bank/ces_bank.module:877
 msgid "Currency name"
 msgstr ""
 
-#: ces_bank/ces_bank.module:848
+#: ces_bank/ces_bank.module:878
 msgid "Exchange currency name."
 msgstr ""
 
-#: ces_bank/ces_bank.module:851
+#: ces_bank/ces_bank.module:881
 msgid "Currency name plural"
 msgstr ""
 
-#: ces_bank/ces_bank.module:852
+#: ces_bank/ces_bank.module:882
 msgid "Exchange currency name in plural."
 msgstr ""
 
-#: ces_bank/ces_bank.module:856
+#: ces_bank/ces_bank.module:886
 msgid "Exchange currency value in hours of work."
 msgstr ""
 
-#: ces_bank/ces_bank.module:859
+#: ces_bank/ces_bank.module:889
 msgid "Exchange administrator"
 msgstr ""
 
-#: ces_bank/ces_bank.module:860
+#: ces_bank/ces_bank.module:890
 msgid "Exchange administrator user."
 msgstr ""
 
-#: ces_bank/ces_bank.module:866
+#: ces_bank/ces_bank.module:896
 msgid "Account identifier"
 msgstr ""
 
-#: ces_bank/ces_bank.module:867
+#: ces_bank/ces_bank.module:897
 msgid "4 letter exchange identifier plus 4 number account code."
 msgstr ""
 
-#: ces_bank/ces_bank.module:871
+#: ces_bank/ces_bank.module:901
 msgid "Account type."
 msgstr ""
 
-#: ces_bank/ces_bank.module:874 ces_offerswants/ces_offerswants.module:2142
+#: ces_bank/ces_bank.module:904 ces_offerswants/ces_offerswants.module:2166
 msgid "Account user"
 msgstr ""
 
-#: ces_bank/ces_bank.module:875 ces_offerswants/ces_offerswants.module:2143
+#: ces_bank/ces_bank.module:905 ces_offerswants/ces_offerswants.module:2167
 msgid "Account user."
 msgstr ""
 
-#: ces_bank/ces_bank.module:879;880
+#: ces_bank/ces_bank.module:909;910
 msgid "Exchange Account"
 msgstr ""
 
-#: ces_bank/ces_bank.module:886
+#: ces_bank/ces_bank.module:916
 msgid "Identifier"
 msgstr ""
 
-#: ces_bank/ces_bank.module:887
+#: ces_bank/ces_bank.module:917
 msgid "Transaction identifier"
 msgstr ""
 
-#: ces_bank/ces_bank.module:891
+#: ces_bank/ces_bank.module:921
 msgid "The buyer account object."
 msgstr ""
 
-#: ces_bank/ces_bank.module:896
+#: ces_bank/ces_bank.module:926
 msgid "The seller account object."
 msgstr ""
 
-#: ces_bank/ces_bank.module:901
+#: ces_bank/ces_bank.module:931
 msgid "The transaction amount."
 msgstr ""
 
-#: ces_bank/ces_bank.module:905
+#: ces_bank/ces_bank.module:935
 msgid "The concept of the transaction."
 msgstr ""
 
-#: ces_bank/ces_bank.module:908
+#: ces_bank/ces_bank.module:938
 msgid "Ordered by"
 msgstr ""
 
-#: ces_bank/ces_bank.module:909
+#: ces_bank/ces_bank.module:939
 msgid "The user who created the transaction."
 msgstr ""
 
-#: ces_bank/ces_bank.module:1141
+#: ces_bank/ces_bank.module:1182
 msgid "Not yet implemented. Sorry!"
 msgstr ""
 
-#: ces_bank/ces_bank.module:1182 ces_summaryblock/ces_summaryblock.module:99
+#: ces_bank/ces_bank.module:1223 ces_summaryblock/ces_summaryblock.module:105
 msgid "Sales"
 msgstr ""
 
-#: ces_bank/ces_bank.module:1189 ces_summaryblock/ces_summaryblock.module:105
+#: ces_bank/ces_bank.module:1230 ces_summaryblock/ces_summaryblock.module:111
 msgid "Purchases"
 msgstr ""
 
-#: ces_bank/ces_bank.module:1239
+#: ces_bank/ces_bank.module:1280
 msgid "Account @name"
 msgstr ""
 
-#: ces_bank/ces_bank.module:1243
+#: ces_bank/ces_bank.module:1284
 msgid "Accept payments manually"
 msgstr ""
 
-#: ces_bank/ces_bank.module:1244
+#: ces_bank/ces_bank.module:1285
 msgid "If cheked, all payments from all accounts but those in the whitelist will not be effective until you manually accept them. Otherwise all payments will automatically be done. If you check this item you must regularly check your messages to quickly accept your pending payments."
 msgstr ""
 
-#: ces_bank/ces_bank.module:1249
+#: ces_bank/ces_bank.module:1290
 msgid "Accept payments whitelist"
 msgstr ""
 
-#: ces_bank/ces_bank.module:1250
+#: ces_bank/ces_bank.module:1291
 msgid "Write one account per line. The payments from these accounts will be automatically accepted."
 msgstr ""
 
-#: ces_bank/ces_bank.module:1256
+#: ces_bank/ces_bank.module:1297
 msgid "Manage account users"
 msgstr ""
 
-#: ces_bank/ces_bank.module:1280
+#: ces_bank/ces_bank.module:1321
 msgid "Could not find account @account."
 msgstr ""
 
-#: ces_bank/ces_bank.module:1341
+#: ces_bank/ces_bank.module:1375
 msgid "Next >>"
 msgstr ""
 
-#: ces_bank/ces_bank.module:1363 ces_offerswants/ces_offerswants.module:1793
+#: ces_bank/ces_bank.module:1397 ces_offerswants/ces_offerswants.module:1808
 msgid "<< Previous"
 msgstr ""
 
-#: ces_bank/ces_bank.module:109;523
+#: ces_bank/ces_bank.module:122;553
 msgid "Administer CES bank"
 msgstr ""
 
-#: ces_bank/ces_bank.module:110;524
+#: ces_bank/ces_bank.module:123;554
 msgid "Top administer interface for CES Bank"
 msgstr ""
 
-#: ces_bank/ces_bank.module:120;443;444
+#: ces_bank/ces_bank.module:133;473;474
 msgid "Edit exchange"
 msgstr ""
 
-#: ces_bank/ces_bank.module:121
+#: ces_bank/ces_bank.module:134
 msgid "Top administer interface for CES Bank - Edit exchange"
 msgstr ""
 
-#: ces_bank/ces_bank.module:131
+#: ces_bank/ces_bank.module:144
 msgid "Delete exchange"
 msgstr ""
 
-#: ces_bank/ces_bank.module:132
+#: ces_bank/ces_bank.module:145
 msgid "Top administer interface for CES Bank - Delete exchange"
 msgstr ""
 
-#: ces_bank/ces_bank.module:142
+#: ces_bank/ces_bank.module:155
 msgid "Edit accounts"
 msgstr ""
 
-#: ces_bank/ces_bank.module:143
+#: ces_bank/ces_bank.module:156
 msgid "Top administer interface for CES Bank - Edit accounts"
 msgstr ""
 
-#: ces_bank/ces_bank.module:153
+#: ces_bank/ces_bank.module:166
 msgid "Edit transactions"
 msgstr ""
 
-#: ces_bank/ces_bank.module:154
+#: ces_bank/ces_bank.module:167
 msgid "Top administer interface for CES Bank - Edit transactions"
 msgstr ""
 
-#: ces_bank/ces_bank.module:165;546 ces_user/ces_user.module:335
+#: ces_bank/ces_bank.module:178;576 ces_user/ces_user.module:378
 msgid "New exchange"
 msgstr ""
 
-#: ces_bank/ces_bank.module:166;547
+#: ces_bank/ces_bank.module:179;577
 msgid "Create a new exchange"
 msgstr ""
 
-#: ces_bank/ces_bank.module:177
+#: ces_bank/ces_bank.module:190
 msgid "Administration"
 msgstr ""
 
-#: ces_bank/ces_bank.module:191
+#: ces_bank/ces_bank.module:204
 msgid "Administer accounts"
 msgstr ""
 
-#: ces_bank/ces_bank.module:203;269;358;468 ces_import4ces/ces_import4ces.module:44 ces_message/ces_message.module:187;211;223
+#: ces_bank/ces_bank.module:216;282;371;498 ces_import4ces/ces_import4ces.module:44 ces_message/ces_message.module:187;211;223
 msgid "List"
 msgstr ""
 
-#: ces_bank/ces_bank.module:209
+#: ces_bank/ces_bank.module:222
 msgid "New account"
 msgstr ""
 
-#: ces_bank/ces_bank.module:221
+#: ces_bank/ces_bank.module:234
 msgid "View account"
 msgstr ""
 
-#: ces_bank/ces_bank.module:233
+#: ces_bank/ces_bank.module:246
 msgid "Edit account"
 msgstr ""
 
-#: ces_bank/ces_bank.module:257
+#: ces_bank/ces_bank.module:270
 msgid "Administer transactions"
 msgstr ""
 
-#: ces_bank/ces_bank.module:277
+#: ces_bank/ces_bank.module:290
 msgid "Do a transaction between two accounts."
 msgstr ""
 
-#: ces_bank/ces_bank.module:289
+#: ces_bank/ces_bank.module:302
 msgid "Enter transaction"
 msgstr ""
 
-#: ces_bank/ces_bank.module:290
+#: ces_bank/ces_bank.module:303
 msgid "Charge a sale to an account."
 msgstr ""
 
-#: ces_bank/ces_bank.module:302
+#: ces_bank/ces_bank.module:315
 msgid "One transaction"
 msgstr ""
 
-#: ces_bank/ces_bank.module:307
+#: ces_bank/ces_bank.module:320
 msgid "Multiple transactions"
 msgstr ""
 
-#: ces_bank/ces_bank.module:308
+#: ces_bank/ces_bank.module:321
 msgid "Charge many sales to many accounts."
 msgstr ""
 
-#: ces_bank/ces_bank.module:320
+#: ces_bank/ces_bank.module:333
 msgid "Autocomplete for multiple transactions"
 msgstr ""
 
-#: ces_bank/ces_bank.module:321
+#: ces_bank/ces_bank.module:334
 msgid "Autocomplete for multiple transactions."
 msgstr ""
 
-#: ces_bank/ces_bank.module:331 ces_summaryblock/ces_summaryblock.module:85
+#: ces_bank/ces_bank.module:344 ces_summaryblock/ces_summaryblock.module:91
 msgid "My account"
 msgstr ""
 
-#: ces_bank/ces_bank.module:332
+#: ces_bank/ces_bank.module:345
 msgid "View account details."
 msgstr ""
 
-#: ces_bank/ces_bank.module:346
+#: ces_bank/ces_bank.module:359
 msgid "Account users"
 msgstr ""
 
-#: ces_bank/ces_bank.module:347
+#: ces_bank/ces_bank.module:360
 msgid "Admin account users"
 msgstr ""
 
-#: ces_bank/ces_bank.module:363;634
+#: ces_bank/ces_bank.module:376;664
 msgid "Add account users"
 msgstr ""
 
-#: ces_bank/ces_bank.module:387;388;658;659
+#: ces_bank/ces_bank.module:400;401;688;689
 msgid "Edit account user"
 msgstr ""
 
-#: ces_bank/ces_bank.module:400
+#: ces_bank/ces_bank.module:413
 msgid "View exchange details"
 msgstr ""
 
-#: ces_bank/ces_bank.module:413
-msgid "Vieu exchange accounts list"
+#: ces_bank/ces_bank.module:426
+msgid "View exchange accounts list"
 msgstr ""
 
-#: ces_bank/ces_bank.module:424
+#: ces_bank/ces_bank.module:442
+msgid "Other exchanges"
+msgstr ""
+
+#: ces_bank/ces_bank.module:443
+msgid "View trade balances with other exchanges"
+msgstr ""
+
+#: ces_bank/ces_bank.module:454
 msgid "Exchanges in your country"
 msgstr ""
 
-#: ces_bank/ces_bank.module:425
+#: ces_bank/ces_bank.module:455
 msgid "List of exchanges in your country"
 msgstr ""
 
-#: ces_bank/ces_bank.module:458
+#: ces_bank/ces_bank.module:488
 msgid "Types of debit and credit limits for accounts."
 msgstr ""
 
-#: ces_bank/ces_bank.module:474
+#: ces_bank/ces_bank.module:504
 msgid "Create a new account limit."
 msgstr ""
 
-#: ces_bank/ces_bank.module:486
+#: ces_bank/ces_bank.module:516
 msgid "View account limit details."
 msgstr ""
 
-#: ces_bank/ces_bank.module:499
+#: ces_bank/ces_bank.module:529
 msgid "Edit account limit"
 msgstr ""
 
-#: ces_bank/ces_bank.module:511
+#: ces_bank/ces_bank.module:541
 msgid "Delete account limit"
 msgstr ""
 
-#: ces_bank/ces_bank.module:557;569
+#: ces_bank/ces_bank.module:587;599
 msgid "Account statement"
 msgstr ""
 
-#: ces_bank/ces_bank.module:558
+#: ces_bank/ces_bank.module:588
 msgid "Last transactions with this account"
 msgstr ""
 
-#: ces_bank/ces_bank.module:586
+#: ces_bank/ces_bank.module:616
 msgid "Accept transaction."
 msgstr ""
 
-#: ces_bank/ces_bank.module:598
+#: ces_bank/ces_bank.module:628
 msgid "Edit transaction."
 msgstr ""
 
-#: ces_bank/ces_bank.module:610
+#: ces_bank/ces_bank.module:640
 msgid "Delete transaction."
 msgstr ""
 
-#: ces_bank/ces_bank.module:622
+#: ces_bank/ces_bank.module:652
 msgid "List users"
 msgstr ""
 
-#: ces_bank/ces_bank.module:623
+#: ces_bank/ces_bank.module:653
 msgid "List account users"
 msgstr ""
 
@@ -1927,39 +1991,39 @@ msgstr ""
 msgid "Integral Community Exchange System Banking"
 msgstr ""
 
-#: ces_bank/views/ces_bank.views.inc:17
+#: ces_bank/views/ces_bank.views.inc:16
 msgid "Ces Exchange"
 msgstr ""
 
-#: ces_bank/views/ces_bank.views.inc:20
+#: ces_bank/views/ces_bank.views.inc:19
 msgid "Ces Exchange table"
 msgstr ""
 
-#: ces_bank/views/ces_bank.views.inc:21
+#: ces_bank/views/ces_bank.views.inc:20
 msgid "Ces Exchange view."
 msgstr ""
 
-#: ces_bank/views/ces_bank.views.inc:31
+#: ces_bank/views/ces_bank.views.inc:30
 msgid "Ces exchange Id"
 msgstr ""
 
-#: ces_bank/views/ces_bank.views.inc:32
+#: ces_bank/views/ces_bank.views.inc:31
 msgid "Ces exchange id."
 msgstr ""
 
-#: ces_bank/views/ces_bank.views.inc:45;46
+#: ces_bank/views/ces_bank.views.inc:43;44
 msgid "Ces exchange message relationship"
 msgstr ""
 
-#: ces_bank/views/ces_bank.views.inc:47 ces_message/views/ces_message.views.inc:144;167
+#: ces_bank/views/ces_bank.views.inc:45 ces_message/views/ces_message.views.inc:144;167
 msgid "More information on this relationship"
 msgstr ""
 
-#: ces_bank/views/ces_bank.views.inc:52
+#: ces_bank/views/ces_bank.views.inc:50
 msgid "Exchange Shortname"
 msgstr ""
 
-#: ces_bank/views/ces_bank.views.inc:53
+#: ces_bank/views/ces_bank.views.inc:51
 msgid "Exchange Shortname."
 msgstr ""
 
@@ -1983,7 +2047,7 @@ msgstr ""
 msgid "CES blog exchange"
 msgstr ""
 
-#: ces_blog/ces_blog.module:123;124 ces_offerswants/ces_offerswants.module:618;960;1230;1507;2132
+#: ces_blog/ces_blog.module:123;124 ces_offerswants/ces_offerswants.module:621;972;1242;1519;2156
 msgid "Title"
 msgstr ""
 
@@ -2027,7 +2091,7 @@ msgstr ""
 msgid "Individual blog for each exchange."
 msgstr ""
 
-#: ces_develop/ces_develop.module:111 ces_user/ces_user.module:151
+#: ces_develop/ces_develop.module:111 ces_user/ces_user.module:192
 msgid "Create new account"
 msgstr ""
 
@@ -2167,19 +2231,19 @@ msgstr ""
 msgid "Step finished successfully."
 msgstr ""
 
-#: ces_import4ces/ces_import4ces.module:641
+#: ces_import4ces/ces_import4ces.module:643
 msgid "Unknown error."
 msgstr ""
 
-#: ces_import4ces/ces_import4ces.module:670
+#: ces_import4ces/ces_import4ces.module:672
 msgid "Are you sure you want to delete the exchange @name and all its data?"
 msgstr ""
 
-#: ces_import4ces/ces_import4ces.module:674
+#: ces_import4ces/ces_import4ces.module:676
 msgid "Invaid import id."
 msgstr ""
 
-#: ces_import4ces/ces_import4ces.module:760
+#: ces_import4ces/ces_import4ces.module:762
 msgid "Import data has been deleted."
 msgstr ""
 
@@ -2207,23 +2271,23 @@ msgstr ""
 msgid "Import data from CES"
 msgstr ""
 
-#: ces_import4ces/imports/offers.php:60
+#: ces_import4ces/imports/offers.php:59
 msgid "The user @user was not found in offer import row @row. It may be a\n      user from another exchange not yet imported."
 msgstr ""
 
-#: ces_import4ces/imports/offers.php:96
+#: ces_import4ces/imports/offers.php:95
 msgid "Image @file could not be downloaded."
 msgstr ""
 
-#: ces_import4ces/imports/trades.php:30;34
+#: ces_import4ces/imports/trades.php:29;33
 msgid "Acount @account not found."
 msgstr ""
 
-#: ces_import4ces/imports/users.php:150
+#: ces_import4ces/imports/users.php:149
 msgid "Error creating Drupal user."
 msgstr ""
 
-#: ces_import4ces/imports/wants.php:66
+#: ces_import4ces/imports/wants.php:58
 msgid "The user @user was not found in want import row @row. It may be a\n      user from another exchange not yet imported."
 msgstr ""
 
@@ -2287,116 +2351,132 @@ msgstr ""
 msgid "Network error in remote transaction."
 msgstr ""
 
-#: ces_interop/ces_interop.module:139
+#: ces_interop/ces_interop.module:141
 msgid "Do you authorize the following transaction?"
 msgstr ""
 
-#: ces_interop/ces_interop.module:184
+#: ces_interop/ces_interop.module:186
 msgid "No details provided."
 msgstr ""
 
-#: ces_interop/ces_interop.module:461;505
+#: ces_interop/ces_interop.module:462;506
 msgid "There is no user with ID @id."
 msgstr ""
 
-#: ces_interop/ces_interop.module:474;525
+#: ces_interop/ces_interop.module:475;526
 msgid "There is no account with ID @id."
 msgstr ""
 
-#: ces_interop/ces_interop.module:487;542
+#: ces_interop/ces_interop.module:488;543
 msgid "There is no transaction with ID @id."
 msgstr ""
 
-#: ces_interop/ces_interop.module:564
+#: ces_interop/ces_interop.module:565
 msgid "CEN Clearing Central URL"
 msgstr ""
 
-#: ces_interop/ces_interop.module:566
+#: ces_interop/ces_interop.module:567
 msgid "The URL of the Community Exchange Network Clearing Central server."
 msgstr ""
 
-#: ces_interop/ces_interop.module:570
+#: ces_interop/ces_interop.module:571
 msgid "CEN Clearing Central IP"
 msgstr ""
 
-#: ces_interop/ces_interop.module:572
+#: ces_interop/ces_interop.module:573
 msgid "Only requests from this IP will be allowed."
 msgstr ""
 
-#: ces_interop/ces_interop.module:576
+#: ces_interop/ces_interop.module:577
 msgid "Debug mode"
 msgstr ""
 
-#: ces_interop/ces_interop.module:578
+#: ces_interop/ces_interop.module:579
 msgid "Do not check on production sites. Accept CEN messages from any address."
 msgstr ""
 
-#: ces_interop/ces_interop.module:591
+#: ces_interop/ces_interop.module:592
 msgid "Allow remote transactions"
 msgstr ""
 
-#: ces_interop/ces_interop.module:592
+#: ces_interop/ces_interop.module:593
 msgid "Allow transactions with remote servers from the Community Exchange Network."
 msgstr ""
 
-#: ces_interop/ces_interop.module:608
+#: ces_interop/ces_interop.module:609
 msgid "NID"
 msgstr ""
 
-#: ces_interop/ces_interop.module:609
+#: ces_interop/ces_interop.module:610
 msgid "Network Identifier in the Community Exchange Network. For example: cen0123. You can check your account at !link."
 msgstr ""
 
-#: ces_interop/ces_interop.module:611
+#: ces_interop/ces_interop.module:612
 msgid "Clearing Central"
 msgstr ""
 
-#: ces_interop/ces_interop.module:618
+#: ces_interop/ces_interop.module:619
 msgid "Password"
 msgstr ""
 
-#: ces_interop/ces_interop.module:620
+#: ces_interop/ces_interop.module:621
 msgid "Password of the Community Exchange Network account for this exchange. Leave blank to keep the stored password."
 msgstr ""
 
-#: ces_interop/ces_interop.module:640
+#: ces_interop/ces_interop.module:641
 msgid "Specify the NID (Network Identifier) to be able to trade with remote echanges within the Community Echange Network."
 msgstr ""
 
-#: ces_interop/ces_interop.module:658
+#: ces_interop/ces_interop.module:659
 msgid "Specify the password for this Community Exchange Network."
 msgstr ""
 
-#: ces_interop/ces_interop.module:680
+#: ces_interop/ces_interop.module:681
 msgid "The pair NID/password is incorrect."
 msgstr ""
 
-#: ces_interop/ces_interop.module:721
+#: ces_interop/ces_interop.module:722
 msgid "Extern network..."
 msgstr ""
 
-#: ces_interop/ces_interop.module:751
+#: ces_interop/ces_interop.module:741
+msgid "Warning: This is a remote transaction using the Community Exchage Network protocol and can not be updated. This will update the transaction only from the local system and therefore you may cause inconsistency in balances."
+msgstr ""
+
+#: ces_interop/ces_interop.module:749
+msgid "Remote transactions can not be edited."
+msgstr ""
+
+#: ces_interop/ces_interop.module:768
 msgid "Netork ID"
 msgstr ""
 
-#: ces_interop/ces_interop.module:752
+#: ces_interop/ces_interop.module:769
 msgid "Enter the identifier of the remote network, for example \"cen1234\". Click \"Search\" to find the network identifier you are looking for."
 msgstr ""
 
-#: ces_interop/ces_interop.module:756 ces_offerswants/ces_offerswants.module:1522;1528
+#: ces_interop/ces_interop.module:773 ces_offerswants/ces_offerswants.module:1534;1540
 msgid "Search"
 msgstr ""
 
-#: ces_interop/ces_interop.module:816
+#: ces_interop/ces_interop.module:833
 msgid "The Network Id must be the three leters \"cen\" plus four numbers."
 msgstr ""
 
-#: ces_interop/ces_interop.module:846
+#: ces_interop/ces_interop.module:863
 msgid "Check that all this data is correct before submit the extern transaction."
 msgstr ""
 
-#: ces_interop/ces_interop.module:858
+#: ces_interop/ces_interop.module:875
 msgid "Buyer Network ID"
+msgstr ""
+
+#: ces_interop/ces_interop.module:951
+msgid "Warning: This is a remote transaction using the Community Exchage Network protocol and can not be revoked. This will delete the transaction only from the local system and therefore you may cause inconsistency in balances."
+msgstr ""
+
+#: ces_interop/ces_interop.module:955
+msgid "Remote transactions can not be deleted."
 msgstr ""
 
 #: ces_interop/ces_interop.module:46
@@ -2412,7 +2492,7 @@ msgid "ICES interoperability services"
 msgstr ""
 
 #: ces_interop/ces_interop.info:0
-msgid "Impleemnts the opentransact protocol for financial transactions."
+msgid "Implements the opentransact protocol for financial transactions."
 msgstr ""
 
 #: ces_message/ces_message.module:29 ces_message/includes/ces_message.message.inc:56 ces_message/views/ces_message.views.inc:16
@@ -2467,11 +2547,11 @@ msgstr ""
 msgid "Error processing message template."
 msgstr ""
 
-#: ces_message/ces_message.module:443
+#: ces_message/ces_message.module:452
 msgid "No accounts to test"
 msgstr ""
 
-#: ces_message/ces_message.module:453
+#: ces_message/ces_message.module:462
 msgid "Mail sent to user"
 msgstr ""
 
@@ -2493,10 +2573,6 @@ msgstr ""
 
 #: ces_message/ces_message.module:233
 msgid "Add message templates"
-msgstr ""
-
-#: ces_message/ces_message.module:241
-msgid "Test"
 msgstr ""
 
 #: ces_message/ces_message.install:323
@@ -2755,7 +2831,7 @@ msgstr ""
 msgid "Ces Messages Admin"
 msgstr ""
 
-#: ces_offerswants/ces_offerwant.tpl.php:30 ces_offerswants/ces_offerswants.module:95;110;589;1490
+#: ces_offerswants/ces_offerwant.tpl.php:30 ces_offerswants/ces_offerswants.module:95;110;592;1502
 msgid "Category"
 msgstr ""
 
@@ -2807,7 +2883,7 @@ msgstr ""
 msgid "Offer or want"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:66;2117
+#: ces_offerswants/ces_offerswants.module:66;2141
 msgid "Offer"
 msgstr ""
 
@@ -2835,315 +2911,315 @@ msgstr ""
 msgid "Full OfferComment"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:459
+#: ces_offerswants/ces_offerswants.module:462
 msgid "You don't have any offer yet. You should publish your goods and skills so others can ask you for them."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:460;257
+#: ces_offerswants/ces_offerswants.module:463;257
 msgid "Add offer"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:464
+#: ces_offerswants/ces_offerswants.module:467
 msgid "You don't have any want yet. Publishing a want is useful not only for you but also for other members searching for valued goods and skills."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:465;316
+#: ces_offerswants/ces_offerswants.module:468;318
 msgid "Add want"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:517;542;671
+#: ces_offerswants/ces_offerswants.module:520;545;674
 msgid "Rate"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:586
+#: ces_offerswants/ces_offerswants.module:589
 msgid "Select a category..."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:590
+#: ces_offerswants/ces_offerswants.module:593
 msgid "Select the category that best matches your announcement."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:617
+#: ces_offerswants/ces_offerswants.module:620
 msgid "Enter here a short but descriptive title."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:627
+#: ces_offerswants/ces_offerswants.module:630
 msgid "Enter here a detailed description."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:635
+#: ces_offerswants/ces_offerswants.module:638
 msgid "keywords"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:636
+#: ces_offerswants/ces_offerswants.module:639
 msgid "Enter a comma-separated list of words to describe your content."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:642
+#: ces_offerswants/ces_offerswants.module:645
 msgid "Image"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:643
+#: ces_offerswants/ces_offerswants.module:646
 msgid "Upload an image for your announce."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:649
+#: ces_offerswants/ces_offerswants.module:652
 msgid "Valid until"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:650
+#: ces_offerswants/ces_offerswants.module:653
 msgid "The announce will be automatically hidden this date"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:660
+#: ces_offerswants/ces_offerswants.module:663
 msgid "Hide"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:661
+#: ces_offerswants/ces_offerswants.module:664
 msgid "Check it if you don't want to publish the announcememnt."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:674
+#: ces_offerswants/ces_offerswants.module:677
 msgid "Eg: '2.5' or '5.00%symbol and transport' or 'Contact me' or 'Free'."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:684
+#: ces_offerswants/ces_offerswants.module:687
 msgid "Expire date must be in the future."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:690
+#: ces_offerswants/ces_offerswants.module:693
 msgid "Select a category."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:749
+#: ces_offerswants/ces_offerswants.module:752
 msgid "Are you sure you want to delete the offer %offer?"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:752
+#: ces_offerswants/ces_offerswants.module:755
 msgid "Are you sure you want to delete the want %want?"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:757
+#: ces_offerswants/ces_offerswants.module:760
 msgid "You can simply hide the announcement so it becomes invisible to all other members but you can publish it later."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:769
+#: ces_offerswants/ces_offerswants.module:772
 msgid "Offer %offer has been deleted."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:779
+#: ces_offerswants/ces_offerswants.module:782
 msgid "- All offer comments have been deleted too."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:783
+#: ces_offerswants/ces_offerswants.module:786
 msgid "Want %want has been deleted."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:865
+#: ces_offerswants/ces_offerswants.module:868
 msgid "Visible"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:880
+#: ces_offerswants/ces_offerswants.module:883
 msgid "Details"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:893
+#: ces_offerswants/ces_offerswants.module:896
 msgid "Comments("
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:896;292
+#: ces_offerswants/ces_offerswants.module:899;293
 msgid "Send Notify"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:959
+#: ces_offerswants/ces_offerswants.module:971
 msgid "Enter here the name of the category"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:968
+#: ces_offerswants/ces_offerswants.module:980
 msgid "Enter here a detailed description with examples."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:979;999;1258;1853;1867
+#: ces_offerswants/ces_offerswants.module:991;1011;1270;1868;1882
 msgid "None"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:982
+#: ces_offerswants/ces_offerswants.module:994
 msgid "Parent category"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:983
+#: ces_offerswants/ces_offerswants.module:995
 msgid "Do not select enything if this is a root category. Otherwise, if you are editing a subcategory, choose the parent category."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:997;1236
+#: ces_offerswants/ces_offerswants.module:1009;1248
 msgid "Context"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1000;1239;1262;1746;221
+#: ces_offerswants/ces_offerswants.module:1012;1251;1274;1761;221
 msgid "Offers"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1001;1242;1266;1763;232
+#: ces_offerswants/ces_offerswants.module:1013;1254;1278;1778;232
 msgid "Wants"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1002;1270
+#: ces_offerswants/ces_offerswants.module:1014;1282
 msgid "Both"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1004
+#: ces_offerswants/ces_offerswants.module:1016
 msgid "Choose whether this category is applicable to offers, wants or both."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1021
+#: ces_offerswants/ces_offerswants.module:1033
 msgid "A title from category is necessary."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1024
+#: ces_offerswants/ces_offerswants.module:1036
 msgid "A description from category is necessary."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1027
+#: ces_offerswants/ces_offerswants.module:1039
 msgid "A exchange from category is necessary."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1030
+#: ces_offerswants/ces_offerswants.module:1042
 msgid "A context from category is necessary."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1049
+#: ces_offerswants/ces_offerswants.module:1061
 msgid "Are you sure you want to delete the category %category?"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1053
+#: ces_offerswants/ces_offerswants.module:1065
 msgid "%category is used by %count offers or wants. It is highly recommended that you change the category of these offers or wants before you delete it. If the category is deleted now they may become unusable or may not display correctly."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1064
+#: ces_offerswants/ces_offerswants.module:1076
 msgid "Category %category has been deleted."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1216
+#: ces_offerswants/ces_offerswants.module:1228
 msgid "Your exchange does not have any category yet. It is very recommended to divide the offers and/or wants into several categories. A good first approach is to create 10-15 categories for offers but a single category for wants."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1217;364
+#: ces_offerswants/ces_offerswants.module:1229;367
 msgid "Add category"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1409
+#: ces_offerswants/ces_offerswants.module:1421
 msgid "CES offers and wants filter"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1487 ces_summaryblock/ces_summaryblock.module:243
+#: ces_offerswants/ces_offerswants.module:1499 ces_summaryblock/ces_summaryblock.module:249
 msgid "All"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1505
+#: ces_offerswants/ces_offerswants.module:1517
 msgid "Update time"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1506
+#: ces_offerswants/ces_offerswants.module:1518
 msgid "Creation time"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1512
+#: ces_offerswants/ces_offerswants.module:1524
 msgid "Order by"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1609
+#: ces_offerswants/ces_offerswants.module:1622
 msgid "There are no results. Try broaden your search criteria in order to get some results."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1618
+#: ces_offerswants/ces_offerswants.module:1633
 msgid "Action not known"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1669
+#: ces_offerswants/ces_offerswants.module:1684
 msgid "Offers and wants"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1750
+#: ces_offerswants/ces_offerswants.module:1765
 msgid "No offers."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1767
+#: ces_offerswants/ces_offerswants.module:1782
 msgid "No wants."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1819
+#: ces_offerswants/ces_offerswants.module:1834
 msgid "Add offer >>"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1831
+#: ces_offerswants/ces_offerswants.module:1846
 msgid "Add want >>"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1850
+#: ces_offerswants/ces_offerswants.module:1865
 msgid "Minimum offers on register"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1851
+#: ces_offerswants/ces_offerswants.module:1866
 msgid "The minimum number of offers that a member must fill in the registration form."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1864
+#: ces_offerswants/ces_offerswants.module:1879
 msgid "Minimum wants on register"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:1865
+#: ces_offerswants/ces_offerswants.module:1880
 msgid "The minimum number of wants that a member must fill in the registration form."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:2064
+#: ces_offerswants/ces_offerswants.module:2085
 msgid "Add a new comment and rating to this offer."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:2069
+#: ces_offerswants/ces_offerswants.module:2090
 msgid "Comment"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:2076
+#: ces_offerswants/ces_offerswants.module:2097
 msgid "Rating from 0 to 5"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:2095
+#: ces_offerswants/ces_offerswants.module:2116
 msgid "Save comment"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:2106
+#: ces_offerswants/ces_offerswants.module:2130
 msgid "Your comment has been successfully saved."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:2118
+#: ces_offerswants/ces_offerswants.module:2142
 msgid "Tokens for offer."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:2121
+#: ces_offerswants/ces_offerswants.module:2145
 msgid "Notify"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:2122
+#: ces_offerswants/ces_offerswants.module:2146
 msgid "Tokens for user notify."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:2128
+#: ces_offerswants/ces_offerswants.module:2152
 msgid "Id of offer"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:2129
+#: ces_offerswants/ces_offerswants.module:2153
 msgid "The id of offer."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:2133
+#: ces_offerswants/ces_offerswants.module:2157
 msgid "Title of offer."
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:2138
-msgid "Bodu of User notify"
+#: ces_offerswants/ces_offerswants.module:2162
+msgid "Body of User notify"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:2139
+#: ces_offerswants/ces_offerswants.module:2163
 msgid "Body of User notify."
 msgstr ""
 
@@ -3155,59 +3231,59 @@ msgstr ""
 msgid "View people's wants"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:244;252
+#: ces_offerswants/ces_offerswants.module:243;252
 msgid "My offers"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:245
+#: ces_offerswants/ces_offerswants.module:244
 msgid "View my current offers"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:265;324
+#: ces_offerswants/ces_offerswants.module:266;327
 msgid "View offer"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:274;333
+#: ces_offerswants/ces_offerswants.module:275;336
 msgid "Edit offer"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:283;342
+#: ces_offerswants/ces_offerswants.module:284;345
 msgid "Delete offer"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:303;311
+#: ces_offerswants/ces_offerswants.module:304;313
 msgid "My wants"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:304
+#: ces_offerswants/ces_offerswants.module:305
 msgid "View my current wants"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:351
+#: ces_offerswants/ces_offerswants.module:354
 msgid "Edit categories"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:352;365
+#: ces_offerswants/ces_offerswants.module:355;368
 msgid "View, edit and add categories for your exchange"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:359
+#: ces_offerswants/ces_offerswants.module:362
 msgid "List categories"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:374;375
+#: ces_offerswants/ces_offerswants.module:377;378
 msgid "Edit category"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:384;385
+#: ces_offerswants/ces_offerswants.module:387;388
 msgid "Delete category"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:394
+#: ces_offerswants/ces_offerswants.module:397
 msgid "Offer comments and ratings"
 msgstr ""
 
-#: ces_offerswants/ces_offerswants.module:395
+#: ces_offerswants/ces_offerswants.module:398
 msgid "View offer with comments and ratings"
 msgstr ""
 
@@ -3315,71 +3391,71 @@ msgstr ""
 msgid "CES bank account summary"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:71
+#: ces_summaryblock/ces_summaryblock.module:77
 msgid "You haven't traded yet."
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:80
+#: ces_summaryblock/ces_summaryblock.module:86
 msgid "No offers yet!"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:111
+#: ces_summaryblock/ces_summaryblock.module:117
 msgid "Last trade"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:117
+#: ces_summaryblock/ces_summaryblock.module:123
 msgid "You may be interested"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:230
+#: ces_summaryblock/ces_summaryblock.module:236
 msgid "Today"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:231
+#: ces_summaryblock/ces_summaryblock.module:237
 msgid "Yesterday"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:232
+#: ces_summaryblock/ces_summaryblock.module:238
 msgid "This week"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:233
+#: ces_summaryblock/ces_summaryblock.module:239
 msgid "Last week"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:234
+#: ces_summaryblock/ces_summaryblock.module:240
 msgid "Last 7 days"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:235
+#: ces_summaryblock/ces_summaryblock.module:241
 msgid "Last 15 days"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:236
+#: ces_summaryblock/ces_summaryblock.module:242
 msgid "Last 30 days"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:237
+#: ces_summaryblock/ces_summaryblock.module:243
 msgid "This month"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:238
+#: ces_summaryblock/ces_summaryblock.module:244
 msgid "Last month"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:239
+#: ces_summaryblock/ces_summaryblock.module:245
 msgid "182 days"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:240
+#: ces_summaryblock/ces_summaryblock.module:246
 msgid "365 days"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:241
+#: ces_summaryblock/ces_summaryblock.module:247
 msgid "This year"
 msgstr ""
 
-#: ces_summaryblock/ces_summaryblock.module:242
+#: ces_summaryblock/ces_summaryblock.module:248
 msgid "Last year"
 msgstr ""
 
@@ -3391,180 +3467,180 @@ msgstr ""
 msgid "Block with ICES bank account summary."
 msgstr ""
 
-#: ces_user/ces_user.module:208
+#: ces_user/ces_user.module:251
 msgid "Forgot password?"
 msgstr ""
 
-#: ces_user/ces_user.module:208
+#: ces_user/ces_user.module:251
 msgid "Request new password via e-mail."
 msgstr ""
 
-#: ces_user/ces_user.module:292 ces_user/ces_user.install:152
+#: ces_user/ces_user.module:335 ces_user/ces_user.install:152
 msgid "Address"
 msgstr ""
 
-#: ces_user/ces_user.module:298
+#: ces_user/ces_user.module:341
 msgid "Email"
 msgstr ""
 
-#: ces_user/ces_user.module:309
+#: ces_user/ces_user.module:352
 msgid "CES register"
 msgstr ""
 
-#: ces_user/ces_user.module:313
+#: ces_user/ces_user.module:356
 msgid "CES front links"
 msgstr ""
 
-#: ces_user/ces_user.module:336
+#: ces_user/ces_user.module:379
 msgid "Documentation"
 msgstr ""
 
-#: ces_user/ces_user.module:337
+#: ces_user/ces_user.module:380
 msgid "Developers"
 msgstr ""
 
-#: ces_user/ces_user.module:338
+#: ces_user/ces_user.module:381
 msgid "Donate"
 msgstr ""
 
-#: ces_user/ces_user.module:339
+#: ces_user/ces_user.module:382
 msgid "Terms of service"
 msgstr ""
 
-#: ces_user/ces_user.module:368
+#: ces_user/ces_user.module:411
 msgid "Select country..."
 msgstr ""
 
-#: ces_user/ces_user.module:373
+#: ces_user/ces_user.module:416
 msgid "New to IntegralCES?"
 msgstr ""
 
-#: ces_user/ces_user.module:378
+#: ces_user/ces_user.module:421
 msgid "Find an exchange near you and start using social money:"
 msgstr ""
 
-#: ces_user/ces_user.module:387
+#: ces_user/ces_user.module:430
 msgid "Register"
 msgstr ""
 
-#: ces_user/ces_user.module:413
+#: ces_user/ces_user.module:456
 msgid "Welcome to <strong>Integral Community Exchange System</strong>,"
 msgstr ""
 
-#: ces_user/ces_user.module:418
+#: ces_user/ces_user.module:461
 msgid "an open source platform featuring social currencies management for communities."
 msgstr ""
 
-#: ces_user/ces_user.module:423
+#: ces_user/ces_user.module:466
 msgid "Boost local economy, return it to human scale."
 msgstr ""
 
-#: ces_user/ces_user.module:424
+#: ces_user/ces_user.module:467
 msgid "Help the environment, lower contamination."
 msgstr ""
 
-#: ces_user/ces_user.module:425
+#: ces_user/ces_user.module:468
 msgid "Gain the control over money, prevent speculation and abuse."
 msgstr ""
 
-#: ces_user/ces_user.module:426
+#: ces_user/ces_user.module:469
 msgid "Create a solid alternative to the current financial system."
 msgstr ""
 
-#: ces_user/ces_user.module:427
+#: ces_user/ces_user.module:470
 msgid "Empower your community. Have fun playing with social currency."
 msgstr ""
 
-#: ces_user/ces_user.module:441
+#: ces_user/ces_user.module:484
 msgid "Full user name"
 msgstr ""
 
-#: ces_user/ces_user.module:442
+#: ces_user/ces_user.module:485
 msgid "The full real user name"
 msgstr ""
 
-#: ces_user/ces_user.module:445
+#: ces_user/ces_user.module:488
 msgid "Main user telephone"
 msgstr ""
 
-#: ces_user/ces_user.module:446
+#: ces_user/ces_user.module:489
 msgid "The main user telephone"
 msgstr ""
 
-#: ces_user/ces_user.module:486
+#: ces_user/ces_user.module:529
 msgid "You have successfully registered to the exchange %name in the Integral Community Exchange System."
 msgstr ""
 
-#: ces_user/ces_user.module:492
+#: ces_user/ces_user.module:535
 msgid "Before you can start using the system, the administration of your exchange must authorize your account. You will receive an email when your account is activated with further instructions. If you have no news in these comming days, contact your exchange administration at %mail."
 msgstr ""
 
-#: ces_user/ces_user.module:498
+#: ces_user/ces_user.module:541
 msgid "See you soon!"
 msgstr ""
 
-#: ces_user/ces_user.module:510
+#: ces_user/ces_user.module:553
 msgid "New exchange URL"
 msgstr ""
 
-#: ces_user/ces_user.module:512
+#: ces_user/ces_user.module:555
 msgid "The URL of the new exchange form or intermediate custom page. You can use the placeholder @langcode for the current language ISO code. If you let it empty the link will be hidden."
 msgstr ""
 
-#: ces_user/ces_user.module:516
+#: ces_user/ces_user.module:559
 msgid "Documentation URL"
 msgstr ""
 
-#: ces_user/ces_user.module:518
+#: ces_user/ces_user.module:561
 msgid "The url of the general documentation page."
 msgstr ""
 
-#: ces_user/ces_user.module:522
+#: ces_user/ces_user.module:565
 msgid "Developers URL"
 msgstr ""
 
-#: ces_user/ces_user.module:524
+#: ces_user/ces_user.module:567
 msgid "The url of the IntegralCES develop site."
 msgstr ""
 
-#: ces_user/ces_user.module:528
+#: ces_user/ces_user.module:571
 msgid "Donate URL"
 msgstr ""
 
-#: ces_user/ces_user.module:530
+#: ces_user/ces_user.module:573
 msgid "The url of the donations page."
 msgstr ""
 
-#: ces_user/ces_user.module:534
+#: ces_user/ces_user.module:577
 msgid "Terms of service URL"
 msgstr ""
 
-#: ces_user/ces_user.module:536
+#: ces_user/ces_user.module:579
 msgid "The terms of service page."
 msgstr ""
 
-#: ces_user/ces_user.module:540
+#: ces_user/ces_user.module:583
 msgid "About URL"
 msgstr ""
 
-#: ces_user/ces_user.module:542
+#: ces_user/ces_user.module:585
 msgid "The about page."
 msgstr ""
 
-#: ces_user/ces_user.module:34
+#: ces_user/ces_user.module:71
 msgid "Welcome to Integral CES"
 msgstr ""
 
-#: ces_user/ces_user.module:40
+#: ces_user/ces_user.module:77
 msgid "Successfuly registered to Integral CES"
 msgstr ""
 
-#: ces_user/ces_user.module:47
+#: ces_user/ces_user.module:84
 msgid "ICES user settings"
 msgstr ""
 
-#: ces_user/ces_user.module:48
-msgid "Change global settings related to IntegralCES user module."
+#: ces_user/ces_user.module:85
+msgid "Change global settings related to IntegralCES user module"
 msgstr ""
 
 #: ces_user/ces_user.install:149
