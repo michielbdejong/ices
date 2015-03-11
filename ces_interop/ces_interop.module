@@ -864,7 +864,7 @@ function ces_interop_transaction_confirm_form($form, &$form_state) {
   );
   $toaccount = $bank->getAccountByName($values['toaccountname']);
   $toaccuser = reset($toaccount['users']);
-  $tousername = ces_user_get_name(user_load($toaccuser['id']));
+  $tousername = ces_user_get_name(user_load($toaccuser['user']));
   $form['itemseller'] = array(
     '#type' => 'item',
     '#title' => t('Seller account'),

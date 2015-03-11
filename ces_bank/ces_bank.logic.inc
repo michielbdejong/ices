@@ -535,7 +535,7 @@ class CesBank {
         $transaction->revoke();
       }
       // The following statement will throw an exception if the transaction is
-      // not revoked or rejected.
+      // not new, revoked or rejected.
       $transaction->setState(CesBankTransactionInterface::STATE_DISCARDED);
       $s->delete($transaction);
       return TRUE;
