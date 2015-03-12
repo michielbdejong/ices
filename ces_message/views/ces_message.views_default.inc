@@ -99,7 +99,7 @@ function ces_message_views_default_views() {
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'ces_message';
   $handler->display->display_options['fields']['created']['field'] = 'created';
-  $handler->display->display_options['fields']['created']['label'] = t('Data');
+  $handler->display->display_options['fields']['created']['label'] = t('Date');
   $handler->display->display_options['fields']['created']['date_format'] = 'medium';
   $handler->display->display_options['fields']['created']['second_date_format'] = 'long';
   /* Camp: Ces Message: Assumpte */
