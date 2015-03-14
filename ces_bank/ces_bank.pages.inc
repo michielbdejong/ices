@@ -219,7 +219,7 @@ function ces_bank_exchange_accounts_page() {
   $accounts = $bank->getAllAccounts(array(
     'exchange' => $exchange['id'],
     'state' => 1,
-    'kind' => array(0,1,2,3,4),
+    'kind' => array(0, 1, 2, 3, 4),
   ));
   $page = array();
   $page['table'] = array(
@@ -278,7 +278,7 @@ function ces_bank_exchange_accounts_page() {
     $row = array(
       $users_out,
       $accountsperuser,
-      $account['balance']
+      $account['balance'],
     );
     $rows[] = $row;
   }
@@ -298,7 +298,7 @@ function ces_bank_exchange_accounts_page() {
 function ces_bank_other_exchanges_page() {
   $bank = new CesBank();
   $exchange = ces_bank_get_current_exchange();
-  // Get virtual accounts
+  // Get virtual accounts.
   $accounts = $bank->getAllAccounts(array(
     'exchange' => $exchange['id'],
     'state' => 1,
@@ -362,7 +362,8 @@ function ces_bank_other_exchanges_page() {
           . ' = ' . $bank->formatAmount($valueb, $exchange, TRUE) . ')';
       }
       else {
-        // This a remote exchange. We don't know the name nor the currency value.
+        // This a remote exchange. We don't know the name nor the currency
+        // value.
         $row[0] = $code . ' (' . t('Remote') . ')';
         $row[1] = '';
       }
