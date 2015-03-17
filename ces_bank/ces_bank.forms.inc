@@ -2048,17 +2048,24 @@ function _ces_bank_set_transaction_message($result, $transaction, $op = 'trigger
   else {
     $bank = new CesBank();
     $status = $transaction['state'] == CesBankTransactionInterface::STATE_TRIGGERED ? 'status' : 'error';
-    drupal_set_message(t('The transaction has NOT been applied.'), $status);
     $messages = $bank->getTransactionLog($transaction);
-    if (!empty($messages)) {
-      $text = t('Details:');
-      $text .= '<ul>';
+    if ($transaction['state'] == CesBankTransactionInterface::STATE_ACCEPTED) {
       foreach ($messages as $message) {
-        $text .= '<li>' . $message . '</li>';
+        drupal_set_message(filter_xss(t('@message',array('@message' => $message))),'warning');
       }
-      $text .= '</ul>';
-      // This filter_xss is here only so that coder module shut up.
-      drupal_set_message(filter_xss($text), $status);
+    } else {
+      drupal_set_message(t('The transaction has NOT been applied.'), $status);
+      $messages = $bank->getTransactionLog($transaction);
+      if (!empty($messages)) {
+        $text = t('Details:');
+        $text .= '<ul>';
+        foreach ($messages as $message) {
+          $text .= '<li>' . $message . '</li>';
+        }
+        $text .= '</ul>';
+        // This filter_xss is here only so that coder module shut up.
+        drupal_set_message(filter_xss($text), $status);
+      }
     }
   }
 }
