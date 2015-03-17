@@ -172,36 +172,36 @@ director clases y sus atribuciones.
 ### ciclo de vida de una transacción.
   
 Las transacciones tienen sólo dos operaciones: aplicar una nueva transacción
-y revocar un aplicado anteriormente uno. Sin embargo, una transacción pasará
-por varios estados entre la creación y la efectiva y la aplicación
-irreversible. Este ciclo de vida se resume en el siguiente diagrama que ahora
-será comentado estado por estado.
+y revocar una aplicada anteriormente. Sin embargo, una transacción pasará
+por varios estados entre que se crea y pasa a ser efectiva e irreversible. 
 
-- NEW: Estado inicial. La transacción ha sido creado pero aún no se ha
-  activado a aplicar. Este es el estado mientras la transacción puede ser
-  editado. A la espera de que el usuario aplique esta transacción.
+Este ciclo de vida se resume en el siguiente diagrama que ahora será comentado
+estado por estado.
 
-- TRIGGERED: La transacción se ha disparado a aplicar. Inmediatamente después
-  de que se pide aceptación por parte de todas las autoridades pertinentes. Se
-  está a la espera de su respuesta. Se convertirá Aceptado o rechazado.
+- NEW: Estado inicial. La transacción ha sido creada pero aún no se ha activado.
+  Este es el estado mientras la transacción puede ser editada. A la espera de 
+  que el usuario confirme la transacción.
 
-- ACCEPTED: La transacción ha sido aceptada por todas las autoridades. Es ser
-  efectivamente aplicado por el sistema. Este estado es muy corta vida en las
-  transacciones locales. El siguiente estado se comprometerán o ERROR si el
-  sistema no aplica la transacción -por ejemplo, un servidor remoto no pudo
-  responder.
+- TRIGGERED: La transacción esta a la espera de ser aceptada. Inmediatamente 
+  después de que se pide aceptación por parte de todas las autoridades 
+  pertinentes. Se está a la espera de su respuesta. Se pasará a ACCEPTED o 
+  REJECTED.
 
-- COMMITTED: La transacción se aplica con éxito. Sin embargo, puede ser
+- ACCEPTED: La transacción ha sido aceptada por todas las autoridades. Este 
+  estado tiene una vida muy corta en las transacciones locales. El siguiente
+  estado es ERROR si el sistema no aplica la transacción, por ejemplo, un 
+  servidor remoto no pudo responder, o COMMITED.
+
+- COMMITTED: La transacción se aplicó con éxito. Sin embargo, puede ser
   revocada. Si hay no son temas para esta transacción después de un tiempo
   prudencial, que se archivará.
 
-- ARCHIVED: La transacción está archivado y aplicado con éxito. Nada se puede
+- ARCHIVED: La transacción está archivada y aplicada con éxito. Nada se puede
   hacer con ella. Existe sólo como datos históricos.
 
-- REJECTED: La transacción, previamente activado para ser aplicado- ha sido
+- REJECTED: La transacción, previamente disparada para ser aplicada, ha sido
   rechazada por algunos de las autoridades. Se desecha después de un tiempo
-  prudencial. Puede alféizar convertido ACEPTADO si algunas autoridades
-  rectifiquen.
+  prudencial. Puede pasar a ACCEPTED si algunas autoridades rectifican.
 
 - DISCARDED: La transacción se descarta y no se ha aplicado. Nada se puede
   hacer con ella. Existe sólo como datos históricos.
@@ -209,24 +209,23 @@ será comentado estado por estado.
 - ERROR: Se produjo un error del sistema al aplicar o revocar la transacción.
   El administrador debe tener cuidado de él.  
   
-  Estos fueron los distintos estados de una transacción puede pasar a través,
-  mientras que se aplica. A continuación se esos estados relacionados con la
-  operación de revocación. El estado inicial de la operación de revocación es
-  la Estado comprometido.
+Estos fueron los distintos estados que una transacción puede pasar, A 
+continuación los estados relacionados con la operación de revocación. 
+El estado inicial de la operación de revocación es el de COMMITTED.
 
-- REVOKE TRIGERED: La transacción se ha disparado a ser revocada. Esperando
-  foracceptance de esta operación por todas las autoridades.
+- REVOKE TRIGERED: La transacción se ha disparado paraa ser revocada. 
+  Esperando la aceptación de la operación por parte de todas las autoridades.
 
 - REVOKE ACCEPTED: La operación de revocación ha sido aceptada por todas las
   autoridades. El sistema está revocando efectivamente la transacción. Este
-  estado es muy efímero estado en locales transacciones. El siguiente estado
-  será revocada o ERROR si el sistema no revoca la transacción.
+  estado es muy efímero en transacciones locales. El siguiente estado
+  será REVOKED o ERROR si el sistema no revoca la transacción.
 
 - REVOKE REJECTED: Algunas autoridades no aceptaron la operación de
-  revocación. El transacción permanecerá aplicado y se archivarán después de un
-  tiempo prudencial.
+  revocación. La transacción seguirá en estado COMMITTED y pasará a 
+  ARCHIVED después de un tiempo prudencial.
 
-- REVOKED: La transacción ha sido revocado con éxito. Se convertirá DESECHADO
+- REVOKED: La transacción ha sido revocado con éxito. Pasara a DISCARDED
   después de un tiempo prudencial.
 
 El estado de la transacción se cambia el uso de la función setstate() de la
