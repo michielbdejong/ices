@@ -401,7 +401,6 @@ function ces_message_send_notify($action, $params, $recipient = array(), $sender
     ces_message_save($notify);
 
     if ($mail) {
-      // @todo Buscar el administrador del exchange como emisor del correo
       $sender    = user_load(1);
       drupal_mail('ces_message', 'ces_message' . ' ' . $action, $user_recipient->mail, $language, $params, $sender->mail, TRUE);
     }
@@ -477,6 +476,20 @@ function ces_message_views_api() {
     'path' => drupal_get_path('module', 'ces_message') . '/views',
   );
 }
+/**
+ * Implements hook_views_pre_execute().
+ *
+ * @todo The message does not convince me, needs revision.
+ */
+function ces_message_views_pre_execute (&$view) {
+  if ($view->name == 'ces_message_admin') {
+    if (!ces_bank_access('admin', 'exchange', CES_BANK_CURRENT_EXCHANGE)) {
+      drupal_set_message('No access. Messages from your account are shown','warning');
+      drupal_goto("ces/bank/account/message");
+    }
+  }
+}
+
 /**
  * @} End of "defgroup ces_message".
  */

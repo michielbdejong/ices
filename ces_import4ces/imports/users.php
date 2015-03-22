@@ -24,11 +24,6 @@ function ces_import4ces_parse_users($import_id, $data, $row, &$context, $width_a
     $context['results']['import_id'] = $import_id;
     $import = ces_import4ces_import_load($import_id);
 
-    // @todo Al crear un usuario se utiliza el mail como identificador y se
-    // genera un password aleatorio, enviano un email al usuario que podra
-    // resetear el password.
-    //
-    // Comprobar que es el comportamiento que deseamos.
     if (CES_IMPORT4CES_RESET_PASSWORD) {
       $password = user_password(8);
     }

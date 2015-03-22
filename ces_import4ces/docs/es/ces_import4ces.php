@@ -76,19 +76,6 @@
  * Lista de tareas pendientes por orden de prioridad
  * -------------------------------------------------
  * 
- * @todo Insertar los campos del usuario que no están en integralCES y tienen 
- *       su utilidad.
- * 
- * @todo Repasar a fondo los campos de todas las tablas que no se están 
- * utilizando y decidir si se implementan o no.
- * 
- * @todo Crear importación anonimizada para testear y que pueda servir para la
- *       demo
- * 
- * @todo Acciones para el último paso: 
- *         + Enviar email a los uusarios para que reseteen la contraseña.
- *         + Añadir enlace para editar Exchange
- * 
  * @todo Subarea Aquest és un concepte que no està implementat en el CES.
  *       Decidir què fem.
  * 

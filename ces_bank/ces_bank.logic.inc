@@ -1380,6 +1380,7 @@ class CesBank {
         break;
 
       case CesBankTransactionInterface::STATE_REJECTED:
+        drupal_set_message('REJECTED'); // DEV
         $this->notifyTransactionAccount('account_debit_rejected', $account_from_name, $params);
         $this->notifyTransactionAccount('account_credit_rejected', $account_to_name, $params);
         break;
