@@ -733,8 +733,9 @@ function ces_bank_transaction_view($transaction) {
   );
   $page['transaction'] = $transaction;
   $states = _ces_bank_get_transaction_states();
-  $page['transaction']['state'] = $states[$transaction['state']];
-  $page['transaction']['amount'] = $bank->formatAmount($transaction['amount'], ces_bank_get_current_exchange(), TRUE);
+  $page['transaction']['state'] = $states[$bank->getTransactionState($transaction)];
+  $exchange = ces_bank_get_current_exchange();
+  $page['transaction']['amount'] = $bank->formatAmount($transaction['amount'], $exchange, TRUE);
   $page['fromaccount'] = $fromaccount;
   $page['toaccount'] = $toaccount;
   $page['toexchange'] = $bank->getExchange($toaccount['exchange']);
@@ -890,7 +891,7 @@ function ces_bank_transactions_admin_page($exchange_id) {
       'data' => format_date($transaction['created'], 'custom', $dateformat),
     );
     $statestring = _ces_bank_get_transaction_states();
-    $row[] = array('data' => $statestring[$transaction['state']]);
+    $row[] = array('data' => $statestring[$bank->getTransactionState($transaction)]);
     $buyer = $bank->getTransactionFromAccount($transaction);
     $useracc = reset($buyer['users']);
     $buyer_uid = $useracc['user'];
@@ -1024,7 +1025,8 @@ function ces_bank_account_statement_page() {
       $type = 2;
     }
     $statestring = _ces_bank_get_transaction_states();
-    $row[] = array('data' => $statestring[$transaction['state']]);
+    $state = $bank->getTransactionState($transaction);
+    $row[] = array('data' => $statestring[$state]);
 
     $useracc = reset($other_account['users']);
     $uid = $useracc['user'];
@@ -1037,7 +1039,7 @@ function ces_bank_account_statement_page() {
       'class' => 'ces-currency-amount',
     );
 
-    if (in_array((int) $transaction['state'], array(3))) {
+    if ($state == 3) {
       $inibalance += $amount;
     }
     $row[] = array(

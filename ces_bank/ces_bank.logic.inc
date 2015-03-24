@@ -405,6 +405,24 @@ class CesBank {
     return $trans->getLog($trans->getState());
   }
   /**
+   * Get the state of this trasaction
+   * 
+   * Note that the result of this function may be different of the content of
+   * $transaction['state'] for example on interexchange transactions where one
+   * is accepted and the other still triggered.
+   * 
+   * @param array $transaction
+   *   The transaction record.
+   * 
+   * @return int
+   *   The true state of the trasaction.
+   */
+  public function getTransactionState(array $transaction) {
+    $st = new IcesSerializer('CesBankBasicTransaction');
+    $trans = $st->loadFromRecord($transaction);
+    return $trans->getState();
+  }
+  /**
    * Gets transaction object records based on conditions.
    *
    * @param array $conditions

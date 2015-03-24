@@ -430,9 +430,23 @@ class CesBankTestCase extends DrupalWebTestCase {
       'amount' => '1',
     );
     $this->doTransaction($user2, $transaction, FALSE, t('The transaction must be manually authorized.'));
+    // Check tansaction state from both sides.
+    $this->checkTransactionState($user1, $transaction, t('Triggered'));
+    $this->checkTransactionState($user2, $transaction, t('Triggered'));
     $this->acceptTransaction($user1, $transaction);
+    $this->checkTransactionState($user1, $transaction, t('Committed'));
+    $this->checkTransactionState($user2, $transaction, t('Committed'));
     $this->assertBalance($user2, '-4');
     $this->assertBalance($user1, '11.15');
+  }
+  /**
+   * Check the state of a given transaction.
+   */
+  protected function checkTransactionState($user, $transaction, $state) {
+    $this->drupalLogin($user);
+    $this->drupalGet('ces/bank/account/transaction');
+    $this->clickLink($transaction['concept']);
+    $this->assertText($state);
   }
   /**
    * Check administrative interface.
