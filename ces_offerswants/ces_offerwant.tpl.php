@@ -62,10 +62,13 @@
             <div class="ces-offerwant-seller-email">
             <?php echo $ces_offerwant_seller_mail; ?>
             </div>
+        <?php endif; ?>
             <div class="ces-offerwant-seller-address">
             <?php echo $ces_offerwant_seller_address; ?>
             </div>
-        <?php endif; ?>
+            <div class="ces-offerwant-seller-exchange-code">
+            <?php echo $ces_exchange_seller_code; ?>
+            </div>
       </div>
     </div>
     <div class="ces-offerwant-actions">

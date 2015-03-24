@@ -904,6 +904,13 @@ function template_preprocess_ces_offerwant(&$variables) {
   $variables['ces_offerwant_seller_phone'] = ces_user_get_main_phone($account);
   $variables['ces_offerwant_seller_mail'] = $account->mail;
   $variables['ces_offerwant_seller_address'] = ces_user_get_full_address($account);
+
+  // Seller exchange info
+  $exchange_seller = ces_bank_get_current_exchange($account);
+  $variables['ces_exchange_seller_name'] = $exchange_seller['name'];
+  $variables['ces_exchange_seller_code'] = $exchange_seller['code'];
+
+
   // Check if this offer belongs to me.
   global $user;
   $variables['ces_offerwant_belongs_to_me'] = ($offerwant->user == $user->uid);
@@ -1163,6 +1170,7 @@ function _ces_offerswants_get_all_exchanges_options() {
   foreach ($exchanges as $exchange) {
     $options[$exchange['id']] = $exchange['code'];
   }
+  $options['all'] = t('All');
   asort($options);
   return $options;
 }
@@ -1713,8 +1721,10 @@ function ces_offerswants_search_execute($keys = NULL, $conditions = NULL) {
       $query->orderBy($value, $direction);
     }
     elseif ($field == 'exchange') {
-      $categories = array_keys(_ces_offerswants_get_categories_options(NULL, $value));
-      $query->condition('category', $categories, 'IN');
+      if ( $value != 'all' ) {
+        $categories = array_keys(_ces_offerswants_get_categories_options(NULL, $value));
+        $query->condition('category', $categories, 'IN');
+      }
     }
     else {
       $query->condition($field, $value);
