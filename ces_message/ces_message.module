@@ -208,7 +208,7 @@ function ces_message_menu() {
     'type' => MENU_LOCAL_TASK,
   );
   $items['ces/admin/message'] = array(
-    'title' => 'List',
+    'title' => 'Templates',
     'description' => 'Administer message templates',
     'page callback' => 'ces_message_template_info_page',
     'type' => MENU_NORMAL_ITEM,
