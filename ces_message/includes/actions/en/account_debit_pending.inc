@@ -6,7 +6,7 @@
  * @ingroup ces_message_template
  */
 
-$subject = '[[exchange:shortname]] Authorize transaction';
+$subject = '[[exchange:shortname]] Authorize transaction of [transaction:toaccount:user:fullname]';
 
 $body = 'A new transaction to [transaction:toaccount:name] ([transaction:toaccount:user:fullname]) has been created and is awaiting your authorization to be applied. 
 

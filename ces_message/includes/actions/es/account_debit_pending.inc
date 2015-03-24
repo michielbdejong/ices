@@ -6,7 +6,7 @@
  * @ingroup ces_message_template
  */
 
-$subject = '[[exchange:shortname]] Autorizar transacción';
+$subject = '[[exchange:shortname]] Autorizar transacción de [transaction:toaccount:user:fullname]';
 
 $body = 'Estimado/a [transaction:toaccount:user:fullname],
 
