@@ -1170,7 +1170,7 @@ function _ces_offerswants_get_all_exchanges_options() {
   foreach ($exchanges as $exchange) {
     $options[$exchange['id']] = $exchange['code'];
   }
-  $options['all'] = t('All');
+  $options['all'] = t('All Internal exchanges');
   asort($options);
   return $options;
 }
