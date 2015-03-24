@@ -1582,6 +1582,16 @@ function ces_bank_transaction_form($form, &$form_state, $op, $arg, $to_account_i
     // Select seller's exchange.
     $toexchangeid = isset($form_state['values']['toexchange']) ? $form_state['values']['toexchange'] : $exchangeid;
     $toexchange = $exchanges[$toexchangeid];
+    $accountconditions = array(
+      'state' => 1,
+      'kind' => array(
+        CesBankLocalAccount::TYPE_INDIVIDUAL,
+        CesBankLocalAccount::TYPE_SHARED,
+        CesBankLocalAccount::TYPE_ORGANIZATION,
+        CesBankLocalAccount::TYPE_COMPANY,
+        CesBankLocalAccount::TYPE_PUBLIC,
+      )
+    );
     if ($to_account_id == NULL) {
       $form['toexchange'] = array(
         '#title' => t('Seller exchange'),
@@ -1595,16 +1605,7 @@ function ces_bank_transaction_form($form, &$form_state, $op, $arg, $to_account_i
         '#weight' => 30,
       );
       // Select seller's account.
-      $accountconditions = array(
-        'exchange' => $toexchangeid,
-        'state' => 1,
-        'kind' => array(
-          CesBankLocalAccount::TYPE_INDIVIDUAL,
-          CesBankLocalAccount::TYPE_SHARED,
-          CesBankLocalAccount::TYPE_ORGANIZATION,
-          CesBankLocalAccount::TYPE_COMPANY,
-          CesBankLocalAccount::TYPE_PUBLIC,
-        ));
+      $accountconditions['exchange'] = $toexchangeid;
       $accounts = $bank->getAllAccounts($accountconditions);
       $tooptions = array();
       foreach ($accounts as $account) {
@@ -2066,7 +2067,7 @@ function _ces_bank_set_transaction_message($result, $transaction, $op = 'trigger
         $text .= '</ul>';
         // This filter_xss is here only so that coder module shuts up.
         drupal_set_message(filter_xss($text), 'error');
-      } 
+      }
     }
   }
 }

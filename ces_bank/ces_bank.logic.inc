@@ -391,11 +391,11 @@ class CesBank {
   }
   /**
    * Return the array of transaction messages for the current transaction state.
-   * 
+   *
    * @param array $transaction
    *   transaction object record.
-   * 
-   * @return array 
+   *
+   * @return array
    *   $log array of strings with log messages for this transaction and current
    *   state.
    */
@@ -406,14 +406,14 @@ class CesBank {
   }
   /**
    * Get the state of this trasaction
-   * 
+   *
    * Note that the result of this function may be different of the content of
    * $transaction['state'] for example on interexchange transactions where one
    * is accepted and the other still triggered.
-   * 
+   *
    * @param array $transaction
    *   The transaction record.
-   * 
+   *
    * @return int
    *   The true state of the trasaction.
    */
@@ -720,13 +720,13 @@ class CesBank {
   /**
    * Check if it's possible to delete accounts or exchange.
    *
-   * @param array $arrayaids 
+   * @param array $arrayaids
    *   array of account identifiers.
-   * 
-   * @param string $context 
+   *
+   * @param string $context
    *   'account': checking for delete one or more accounts of an exchange.
    *   exchange id: checking for delete all accounts of an entire exchange.
-   * 
+   *
    * @return array
    *   array of accounts:
    *     'aid': account id, 'name': account name.
@@ -742,7 +742,7 @@ class CesBank {
    *   array of users: (only is $context != 'account')
    *     All users, recommended action and other accounts if there are any.
    *   array of transactions: (only is $context != 'account')
-   *     Total number of transactions and array of transactions 
+   *     Total number of transactions and array of transactions
    *     that refers from or to another exchange (inter-exchange).
    */
   public function deleteAccountsCheck($arrayaids, $context = 'account') {
@@ -869,7 +869,7 @@ class CesBank {
   /**
    * Delete or cancel drupal users and all content associated.
    *
-   * @param array $users 
+   * @param array $users
    *   'uid': user id.
    *   'action':
    *     delete -> delete oferswants, comments and user.
@@ -2985,7 +2985,7 @@ class CesBankInterExchangeTransaction extends CesBankDecoratedTransaction {
   }
   /**
    * Implements getState().
-   * 
+   *
    * Only works for states from 0 to 5.
    */
   public function getState() {
