@@ -491,5 +491,21 @@ function ces_message_views_pre_execute (&$view) {
 }
 
 /**
+ * Implements hook_cron().
+ */
+
+function ces_message_cron() {
+  // $date_delete = time() - ( 60 * 60 * 24 * 30 ); // 1 mounth ago
+  $date_delete = time() - ( 60 * 60 * 24 * 365 ); // 1 year ago
+  $num_deleted=db_delete('ces_message')
+    ->condition('created', $date_delete, '<')
+    ->execute();
+  if ( $num_deleted && $num_deleted > 0 ) {
+    $msg = 'Delete '.$num_deleted.' old messages';
+    watchdog('cron',$msg);
+  }
+}
+
+/**
  * @} End of "defgroup ces_message".
  */
