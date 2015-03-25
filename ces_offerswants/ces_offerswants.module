@@ -1633,9 +1633,13 @@ function ces_offerswants_list_page($offerwant_type = 'offer', $action = NULL, $a
     }
   }
   elseif ($action == 'search') {
-    $page += search_data($arg2,
-      'ces_offerswants',
-      array('exchange' => $arg1, 'orderby' => $arg3, 'state' => 1));
+    $page += search_data($arg2, 'ces_offerswants',
+      array(
+        'exchange' => $arg1,
+        'orderby' => $arg3,
+        'state' => 1,
+        'type' => $offerwant_type
+      ));
   }
   else {
     drupal_set_message(t('Action not known'), 'error');
