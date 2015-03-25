@@ -133,22 +133,26 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->createExchanges();
     $this->createAccounts();
     $this->doTransactions();
-    // Balance: HORA0001: 1.5, HORA0002: -1.5
-    $this->adminTransactions();
+    // Balance: HORA0001: 1.5, HORA0002: -1.5.
     $this->checkLimits();
-    // Balance: HORA0001: 19.5, HORA0002: -19.5
+    // Balance: HORA0001: 19.5, HORA0002: -19.5.
     $this->checkManualAuthorization();
-    // Balance: HORA0001: 10.25, HORA0002: -10.25
+    // Balance: HORA0001: 10.25, HORA0002: -10.25.
     $this->doTransactionsInterexchange();
-    // Balance: HORA0001: 10.75, BCNA0001: -5
+    $this->adminTransactions();
+    // Balance: HORA0001: 10.75, BCNA0001: -5.
     $this->doAdminTransaction();
-    // Balance: HORA0001: 11.25, HORA0002: -10.75
+    // Balance: HORA0001: 11.25, HORA0002: -10.75.
     $this->checkInterexchangeManualAccept();
-    // Balance: HORA0001: 11.15, BCNA0001: -4
+    // Balance: HORA0001: 11.15, BCNA0001: -4.
     $this->checkVisibilityOptions();
-    // Admin accounts.
-    $this->adminAccounts();
+    // Other accounts page.
     $this->checkOtherAccountsPage();
+    $this->doEditTransactions();
+    // Balance: HORA0001: 11.40, HORA0002: -11.00.
+    $this->doEditInterexchangeTransactions();
+    // Balance: HORA0001: 12.40, BCNA0001: -14.00.
+    $this->adminAccounts();
   }
   /**
    * Creates two exchanges.
@@ -392,7 +396,7 @@ class CesBankTestCase extends DrupalWebTestCase {
     $record = array(
       'seller' => 'HORA0001',
       'buyer' => 'BCNA0001',
-      'concept' => 'Third test transaction.',
+      'concept' => 'Fourth test transaction.',
       'amount' => '0.5',
     );
     $this->doTransaction($user1, $record, TRUE, 'The transaction has NOT been applied');
@@ -413,7 +417,6 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->drupalPost(NULL, NULL, t('Update transaction'));
     $this->drupalPost(NULL, NULL, t('Update transaction'));
     $this->drupalLogout();
-    $this->drupalLogin($this->admin2);
     $this->assertBalance($user1, '10.75');
     $this->assertBalance($user2, '-5');
   }
@@ -457,6 +460,7 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->assertText('First test transaction.');
     $this->assertText('Second test transaction.');
     $this->assertText('Third test transaction.');
+    $this->assertText('Fourth test transaction.');
   }
   /**
    * Do transactions as admin.
@@ -662,11 +666,21 @@ class CesBankTestCase extends DrupalWebTestCase {
    *   Whether this transaction should be permitted by the system.
    * @param string $message
    *   Optional, a message to assert after doing the transaction.
+   * @param string $op
+   *   Optional, whether this is a new transaction ('new') or we are editing an
+   *   existing transaction ('edit').
    */
-  protected function doTransaction($user, $record, $success = TRUE, $message = NULL) {
+  protected function doTransaction($user, $record, $success = TRUE, $message = NULL, $op = 'new') {
     $this->drupalLogin($user);
     $this->clickLink(t('My account'));
-    $this->clickLink(t('Enter transaction'));
+    if ($op == 'new') {
+      $this->clickLink(t('Enter transaction'));
+    }
+    else {
+      $this->clickLink(t('Account statement'));
+      $this->clickLink($record['concept']);
+      $this->clickLink(t('Edit'));
+    }
     $edit = array(
       'fromaccountname' => $record['buyer'],
       'concept' => $record['concept'],
@@ -687,16 +701,17 @@ class CesBankTestCase extends DrupalWebTestCase {
         }
       }
     }
-    $this->drupalPost(NULL, $edit, t('Create transaction'));
+    $button = ($op == 'new' ? t('Create transaction') : t('Update transaction'));
+    $this->drupalPost(NULL, $edit, $button);
     $this->assertText($record['buyer']);
     if (isset($record['seller'])) {
       $this->assertText($record['seller']);
     }
     $this->assertText($record['amount']);
-    $this->assertText($record['amount']);
-    $this->drupalPost(NULL, array(), t('Confirm transaction'));
+    $button = ($op == 'new' ? t('Confirm transaction') : t('Update transaction'));
+    $this->drupalPost(NULL, array(), $button);
     if (!$message) {
-      $message = t('Transaction successfully applied.');
+      $message = ($op == 'new' ? t('Transaction successfully applied.') : t('Transaction successfully updated.'));
       if ($success) {
         $this->assertText($message);
       }
@@ -952,5 +967,38 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->assertText('+0.40');
     $this->drupalLogout();
   }
+  /**
+   * Test edit local transaction.
+   */
+  protected function doEditTransactions() {
+    $user1 = $this->accountUser($this->account11);
+    $user2 = $this->accountUser($this->account12);
+    $record = array(
+      'buyer' => 'HORA0002',
+      'concept' => 'First test transaction.',
+      'amount' => '1.50',
+    );
+    $this->doTransaction($user1, $record, TRUE, NULL, 'edit');
+    $this->assertBalance($user1, '11.40');
+    $this->assertBalance($user2, '-11.00');
+  }
+  /**
+   * Test edit interexchange transactions.
+   * **/
+  protected function doEditInterexchangeTransactions() {
+    $user1 = $this->accountUser($this->account11);
+    $user2 = $this->accountUser($this->account21);
+    // Interexchange.
+    $record = array(
+      'seller' => 'HORA0001',
+      'buyer' => 'BCNA0001',
+      'concept' => 'Fourth test transaction.',
+      'amount' => '1.5',
+    );
+    $this->doTransaction($user1, $record, TRUE, NULL, 'edit');
+    $this->assertBalance($user1, '12.40');
+    $this->assertBalance($user2, '-14.00');
+  }
+
 }
 /** @} */

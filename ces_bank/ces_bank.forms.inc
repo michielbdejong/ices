@@ -1564,10 +1564,21 @@ function ces_bank_transaction_form($form, &$form_state, $op, $arg, $to_account_i
       $from = $bank->getTransactionFromAccount($arg);
       $to = $bank->getTransactionToAccount($arg);
       $toexchange = $exchanges[$to['exchange']];
-      $form_state['values']['toexchange'] = $to['exchange'];
-      $form_state['values']['toaccountname'] = $to['name'];
-      $form_state['values']['fromexchange'] = $from['exchange'];
-      $form_state['values']['fromaccountname'] = $from['name'];
+      // During the first form build, there are no $form_state['values'], but
+      // there may be subsequent executions (due to ajax calls) where we want to
+      // preserve the existing value from the user.
+      if (empty($form_state['values']['toexchange'])) {
+        $form_state['values']['toexchange'] = $to['exchange'];
+      }
+      if (empty($form_state['values']['toaccountname'])) {
+        $form_state['values']['toaccountname'] = $to['name'];
+      }
+      if (empty($form_state['values']['fromexchange'])) {
+        $form_state['values']['fromexchange'] = $from['exchange'];
+      }
+      if (empty($form_state['values']['fromaccountname'])) {
+        $form_state['values']['fromaccountname'] = $from['name'];
+      }
     }
     $form['operation'] = array(
       '#type' => 'value',
