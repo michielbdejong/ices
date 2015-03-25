@@ -1139,6 +1139,7 @@ class CesBank {
       $transaction->setState(CesBankTransactionInterface::STATE_REJECTED);
       $s = new IcesSerializer('CesBankBasicTransaction');
       $s->save($transaction);
+      $this->notifyTransaction($transaction);
       return ($transaction->getState() == CesBankTransactionInterface::STATE_REJECTED);
     }
     catch (Exception $e) {
@@ -1398,7 +1399,6 @@ class CesBank {
         break;
 
       case CesBankTransactionInterface::STATE_REJECTED:
-        drupal_set_message('REJECTED'); // DEV
         $this->notifyTransactionAccount('account_debit_rejected', $account_from_name, $params);
         $this->notifyTransactionAccount('account_credit_rejected', $account_to_name, $params);
         break;
