@@ -984,7 +984,7 @@ class CesBankTestCase extends DrupalWebTestCase {
   }
   /**
    * Test edit interexchange transactions.
-   * **/
+   */
   protected function doEditInterexchangeTransactions() {
     $user1 = $this->accountUser($this->account11);
     $user2 = $this->accountUser($this->account21);

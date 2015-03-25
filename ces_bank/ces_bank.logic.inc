@@ -405,7 +405,7 @@ class CesBank {
     return $trans->getLog($trans->getState());
   }
   /**
-   * Get the state of this trasaction
+   * Get the state of this trasaction.
    *
    * Note that the result of this function may be different of the content of
    * $transaction['state'] for example on interexchange transactions where one

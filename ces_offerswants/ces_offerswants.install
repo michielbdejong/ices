@@ -235,7 +235,7 @@ function ces_offerswants_update_7100() {
       ),
     ),
     'primary key' => array('cid'),
-0  );
+  );
   db_create_table('ces_offercomment', $schema['ces_offercomment']);
 }
 

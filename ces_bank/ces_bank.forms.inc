@@ -1601,7 +1601,7 @@ function ces_bank_transaction_form($form, &$form_state, $op, $arg, $to_account_i
         CesBankLocalAccount::TYPE_ORGANIZATION,
         CesBankLocalAccount::TYPE_COMPANY,
         CesBankLocalAccount::TYPE_PUBLIC,
-      )
+      ),
     );
     if ($to_account_id == NULL) {
       $form['toexchange'] = array(
