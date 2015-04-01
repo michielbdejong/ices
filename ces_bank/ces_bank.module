@@ -1340,8 +1340,9 @@ function ces_bank_form_user_profile_validate($form, &$form_state) {
  */
 function ces_bank_form_user_profile_submit($form, &$form_state) {
   global $user;
+  $user_edit = $form_state['user']->uid;
   $bank = new CesBank();
-  $accounts = $bank->getUserAccounts($user->uid);
+  $accounts = $bank->getUserAccounts($user_edit);
   $values = $form_state['values']['ces_account'];
   foreach ($accounts as $account) {
     $value = $values[$account['id']];
