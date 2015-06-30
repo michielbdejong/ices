@@ -262,18 +262,33 @@ function ces_bank_exchange_accounts_page() {
     $count = 0;
     foreach ($account['users'] as $user) {
       $count++;
-      $user = $users[$user['user']];
-      $uo = ces_bank_get_full_username($user);
+      if (isset($users[$user['user']])) {
+        $user = $users[$user['user']];
+        $uo = ces_bank_get_full_username($user);
+      }
+      else {
+        $user = FALSE;
+        $uo = 'Nonexistent user';
+      }
       if ($count > 1) {
         $users_out .= '<br/>';
       }
       // First cell begins with 8 chars of the name user in capital letters
       // only for sort case insensitive proposals.
-      $users_out .= strtoupper(sprintf('%8.8s', $uo)) .
-      '<div class="ces-user-column"> <div class="user-picture">' .
-      theme('user_picture', array('account' => $user)) . '</div>' .
-      l(ucfirst($uo), 'user/' . $user->uid) .
-      '</div>';
+      if ($user) {
+        $users_out .= strtoupper(sprintf('%8.8s', $uo)) .
+        '<div class="ces-user-column"> <div class="user-picture">' .
+        theme('user_picture', array('account' => $user)) . '</div>' .
+        l(ucfirst($uo), 'user/' . $user->uid) .
+        '</div>';
+      }
+      else {
+        // $users_out .= $uo;
+        $users_out .= strtoupper(sprintf('%8.8s', $uo)) .
+        '<div class="ces-user-column">' .
+        $uo .
+        '</div>';
+      }
     }
     $row = array(
       $users_out,
@@ -688,7 +703,12 @@ function ces_bank_account_view($account) {
   $page['account']['exchange'] = $exchange['name'];
   $users = reset($account['users']);
   $accuser = user_load($users['user']);
-  $page['account']['username'] = $accuser->name;
+  if ($accuser) {
+    $page['account']['username'] = $accuser->name;
+  }
+  else {
+    $page['account']['username'] = t('Nonexistent user');
+  }
   // TODO: these arrays are repeated in ces_bank_account_form(). They should be
   // shared.
   $kinds = array(

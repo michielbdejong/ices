@@ -206,10 +206,9 @@ function ces_bank_account_user_form_submit($form, &$form_state) {
  *   Account.
  * @param bool $administrator
  *   Exchange administrator or user account.
- *
- * @todo Prevent deleting the last user.
  */
 function ces_bank_account_user_delete_form($form, &$form_state, $user = NULL, $account = NULL, $administrator = FALSE) {
+  $drupal_user = FALSE;
   drupal_set_title(t('Delete account user') . ' ' . $account['name']);
   $bank = new CesBank();
   if ($account == NULL) {
@@ -219,12 +218,24 @@ function ces_bank_account_user_delete_form($form, &$form_state, $user = NULL, $a
   if (!is_array($account)) {
     $account = $bank->getAccount($account);
   }
-  // $user puede venir como objeto o solo el id.
+  // $user It may come as object or the identification.
   if (is_numeric($user)) {
-    $user = user_load($user);
+    $drupal_user = user_load($user);
   }
   if (is_array($user)) {
-    $user = user_load($user['username']);
+    $drupal_user = user_load($user['username']);
+  }
+  if (is_object($user)) {
+    $drupal_user = $user;
+  }
+  // We allow decoupling nonexistent users.
+  if (!$drupal_user) {
+    $uid = $user;
+    $username = t('Nonexistent user');
+  }
+  else {
+    $uid = $drupal_user->uid;
+    $username = $drupal_user->name;
   }
   $form['bankaccount'] = array();
   $form['bankaccount']['account_id'] = array(
@@ -237,11 +248,11 @@ function ces_bank_account_user_delete_form($form, &$form_state, $user = NULL, $a
   );
   $form['bankaccount']['account_user_id'] = array(
     '#type' => 'value',
-    '#value' => $user->uid,
+    '#value' => $uid,
   );
   $form['bankaccount']['title'] = array(
     '#type' => 'item',
-    '#title' => check_plain(t('Delete user') . ' ' . $user->name . ' ' . t('of') . ' ' . t('account')),
+    '#title' => check_plain(t('Delete user') . ' ' . $username . ' ' . t('of') . ' ' . t('account')),
     '#markup' => t('Confirm delete user of account.'),
   );
   $form['bankaccount']['submit'] = array(

@@ -55,17 +55,28 @@ function ces_bank_account_users_admin($administrator = NULL, $account = NULL) {
     if ($administrator) {
       $link_delete = 'ces/admin/account/users/' . $account->id . '/users_account/' . $account_user->user . '/delete';
       $link_edit   = 'ces/admin/account/users/' . $account->id . '/users_account/' . $account_user->user . '/edit';
+      $link_delete_not_user   = 'ces/admin/account/users/' . $account->id . '/users_account/' . $account_user->user . '/delete_not_user';
     }
     else {
       $link_delete = 'ces/bank/account/' . $account_user->user . '/users_account/delete';
       $link_edit   = 'ces/bank/account/' . $account_user->user . '/users_account/edit';
     }
-    $row = array(
-      $user_drupal->name,
-      $user_drupal->mail,
-      ($account_user->privilege == 0) ? t('yes') : t('No'),
-      l(t('Edit'), $link_edit) . ' ' . l(t('Delete'), $link_delete),
-    );
+    if ($user_drupal) {
+      $row = array(
+        $user_drupal->name,
+        $user_drupal->mail,
+        ($account_user->privilege == 0) ? t('yes') : t('No'),
+        l(t('Edit'), $link_edit) . ' ' . l(t('Delete'), $link_delete),
+      );
+    }
+    else {
+      $row = array(
+        t('Nonexistent user'),
+        '',
+        '',
+        (isset($link_delete_not_user)) ? l(t('Delete'), $link_delete_not_user) : '',
+      );
+    }
     $rows[] = $row;
   }
   $page['table']['#rows'] = $rows;
