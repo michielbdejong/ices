@@ -96,7 +96,10 @@ function ces_bank_access($permission, $object, $objectid, $account = NULL) {
   }
 
   // Check account permissions.
-  if ($permission == 'admin' && $object == 'account' && $objectid) {
+  if ( ($permission == 'admin' && $object == 'account' && $objectid) ||
+    ($permission == 'view' && $object == 'account transactions' && $objectid) ||
+    ($permission == 'use' && $object == 'exchange accounts' && $objectid) ||
+    ($permission == 'use' && $object == 'account seller' && $objectid) ) {
     if (empty($account)) {
       $account = ces_bank_get_current_account();
       $account = $account['id'];
