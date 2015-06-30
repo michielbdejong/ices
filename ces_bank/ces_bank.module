@@ -1091,7 +1091,7 @@ function ces_bank_get_full_username($account) {
     }
     $userfullname .= $item['safe_value'];
   }
-  if (empty($userfullname)) {
+  if (empty($userfullname) && $account) {
     $userfullname = $account->name;
   }
   return $userfullname;
