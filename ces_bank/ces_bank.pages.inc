@@ -276,16 +276,19 @@ function ces_bank_exchange_accounts_page() {
       // First cell begins with 8 chars of the name user in capital letters
       // only for sort case insensitive proposals.
       if ($user) {
-        $users_out .= strtoupper(sprintf('%8.8s', $uo)) .
-        '<div class="ces-user-column"> <div class="user-picture">' .
+        if ( $count == 1 ) {
+          $users_out .= strtoupper(sprintf('%8.8s', $uo));
+        } 
+        $users_out .= '<div class="ces-user-column"> <div class="user-picture">' .
         theme('user_picture', array('account' => $user)) . '</div>' .
         l(ucfirst($uo), 'user/' . $user->uid) .
         '</div>';
       }
       else {
-        // $users_out .= $uo;
-        $users_out .= strtoupper(sprintf('%8.8s', $uo)) .
-        '<div class="ces-user-column">' .
+        if ( $count == 1 ) {
+          $users_out .= strtoupper(sprintf('%8.8s', $uo));
+        } 
+        $users_out .= '<div class="ces-user-column">' .
         $uo .
         '</div>';
       }
