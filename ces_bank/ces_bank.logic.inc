@@ -1585,7 +1585,7 @@ class CesBankExchange extends IcesDBObject {
     // NOTE: this function is highly inefficient. It can be changed with a
     // single specific DB query if causes performance problems.
     $s = new IcesSerializer('CesBankLocalAccount');
-    $accounts = $s->loadCollection(array('exchange' => $this->id), 'name');
+    $accounts = $s->loadCollection(array('exchange' => $this->id, 'kind' => array(0, 1, 2, 3, 4)), 'name');
     $start = floor((count($accounts) - 1) / 2);
     // This is a bit tricky.
     $code = !empty($accounts) ? $accounts[$start]->getCode() : 0;
