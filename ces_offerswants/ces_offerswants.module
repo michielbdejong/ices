@@ -224,7 +224,8 @@ function ces_offerswants_menu() {
     'page arguments' => array('offer', 4, 5, 6, 7, 8),
     'access callback' => 'ces_bank_access',
     'access arguments' => array('view', 'exchange details',
-      CES_BANK_CURRENT_EXCHANGE),
+      CES_BANK_CURRENT_EXCHANGE,
+    ),
     'type' => MENU_NORMAL_ITEM,
     'weight' => 220,
   );
@@ -235,7 +236,8 @@ function ces_offerswants_menu() {
     'page arguments' => array('want', 4, 5, 6, 7, 8),
     'access callback' => 'ces_bank_access',
     'access arguments' => array('view', 'exchange details',
-      CES_BANK_CURRENT_EXCHANGE),
+      CES_BANK_CURRENT_EXCHANGE,
+    ),
     'type' => MENU_NORMAL_ITEM,
     'weight' => 230,
   );
@@ -399,8 +401,6 @@ function ces_offerswants_menu() {
     'page callback' => 'ces_offercomment_page',
     'page arguments' => array(4),
     'access callback' => TRUE,
-    // 'access callback' => 'ces_offerwant_access',
-    // 'access arguments' => array('edit', 4),
   );
   return $menu;
 }
@@ -458,14 +458,16 @@ function _ces_offerswants_my_page($type) {
   $page = _ces_offerswants_user_page($type, $user->uid, 'full');
   if (empty($page)) {
     $text = array();
+    $t_you_dont = t("You don't have any offer yet. You should publish your goods and skills so others can ask you for them.");
+    $t_add_offer = t('Add offer');
     if ($type == 'offer') {
-      $text['#markup'] = t("You don't have any offer yet. You should publish your goods and skills so others can ask you for them.")
-                       . ' ' . l(t('Add offer'), 'ces/bank/account/myoffers/add');
+      $text['#markup'] = $t_you_dont . ' ' . l($t_add_offer, 'ces/bank/account/myoffers/add');
     }
     else {
       // Type == want.
-      $text['#markup'] = t("You don't have any want yet. Publishing a want is useful not only for you but also for other members searching for valued goods and skills.")
-                       . ' ' . l(t('Add want'), 'ces/bank/account/mywants/add');
+      $t_you_dont_have = t("You don't have any want yet. Publishing a want is useful not only for you but also for other members searching for valued goods and skills.");
+      $t_add_want = t('Add want');
+      $text['#markup'] = $t_you_dont_have . ' ' . l($t_add_want, 'ces/bank/account/mywants/add');
     }
     $page[] = $text;
   }
@@ -598,7 +600,8 @@ function ces_offerwant_form($form, &$form_state, $offerwant_type = 'offer', $off
     );
   }
   elseif (count($options) == 1) {
-    foreach ($options as $category_id => $category_name);
+    foreach ($options as $category_id => $category_name) {
+    }
     $form['category'] = array(
       '#type' => 'value',
       '#value' => $category_id,
@@ -905,11 +908,10 @@ function template_preprocess_ces_offerwant(&$variables) {
   $variables['ces_offerwant_seller_mail'] = $account->mail;
   $variables['ces_offerwant_seller_address'] = ces_user_get_full_address($account);
 
-  // Seller exchange info
+  // Seller exchange info.
   $exchange_seller = ces_bank_get_current_exchange($account);
   $variables['ces_exchange_seller_name'] = $exchange_seller['name'];
   $variables['ces_exchange_seller_code'] = $exchange_seller['code'];
-
 
   // Check if this offer belongs to me.
   global $user;
@@ -1178,7 +1180,7 @@ function _ces_offerswants_get_all_exchanges_options() {
  * Helper.
  *
  * @param string $offerwant_type
- *   'offer' or 'want'.
+ *   Offer or want.
  * @param int $exchange
  *   Exchange identifier.
  */
@@ -1232,9 +1234,10 @@ function ces_offerswants_admin_categories_page() {
   $categories = ces_offerswants_get_categories();
   $page = array();
   if (empty($categories)) {
+    $t_yout_exchange = t('Your exchange does not have any category yet. It is very recommended to divide the offers and/or wants into several categories. A good first approach is to create 10-15 categories for offers but a single category for wants.');
+    $t_add_category = t('Add category');
     return array(
-      '#markup' => t('Your exchange does not have any category yet. It is very recommended to divide the offers and/or wants into several categories. A good first approach is to create 10-15 categories for offers but a single category for wants.')
-      . ' ' . l(t('Add category'), 'ces/admin/categories/add'),
+      '#markup' => $t_yout_exchange . ' ' . l($t_add_category, 'ces/admin/categories/add'),
     );
   }
   $page['table'] = array(
@@ -1339,6 +1342,7 @@ class CesOffersWantsEntityController extends DrupalDefaultEntityController {
     db_delete('ces_offerwant')->condition('id', $offerwant->id)->execute();
     field_attach_delete('ces_offerwant', $offerwant);
   }
+
 }
 /**
  * Entity controller.
@@ -1397,6 +1401,7 @@ class CesOffersWantsCategoryEntityController extends DrupalDefaultEntityControll
     db_delete('ces_category')->condition('id', $category->id)->execute();
     field_attach_delete('ces_category', $category);
   }
+
 }
 
 /**
@@ -1418,6 +1423,7 @@ class OfferCommentEntityController extends DrupalDefaultEntityController {
     $offercomment = ces_offercomment_load($cid);
     db_delete('ces_offercomment')->condition('cid', $offercomment->cid)->execute();
   }
+
 }
 
 /**
@@ -1638,7 +1644,7 @@ function ces_offerswants_list_page($offerwant_type = 'offer', $action = NULL, $a
         'exchange' => $arg1,
         'orderby' => $arg3,
         'state' => 1,
-        'type' => $offerwant_type
+        'type' => $offerwant_type,
       ));
   }
   else {
@@ -1725,7 +1731,7 @@ function ces_offerswants_search_execute($keys = NULL, $conditions = NULL) {
       $query->orderBy($value, $direction);
     }
     elseif ($field == 'exchange') {
-      if ( $value != 'all' ) {
+      if ($value != 'all') {
         $categories = array_keys(_ces_offerswants_get_categories_options(NULL, $value));
         $query->condition('category', $categories, 'IN');
       }
@@ -2083,8 +2089,9 @@ function ces_offercomment_page($offerid) {
     $page[] = drupal_get_form('ces_offercomment_add_form', $offerid);
   }
   else {
+    $t_there = t('There is no offer with @offerid id number.', array('@offerid' => $offerid));
     $text = array(
-      '#markup' => t('There is no offer with ' . $offerid . ' id number.'),
+      '#markup' => $t_there,
     );
     $page[] = $text;
   }
@@ -2268,4 +2275,6 @@ function ces_offerswants_image_style_delete($style) {
     variable_set('ces_offerswants_image_style_name', $style['name']);
   }
 }
-/** @} */
+/**
+ * @}
+ */

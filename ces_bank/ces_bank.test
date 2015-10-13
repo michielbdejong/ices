@@ -16,52 +16,42 @@
  */
 class CesBankTestCase extends DrupalWebTestCase {
   /**
-   * @var user
-   * The global administrator.
+   * Global Admin User.
    */
   protected $globalAdminUser;
   /**
-   * @var exchange
    * First exchange properties.
    */
   protected $exchange1;
   /**
-   * @var exchange
    * Second exchange propeties.
    */
   protected $exchange2;
   /**
-   * @var $admin1
    * Administrator user for exchange 1.
    */
   protected $admin1;
   /**
-   * @var $account11;
    * First account from exchange 1.
    */
   protected $account11;
   /**
-   * @var $account12
    * Second account from exchange 1.
    */
   protected $account12;
   /**
-   * @var $accountV1
    * Virtual account from exchange 1 to 2.
    */
   protected $accountV1;
   /**
-   * @var $accountV2
    * Virtual account from exchange 2 to 1.
    */
   protected $accountV2;
   /**
-   * @var $admin2
    * Administrator user for exchange 2.
    */
   protected $admin2;
   /**
-   * @var $account21;
    * First account from exchange 2.
    */
   protected $account21;
@@ -484,7 +474,8 @@ class CesBankTestCase extends DrupalWebTestCase {
   }
   /**
    * Helper function.
-   * @return object
+   *
+   * @param object $record
    *   A user object suitable for drupalLogin() function.
    */
   protected function accountUser($record) {
@@ -497,7 +488,8 @@ class CesBankTestCase extends DrupalWebTestCase {
   }
   /**
    * Helper function.
-   * @return array
+   *
+   * @param array $record
    *   User account form array with proper keys.
    */
   protected function accountRecord($record) {
@@ -522,7 +514,7 @@ class CesBankTestCase extends DrupalWebTestCase {
    * Create a new user request.
    *
    * @param array $record
-   *   associative array with entries:
+   *   Associative array with entries:
    *   - exchange: associative array with entries
    *     - country
    *     - fullname
@@ -552,6 +544,7 @@ class CesBankTestCase extends DrupalWebTestCase {
    *     - title
    *     - body
    *     - keywords
+   *   .
    */
   protected function createAccount($record) {
     // Choose country from first page.
@@ -1001,4 +994,6 @@ class CesBankTestCase extends DrupalWebTestCase {
   }
 
 }
-/** @} */
+/**
+ * @}
+ */

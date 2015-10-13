@@ -96,10 +96,10 @@ function ces_bank_access($permission, $object, $objectid, $account = NULL) {
   }
 
   // Check account permissions.
-  if ( ($permission == 'admin' && $object == 'account' && $objectid) ||
+  if (($permission == 'admin' && $object == 'account' && $objectid) ||
     ($permission == 'view' && $object == 'account transactions' && $objectid) ||
     ($permission == 'use' && $object == 'exchange accounts' && $objectid) ||
-    ($permission == 'use' && $object == 'account seller' && $objectid) ) {
+    ($permission == 'use' && $object == 'account seller' && $objectid)) {
     if (empty($account)) {
       $account = ces_bank_get_current_account();
       $account = $account['id'];
@@ -116,6 +116,7 @@ function ces_bank_access($permission, $object, $objectid, $account = NULL) {
 
   $bank = new CesBank();
   return $bank->access($args[0], $args[1], $args[2], $args[3]);
+
 }
 /**
  * Menu hook for ces_bank. Includes most CES menu functions.
@@ -292,13 +293,18 @@ function ces_bank_menu() {
     'weight' => 0,
     'description' => 'Do a transaction between two accounts.',
     'page callback' => '_ces_bank_get_form',
-    'page arguments' => array('ces_bank_transaction_form', 'new',
-      CES_BANK_CURRENT_EXCHANGE, NULL, NULL),
+    'page arguments' => array('ces_bank_transaction_form',
+      'new',
+      CES_BANK_CURRENT_EXCHANGE,
+      NULL,
+      NULL,
+    ),
     'file' => 'ces_bank.forms.inc',
     'file path' => drupal_get_path('module', 'ces_bank'),
     'access callback' => 'ces_bank_access',
     'access arguments' => array('use', 'exchange accounts',
-      CES_BANK_CURRENT_EXCHANGE),
+      CES_BANK_CURRENT_EXCHANGE,
+    ),
     'weight' => 10,
   );
   $menu['ces/bank/account/sell'] = array(
@@ -306,12 +312,14 @@ function ces_bank_menu() {
     'description' => 'Charge a sale to an account.',
     'page callback' => '_ces_bank_get_form',
     'page arguments' => array('ces_bank_transaction_form', 'new',
-      CES_BANK_CURRENT_EXCHANGE, CES_BANK_CURRENT_ACCOUNT, NULL),
+      CES_BANK_CURRENT_EXCHANGE, CES_BANK_CURRENT_ACCOUNT, NULL,
+    ),
     'file' => 'ces_bank.forms.inc',
     'file path' => drupal_get_path('module', 'ces_bank'),
     'access callback' => 'ces_bank_access',
     'access arguments' => array('use', 'account seller',
-      CES_BANK_CURRENT_ACCOUNT),
+      CES_BANK_CURRENT_ACCOUNT,
+    ),
     'weight' => 130,
   );
   $menu['ces/bank/account/sell/simple'] = array(
@@ -328,7 +336,8 @@ function ces_bank_menu() {
     'file path' => drupal_get_path('module', 'ces_bank'),
     'access callback' => 'ces_bank_access',
     'access arguments' => array('use', 'account seller',
-      CES_BANK_CURRENT_ACCOUNT),
+      CES_BANK_CURRENT_ACCOUNT,
+    ),
     'type' => MENU_LOCAL_TASK,
     'weight' => 1,
   );
@@ -340,7 +349,8 @@ function ces_bank_menu() {
     'file path' => drupal_get_path('module', 'ces_bank'),
     'access callback' => 'ces_bank_access',
     'access arguments' => array('use', 'account seller',
-      CES_BANK_CURRENT_ACCOUNT),
+      CES_BANK_CURRENT_ACCOUNT,
+    ),
     'type' => MENU_CALLBACK,
   );
   $menu['ces/bank/account'] = array(
@@ -348,12 +358,14 @@ function ces_bank_menu() {
     'description' => 'View account details.',
     'page callback' => '_ces_bank_get_form',
     'page arguments' => array('ces_bank_account_statement_form',
-      CES_BANK_CURRENT_ACCOUNT),
+      CES_BANK_CURRENT_ACCOUNT,
+    ),
     'file' => 'ces_bank.forms.inc',
     'file path' => drupal_get_path('module', 'ces_bank'),
     'access callback' => 'ces_bank_access',
     'access arguments' => array('view', 'account transactions',
-      CES_BANK_CURRENT_ACCOUNT),
+      CES_BANK_CURRENT_ACCOUNT,
+    ),
     'expanded' => TRUE,
     'weight' => 100,
   );
@@ -420,7 +432,8 @@ function ces_bank_menu() {
     'type' => MENU_NORMAL_ITEM,
     'access callback' => 'ces_bank_access',
     'access arguments' => array('view', 'exchange details',
-      CES_BANK_CURRENT_EXCHANGE),
+      CES_BANK_CURRENT_EXCHANGE,
+    ),
     'expanded' => TRUE,
     'weight' => 200,
   );
@@ -433,7 +446,8 @@ function ces_bank_menu() {
     'type' => MENU_NORMAL_ITEM,
     'access callback' => 'ces_bank_access',
     'access arguments' => array('view', 'exchange accounts',
-      CES_BANK_CURRENT_EXCHANGE),
+      CES_BANK_CURRENT_EXCHANGE,
+    ),
     'weight' => 240,
   );
   $menu['ces/bank/exchange/accounts/list'] = array(
@@ -450,7 +464,8 @@ function ces_bank_menu() {
     'type' => MENU_LOCAL_TASK,
     'access callback' => 'ces_bank_access',
     'access arguments' => array('view', 'exchange accounts',
-      CES_BANK_CURRENT_EXCHANGE),
+      CES_BANK_CURRENT_EXCHANGE,
+    ),
     'weight' => 100,
   );
   $menu['ces/bank/exchange/list/%'] = array(
@@ -469,7 +484,8 @@ function ces_bank_menu() {
     'type' => MENU_CALLBACK,
     'access callback' => 'ces_bank_access',
     'access arguments' => array('view', 'exchange accounts',
-      CES_BANK_CURRENT_EXCHANGE),
+      CES_BANK_CURRENT_EXCHANGE,
+    ),
     'page callback' => 'ces_bank_user_autocomplete',
   );
   $menu['ces/admin/exchange'] = array(
@@ -477,7 +493,8 @@ function ces_bank_menu() {
     'description' => 'Edit exchange',
     'page callback' => '_ces_bank_get_form',
     'page arguments' => array('ces_bank_exchange_form', 'edit',
-      CES_BANK_CURRENT_EXCHANGE),
+      CES_BANK_CURRENT_EXCHANGE,
+    ),
     'file' => 'ces_bank.forms.inc',
     'file path' => drupal_get_path('module', 'ces_bank'),
     'type' => MENU_NORMAL_ITEM,
@@ -495,7 +512,8 @@ function ces_bank_menu() {
     'type' => MENU_NORMAL_ITEM,
     'access callback' => 'ces_bank_access',
     'access arguments' => array('view', 'exchange limitchains',
-      CES_BANK_CURRENT_EXCHANGE),
+      CES_BANK_CURRENT_EXCHANGE,
+    ),
   );
   $menu['ces/admin/limitchain/list'] = array(
     'title' => 'List',
@@ -524,7 +542,8 @@ function ces_bank_menu() {
     'type' => MENU_LOCAL_TASK,
     'access callback' => 'ces_bank_access',
     'access arguments' => array('view', 'exchange limitchains',
-      CES_BANK_CURRENT_EXCHANGE),
+      CES_BANK_CURRENT_EXCHANGE,
+    ),
     'weight' => 2,
   );
   $menu['ces/admin/limitchain/%ces_limitchain/edit'] = array(
@@ -594,7 +613,8 @@ function ces_bank_menu() {
     'file path' => drupal_get_path('module', 'ces_bank'),
     'access callback' => 'ces_bank_access',
     'access arguments' => array('view', 'account transactions',
-      CES_BANK_CURRENT_ACCOUNT),
+      CES_BANK_CURRENT_ACCOUNT,
+    ),
     'weight' => 140,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -1477,7 +1497,8 @@ function ces_bank_user_register_submit($form, &$form_state) {
 }
 /**
  * AJAX autocomplete callback.
- * @return string
+ *
+ * @param string $string
  *   Users in current exchange.
  */
 function ces_bank_user_autocomplete($string) {
@@ -1513,4 +1534,6 @@ function ces_bank_views_api() {
     'path' => drupal_get_path('module', 'ces_bank') . '/views',
   );
 }
-/** @} */
+/**
+ * @}
+ */

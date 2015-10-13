@@ -180,7 +180,7 @@ function ces_message_template_view($entity, $view_mode = 'tweaky') {
   $entity->content['ces_action'] = array(
     '#type' => 'item',
     '#title' => t('Action'),
-    '#markup' => t(ces_message_action_load($entity->ces_action_id)->description),
+    '#markup' => t('@description', array('@description' => ces_message_action_load($entity->ces_action_id)->description)),
   );
   $entity->content['language'] = array(
     '#type' => 'item',
@@ -321,10 +321,6 @@ function ces_message_template_form($form, &$form_state, $entity) {
       '#options' => $options,
       '#required' => TRUE,
       '#default_value' => $field_language,
-      // '#ajax' => array(
-      // 'callback' => 'ces_message_fields_ajax_callback',
-      // 'wrapper' => 'ces-message-wrapper',
-      // ),
     );
   }
   else {
@@ -346,13 +342,6 @@ function ces_message_template_form($form, &$form_state, $entity) {
     '#default_value' => $entity->ces_action_id,
     '#weight' => 0,
   );
-  // $form['ces_action'] = array(
-  // '#type' => 'textfield',
-  // '#title' => t('Action'),
-  // '#required' => TRUE,
-  // '#default_value' => $entity->ces_action,
-  // '#weight' => 0,
-  // );
   $form['subject'] = array(
     '#type' => 'textfield',
     '#title' => t('Subject'),
@@ -483,8 +472,7 @@ function ces_message_template_delete($entity) {
  *
  * @see hook_entity_info_alter()
  */
-interface CesMessageTemplateControllerInterface
-  extends DrupalEntityControllerInterface {
+interface CesMessageTemplateControllerInterface extends DrupalEntityControllerInterface {
 
   /**
    * Create an entity.
@@ -515,9 +503,7 @@ interface CesMessageTemplateControllerInterface
  * Our subclass of DrupalDefaultEntityController lets us add a few
  * important create, update, and delete methods.
  */
-class CesMessageTemplateController
-  extends DrupalDefaultEntityController
-  implements CesMessageTemplateControllerInterface {
+class CesMessageTemplateController extends DrupalDefaultEntityController implements CesMessageTemplateControllerInterface {
 
   /**
    * Create and return a new ces_message_template entity.
@@ -617,6 +603,7 @@ class CesMessageTemplateController
       }
     }
   }
+
 }
 
 /**

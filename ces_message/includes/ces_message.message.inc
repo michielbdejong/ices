@@ -96,7 +96,7 @@ function ces_message_view($entity, $view_mode = 'tweaky') {
   $entity->content['type_message'] = array(
     '#type' => 'item',
     '#title' => t('Type message'),
-    '#markup' => t($entity->type_message),
+    '#markup' => t('@type', array('@type' => $entity->type_message)),
   );
   $entity->content['subject'] = array(
     '#type' => 'item',
@@ -151,8 +151,7 @@ function ces_message_delete($entity) {
  *
  * @see hook_entity_info_alter()
  */
-interface CesMessageEntityControllerInterface
-  extends DrupalEntityControllerInterface {
+interface CesMessageEntityControllerInterface extends DrupalEntityControllerInterface {
 
   /**
    * Create an entity.
@@ -183,9 +182,7 @@ interface CesMessageEntityControllerInterface
  * Our subclass of DrupalDefaultEntityController lets us add a few
  * important create, update, and delete methods.
  */
-class CesMessageEntityController
-  extends DrupalDefaultEntityController
-  implements CesMessageEntityControllerInterface {
+class CesMessageEntityController extends DrupalDefaultEntityController implements CesMessageEntityControllerInterface {
 
   /**
    * Create and return a new ces_message entity.
@@ -284,6 +281,7 @@ class CesMessageEntityController
       }
     }
   }
+
 }
 /**
  * Build the pager query.

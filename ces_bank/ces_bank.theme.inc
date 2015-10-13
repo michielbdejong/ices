@@ -119,6 +119,7 @@ function theme_ces_bank_transaction_view($variables) {
 }
 /**
  * Theme function for page ces_bank_limitchain_view().
+ *
  * @todo move this to page function! -My God, this is logic!!
  */
 function theme_ces_bank_limitchain_view($variables) {
@@ -186,4 +187,6 @@ function theme_ces_bank_limitchain_view($variables) {
   $out .= '</div>';
   return $out;
 }
-/** @} */
+/**
+ * @}
+ */

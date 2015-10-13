@@ -1,8 +1,10 @@
 <?php
 /**
  * @file
- * @brief Forms definition, submit and validation functions for account users 
- *        in ces_bank module.
+ * Forms definition.
+ *
+ * Forms definition, submit and validation functions for account users
+ * in ces_bank module.
  */
 
 /**
@@ -15,9 +17,9 @@
 /**
  * Form for add an user account.
  *
- * @param array  $form
+ * @param array $form
  *   Form.
- * @param array  $form_state
+ * @param array $form_state
  *   State form.
  * @param string $user
  *   Usuer.
@@ -43,7 +45,8 @@ function ces_bank_account_user_form($form, &$form_state, $user = NULL, $account 
     $user = user_load($user['username']);
   }
 
-  drupal_set_title(t('Account') . ' ' . $account['name']);
+  $t_account = t('Account');
+  drupal_set_title($t_account . ' ' . $account['name']);
 
   $admin = ces_bank_access('admin', 'account', $account['id']);
 
@@ -61,14 +64,16 @@ function ces_bank_account_user_form($form, &$form_state, $user = NULL, $account 
   }
   $form['bankaccount'] = array();
   if ($user) {
+    $t_edit = t('Edit user in account');
     $form['titular'] = array(
-      '#markup' => '<h2>' . t('Edit user in account') . ' ' . $account['name'] . '</h2>',
+      '#markup' => '<h2>' . $t_edit . ' ' . $account['name'] . '</h2>',
       '#weight' => -10,
     );
   }
   else {
+    $t_add = t('Add user in account');
     $form['titular'] = array(
-      '#markup' => '<h2>' . t('Add user in account') . ' ' . $account['name'] . '</h2>',
+      '#markup' => '<h2>' . $t_add . ' ' . $account['name'] . '</h2>',
       '#weight' => -10,
     );
   }
@@ -209,7 +214,8 @@ function ces_bank_account_user_form_submit($form, &$form_state) {
  */
 function ces_bank_account_user_delete_form($form, &$form_state, $user = NULL, $account = NULL, $administrator = FALSE) {
   $drupal_user = FALSE;
-  drupal_set_title(t('Delete account user') . ' ' . $account['name']);
+  $t_delete = t('Delete account user');
+  drupal_set_title($t_delete . ' ' . $account['name']);
   $bank = new CesBank();
   if ($account == NULL) {
     $account = ces_bank_get_current_account();
@@ -250,9 +256,12 @@ function ces_bank_account_user_delete_form($form, &$form_state, $user = NULL, $a
     '#type' => 'value',
     '#value' => $uid,
   );
+  $t_delete_user = t('Delete user');
+  $t_account = t('account');
+  $t_of = t('of');
   $form['bankaccount']['title'] = array(
     '#type' => 'item',
-    '#title' => check_plain(t('Delete user') . ' ' . $username . ' ' . t('of') . ' ' . t('account')),
+    '#title' => check_plain($t_delete_user . ' ' . $username . ' ' . $t_of . ' ' . $t_account),
     '#markup' => t('Confirm delete user of account.'),
   );
   $form['bankaccount']['submit'] = array(
@@ -295,4 +304,6 @@ function ces_bank_account_user_delete_form_submit($form, &$form_state) {
     drupal_set_message(t('An error occurred while saving the user account record. Details: %msg', array('%msg' => $e->getMessage())), 'error');
   }
 }
-/** @} */
+/**
+ * @}
+ */

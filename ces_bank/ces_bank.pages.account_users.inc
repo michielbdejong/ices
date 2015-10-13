@@ -18,7 +18,8 @@ function ces_bank_account_users_admin($administrator = NULL, $account = NULL) {
   if ($account == NULL) {
     $account = ces_bank_get_current_account();
   }
-  drupal_set_title(t('List users account') . ' ' . $account['name']);
+  $t_list_users_account = t('List users account');
+  drupal_set_title($t_list_users_account . ' ' . $account['name']);
   $s = new IcesSerializer('CesBankLocalAccount');
   $account = $s->loadFromUniqueKey('name', $account['name']);
   // @todo Comprobar permisos con cuenta.
@@ -83,4 +84,6 @@ function ces_bank_account_users_admin($administrator = NULL, $account = NULL) {
   return $page;
 
 }
-/** @} */
+/**
+ * @}
+ */

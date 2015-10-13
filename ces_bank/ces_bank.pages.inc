@@ -130,7 +130,9 @@ function ces_bank_accounts_admin($exchange_id) {
       $states[$account['state']],
       $limits[$account['limitchain']],
       // Quitamos moneda de la cantidad para poder ser ordenado.
+      // @code
       // $bank->formatAmount($account['balance'], $exchange, TRUE),
+      // @endcode
       number_format($account['balance'], 2),
       l(t('View'), 'ces/admin/account/' . $account['id'] . '/view') . ' ' .
       l(t('Edit'), 'ces/admin/account/' . $account['id'] . '/edit') . ' ' .
@@ -276,18 +278,18 @@ function ces_bank_exchange_accounts_page() {
       // First cell begins with 8 chars of the name user in capital letters
       // only for sort case insensitive proposals.
       if ($user) {
-        if ( $count == 1 ) {
+        if ($count == 1) {
           $users_out .= strtoupper(sprintf('%8.8s', $uo));
-        } 
+        }
         $users_out .= '<div class="ces-user-column"> <div class="user-picture">' .
         theme('user_picture', array('account' => $user)) . '</div>' .
         l(ucfirst($uo), 'user/' . $user->uid) .
         '</div>';
       }
       else {
-        if ( $count == 1 ) {
+        if (count == 1) {
           $users_out .= strtoupper(sprintf('%8.8s', $uo));
-        } 
+        }
         $users_out .= '<div class="ces-user-column">' .
         $uo .
         '</div>';
@@ -382,7 +384,8 @@ function ces_bank_other_exchanges_page() {
       else {
         // This a remote exchange. We don't know the name nor the currency
         // value.
-        $row[0] = $code . ' (' . t('Remote') . ')';
+        $remote = t('Remote');
+        $row[0] = $code . ' (' . $remote . ')';
         $row[1] = '';
       }
       $row[2] = $import;
@@ -419,11 +422,12 @@ function ces_bank_account_list_page() {
   $bank = new CesBank();
   $page = array();
   $accounts = $bank->getUserAccounts($user->uid);
+  $t_account = t('Account');
   foreach ($accounts as $account) {
     $exchange = $bank->getExchange($account['exchange']);
     $accform = array(
       '#type' => 'fieldset',
-      '#title' => t('Account') . ' ' . $account['name'],
+      '#title' => $t_account . ' ' . $account['name'],
     );
     $accform['exchange'] = array(
       '#type' => 'item',
@@ -738,7 +742,7 @@ function ces_bank_account_view($account) {
  * TODO: Document.
  *
  * @param array $transaction
- *   transaction record.
+ *   Transaction record.
  */
 function ces_bank_transaction_view($transaction) {
   $bank = new CesBank();
@@ -1032,7 +1036,8 @@ function ces_bank_account_statement_page() {
   foreach ($transactions as $transaction) {
     $row = array();
     $row[] = array(
-      'data' => format_date($transaction['created'], 'custom', $dateformat));
+      'data' => format_date($transaction['created'], 'custom', $dateformat),
+    );
 
     if ($transaction['fromaccount'] != $account['id']) {
       $other_account = $bank->getTransactionFromAccount($transaction);
@@ -1099,4 +1104,6 @@ function _ces_bank_get_transaction_states() {
     11 => t('Error'),
   );
 }
-/** @} */
+/**
+ *  @}
+ */
