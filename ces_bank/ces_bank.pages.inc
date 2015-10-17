@@ -287,7 +287,7 @@ function ces_bank_exchange_accounts_page() {
         '</div>';
       }
       else {
-        if (count == 1) {
+        if ($count == 1) {
           $users_out .= strtoupper(sprintf('%8.8s', $uo));
         }
         $users_out .= '<div class="ces-user-column">' .

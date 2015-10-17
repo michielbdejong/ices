@@ -4,19 +4,35 @@
  * Test ces_interop module.
  */
 
+/**
+ * Test Interop.
+ *
+ * The test on the server can not be implemented for lack of external libraries.
+ * If you're local and want to do the test you must follow these instructions.
+ *
+ * @code
+ * cd sites/all/libraries
+ * git clone --branch master https://github.com/bshaffer/oauth2-server-php.git
+ * cd oauth2-server-php
+ * git checkout v1.4
+ * @endcode
+ */
+
+define('TEST_INTEROP', FALSE);
+
+/**
+ * Ces Interop Test Case.
+ */
 class CesInteropTestCase extends CesBankTestCase {
   /**
-   * @var string
    * OAuth2 test client key.
    */
   protected $clientKey = 'test';
   /**
-   * @var string
    * OAuth2 test client secret.
    */
   protected $clientSecret = 'test_secret';
   /**
-   * @var string
    * Oauth2 test client redirect URI.
    */
   protected $clientUri;
@@ -69,13 +85,16 @@ class CesInteropTestCase extends CesBankTestCase {
    * one test function to save resources.
    */
   protected function testAll() {
+    if (!TEST_INTEROP) {
+      return TRUE;
+    }
     $this->createExchanges();
     $this->createAccounts();
     // Now we are ready to test opentransact.
     $this->doOpentransact();
     $this->doResources();
     // Clean false positives from test results.
-    $this->deleteOAuth2Exceptions();
+    $this->deleteOauth2Exceptions();
   }
   /**
    * Test opentransact features.
@@ -162,12 +181,12 @@ class CesInteropTestCase extends CesBankTestCase {
   }
   /**
    * Handles OAuth2 autorization.
-   * 
+   *
    * This function is used both for OpenTransact and for Resources services.
    *
    * @param string $endpoint_auth
    *   The authorization url.
-   * @param stirng $endpoint_token
+   * @param string $endpoint_token
    *   The token url.
    * @param object $account
    *   The test account to authenticate.
@@ -233,7 +252,6 @@ class CesInteropTestCase extends CesBankTestCase {
     $result = $this->httpRequest($token_url, $options);
     $response = json_decode($result->data);
     $access_token = $response->access_token;
-
     return $access_token;
   }
   /**
@@ -245,13 +263,13 @@ class CesInteropTestCase extends CesBankTestCase {
   }
   /**
    * Deletes an exception assertion thrown by oauth2_server.
-   * 
-   * These exceptions don't prevent the right operation but causes the test to 
+   *
+   * These exceptions don't prevent the right operation but causes the test to
    * fail.
-   * It has been reported to oauth2_server project at 
+   * It has been reported to oauth2_server project at
    * https://drupal.org/node/2276543 with currently no reply.
    */
-  protected function deleteOAuth2Exceptions() {
+  protected function deleteOauth2Exceptions() {
     $connection = Database::getConnection('default', 'simpletest_original_default');
     $res = (bool) $connection->delete('simpletest')
       ->condition('status', 'exception')
@@ -261,4 +279,5 @@ class CesInteropTestCase extends CesBankTestCase {
       $this->assert('debug', 'Deleted exceptions from oauth2_server module.');
     }
   }
+
 }

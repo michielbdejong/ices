@@ -1446,68 +1446,67 @@ class CesBank {
 class CesBankExchange extends IcesDBObject {
   public static $table = 'ces_exchange';
   /**
-   * @var int
+   * Id.
    */
   public $id;
   /**
-   * @var string
+   * Code.
    */
   public $code;
   /**
-   * @var int
+   * State.
    */
   public $state;
   /**
-   * @var Currency
+   * Currency.
    */
   protected $currency;
   /**
-   * @var int
+   * Limitchain.
    */
   public $limitchain;
   /**
-   * @var string
+   * Shortname.
    */
   public $shortname;
   /**
-   * @var string
+   * Name.
    */
   public $name;
   /**
-   * @var string
+   * Country.
    */
   public $country;
   /**
-   * @var string
+   * Region.
    */
   public $region;
   /**
-   * @var string
+   * Town.
    */
   public $town;
   /**
-   * @var string
+   * Website.
    */
   public $website;
   /**
-   * @var string
+   * Map.
    */
   public $map;
   /**
-   * @var int
    * Administrator user uid.
    */
   public $admin;
   /**
-   * @var int
+   * Created.
    */
   public $created;
   /**
-   * @var int
+   * Modified.
    */
   public $modified;
   /**
-   * @var array
+   * Data.
    */
   public $data = array();
 
@@ -1714,8 +1713,7 @@ class CesBankExchange extends IcesDBObject {
  */
 class CesBankCurrency extends IcesDBObject {
   /**
-   * @var string
-   * currencysymbol
+   * currencysymbol.
    */
   public $currencysymbol;
   /**
