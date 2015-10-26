@@ -1,0 +1,87 @@
+/**
+
+@page faq FAQ Preguntas frecuentes.
+
+@section faq_recuperar_contrasenya He olvidado mi contraseña. ¿Como puedo volver a entrar?
+
+Si has olvidado la contraseña de tu cuenta, deberás ir a integralces.net y
+darle al enlace 'Forgot password?'.
+
+![](/../img/recuperar_contrasena-01.png)
+
+Añadir tu correo electrónico y darle al botón de 'Enviar una nueva contraseña'.
+
+![](/../img/recuperar_contrasena-02.png)
+
+Si realmente existe un usuario con el correo asignado recibirás un mail con tu
+nombre de usuario y un enlace para añadir una nueva contraseña.
+
+![](/../img/recuperar_contrasena-03.png)
+
+@section porque_no_correos ¿Porque no puedo tener más de un usuario con el mismo correo?
+
+Una de las diferencias del CES con respecto a integralCES en que podemos
+controlar diferente cuentas con un mismo usuario, haciendo mucho más cómoda
+la administración de varias cuentas.
+
+Una restricción que hay en el programa es no tener más de un usuario con el
+mismo correo electrónico.
+
+@section faq_error_editar_perfil Cuando edito mi usuario me dice que el correo electrónico ya esta cogido.
+
+Este caso se da cuando tenemos más de un usuario en drupal con el mismo correo
+electrónico.
+
+![](/../img/correo_en_uso.png)
+
+Al importar las redes del CES al integralCES los usuarios son creados 
+automáticamente y eso puede producir duplicaciones.
+
+Este caso en particular se debe a que tenemos otro usuario, será necesario
+modificar el correo del otro usuario para poder editar el perfil de este.
+
+Si no conoces el usuario y password del otro usuario, se puede ir a recuperar
+la contraseña para que el sistema nos envíe un e-mail con los datos del
+usuario y el enlace para poder cambiar la contraseña, en este momento podremos
+aprovechar para cambiar el correo del mismo.
+
+@ref faq_recuperar_contrasenya
+
+Si deseamos tener un usuario por cada cuenta que tengamos será necesario que
+cada una de ellas tenga un correo electrónico diferente.
+
+@ref faq_cambio_mail
+
+Otra opción es la posibilidad que nos brinda integralCES de controlar más de
+una cuenta con un solo usuario.
+
+@ref faq_mas_de_una_cuenta
+
+@section faq_cambio_mail Como puedo cambiar el correo electrónico de mi usuario
+
+Una vez dentro del integralCES podemos ir a nuestro perfil desde el enlace
+de la parte superior derecha.
+
+![](/../img/enlace_perfil.png)
+
+Le damos a 'Edita' y nos mostrará el formulario con nuestros datos personales.
+
+![](/../img/editar_perfil-01.png)
+
+@section faq_mas_de_una_cuenta ¿Como puedo añadir mi usuario a otra cuenta?
+
+Desde la pagina de editar perfil, podemos administrar los usuarios de las cuentas.
+
+![](/../img/editar_cuenta-01.png)
+
+Desde el botón 'Manage account users' entramos a gestionar usuarios.
+
+![](/../img/editar_cuenta-02.png)
+
+Desde 'Add acount user' añadimos tantos usuarios como queramos, pudiendo 
+darles privilegios en la cuenta o no.
+
+
+![](/../img/editar_cuenta-03.png)
+
+*/
