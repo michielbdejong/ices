@@ -269,6 +269,18 @@ function ces_bank_menu() {
     'access arguments' => array('admin', 'exchange', CES_BANK_CURRENT_EXCHANGE),
     'weight' => 4,
   );
+  $menu['ces/admin/account/%ces_account/transactions'] = array(
+    'title' => 'Transactions',
+    'description' => 'Show account transactions',
+    'page callback' => 'ces_bank_transactions_admin_page',
+    'page arguments' => array(CES_BANK_CURRENT_EXCHANGE, 3),
+    'file' => 'ces_bank.pages.inc',
+    'file path' => drupal_get_path('module', 'ces_bank'),
+    'type' => MENU_LOCAL_TASK,
+    'access callback' => 'ces_bank_access',
+    'access arguments' => array('admin', 'exchange', CES_BANK_CURRENT_EXCHANGE),
+    'weight' => 5,
+  );
   $menu['ces/admin/transaction'] = array(
     'title' => 'Transactions',
     'description' => 'Administer transactions',

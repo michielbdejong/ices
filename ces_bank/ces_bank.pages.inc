@@ -136,7 +136,8 @@ function ces_bank_accounts_admin($exchange_id) {
       number_format($account['balance'], 2),
       l(t('View'), 'ces/admin/account/' . $account['id'] . '/view') . ' ' .
       l(t('Edit'), 'ces/admin/account/' . $account['id'] . '/edit') . ' ' .
-      l(t('Delete'), 'ces/admin/account/' . $account['id'] . '/delete'),
+      l(t('Delete'), 'ces/admin/account/' . $account['id'] . '/delete') . ' ' .
+      l(t('Transactions'), 'ces/admin/account/' . $account['id'] . '/transactions'),
     );
     $rows[] = $row;
   }
@@ -839,7 +840,7 @@ function _ces_bank_sort_table_cmpr($a, $b) {
 /**
  * Lastest transactions admin page.
  */
-function ces_bank_transactions_admin_page($exchange_id) {
+function ces_bank_transactions_admin_page($exchange_id, $account = null) {
   $bank = new CesBank();
   if (!isset($exchange_id) || empty($exchange_id) || $exchange_id == 'ces_current_exchange') {
     $exchange = ces_bank_get_current_exchange();
@@ -853,6 +854,9 @@ function ces_bank_transactions_admin_page($exchange_id) {
         '#markup' => '<p>' . t('Invalid exchange') . '</p>',
       ),
     );
+  }
+  if ($account) {
+    drupal_set_title(t('Transactions of account') . ' ' . $account['name']);
   }
   // Use the account statement filter form.
   $form_state = array('method' => 'get');
@@ -901,11 +905,17 @@ function ces_bank_transactions_admin_page($exchange_id) {
       ),
     ),
   );
-  $transactions = $bank->getTransactions(array(
-    'exchange' => $exchange['id'],
+  $conditions = array(
     'createdsince' => $timefrom,
     'createduntil' => $timeto,
-  ));
+  );
+  if ($account) {
+    $conditions['account'] = $account['id'];
+  }
+  else {
+    $conditions['exchange'] = $exchange['id'];
+  }
+  $transactions = $bank->getTransactions($conditions);
   $dateformat = $format = variable_get('date_format_short', 'm/d/Y');
   $space = strpos($format, ' ');
   if ($space !== FALSE) {
