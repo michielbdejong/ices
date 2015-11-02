@@ -77,6 +77,16 @@ function ces_bank_accounts_admin($exchange_id) {
         'field' => 'name',
       ),
       array(
+        'data' => t('User'),
+        'sort' => 'asc',
+        'field' => 'user',
+      ),
+      array(
+        'data' => t('Email'),
+        'sort' => 'asc',
+        'field' => 'mail',
+      ),
+      array(
         'data' => t('Type'),
         'sort' => 'asc',
         'field' => 'kind',
@@ -123,9 +133,32 @@ function ces_bank_accounts_admin($exchange_id) {
     $limits[$id] = $limit['name'];
   }
   $rows = array();
+  $order_table = tablesort_get_order($page['table']['#header']);
   foreach ($accounts as $account) {
+    $users = '';
+    $mails = '';
+    $result = db_query('SELECT user FROM {ces_accountuser} WHERE account = :aid', array(':aid' => $account['id']));
+    foreach ($result as $index => $record) {
+      if ($index > 0) {
+        $users .= '<br />';
+        $mails .= '<br />';
+      }
+      $result2 = db_query('SELECT uid, name, mail FROM {users} WHERE uid = :uid', array(':uid' => $record->user));
+      foreach ($result2 as $user) {
+        $user_short = strlen($user->name) > 10 ? substr($user->name, 0, 6) . '...' : $user->name;
+        $mail_short = strlen($user->mail) > 14 ? substr($user->mail, 0, 10) . '...' : $user->mail;
+        // Insert 10 chars of the name to sort properly. Later they'll be removed.
+        if ($order_table['sql'] == 'user' && $index == 0) {
+          $users .= str_pad(strtolower($user_short), 10);
+        }
+        $users .= '<a title="' . $user->name . '" href="/user/' . $user->uid . '">' . $user_short . '</a>';
+        $mails .= '<a title="' . $user->mail . '" href="mailto:' . $user->mail . '">' . $mail_short . '</a>';
+      }
+    }
     $row = array(
       $account['name'],
+      $users,
+      $mails,
       $kinds[$account['kind']],
       $states[$account['state']],
       $limits[$account['limitchain']],
@@ -142,6 +175,11 @@ function ces_bank_accounts_admin($exchange_id) {
     $rows[] = $row;
   }
   _ces_bank_sort_table($page['table']['#header'], $rows);
+  if ($order_table['sql'] == 'user') {
+    for ($i=0; $i < count($rows); $i++) {
+      $rows[$i][1] = substr($rows[$i][1], 10);
+    }
+  }
   $page['table']['#rows'] = $rows;
   return $page;
 }
@@ -840,7 +878,7 @@ function _ces_bank_sort_table_cmpr($a, $b) {
 /**
  * Lastest transactions admin page.
  */
-function ces_bank_transactions_admin_page($exchange_id, $account = null) {
+function ces_bank_transactions_admin_page($exchange_id, $account = NULL) {
   $bank = new CesBank();
   if (!isset($exchange_id) || empty($exchange_id) || $exchange_id == 'ces_current_exchange') {
     $exchange = ces_bank_get_current_exchange();
