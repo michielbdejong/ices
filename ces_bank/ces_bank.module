@@ -222,7 +222,7 @@ function ces_bank_menu() {
     'weight' => 0,
   );
   $menu['ces/admin/account/new'] = array(
-    'title' => 'New',
+    'title' => 'New account',
     'description' => 'New account',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ces_bank_account_form'),
@@ -232,6 +232,18 @@ function ces_bank_menu() {
     'access callback' => 'ces_bank_access',
     'access arguments' => array('admin', 'exchange', CES_BANK_CURRENT_EXCHANGE),
     'weight' => 1,
+  );
+  $menu['ces/admin/account/newuser'] = array(
+    'title' => 'New user',
+    'description' => 'New user',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ces_bank_newuser_form'),
+    'file' => 'ces_bank.forms.inc',
+    'file path' => drupal_get_path('module', 'ces_bank'),
+    'type' => MENU_LOCAL_TASK,
+    'access callback' => 'ces_bank_access',
+    'access arguments' => array('admin', 'exchange', CES_BANK_CURRENT_EXCHANGE),
+    'weight' => 2,
   );
   $menu['ces/admin/account/%ces_account/view'] = array(
     'title' => 'View',
@@ -243,7 +255,7 @@ function ces_bank_menu() {
     'type' => MENU_LOCAL_TASK,
     'access callback' => 'ces_bank_access',
     'access arguments' => array('admin', 'exchange', CES_BANK_CURRENT_EXCHANGE),
-    'weight' => 2,
+    'weight' => 3,
   );
   $menu['ces/admin/account/%ces_account/edit'] = array(
     'title' => 'Edit',
@@ -255,7 +267,7 @@ function ces_bank_menu() {
     'type' => MENU_LOCAL_TASK,
     'access callback' => 'ces_bank_access',
     'access arguments' => array('admin', 'exchange', CES_BANK_CURRENT_EXCHANGE),
-    'weight' => 3,
+    'weight' => 4,
   );
   $menu['ces/admin/account/%ces_account/delete'] = array(
     'title' => 'Delete',
@@ -267,7 +279,7 @@ function ces_bank_menu() {
     'type' => MENU_LOCAL_TASK,
     'access callback' => 'ces_bank_access',
     'access arguments' => array('admin', 'exchange', CES_BANK_CURRENT_EXCHANGE),
-    'weight' => 4,
+    'weight' => 5,
   );
   $menu['ces/admin/account/%ces_account/transactions'] = array(
     'title' => 'Transactions',
@@ -279,7 +291,7 @@ function ces_bank_menu() {
     'type' => MENU_LOCAL_TASK,
     'access callback' => 'ces_bank_access',
     'access arguments' => array('admin', 'exchange', CES_BANK_CURRENT_EXCHANGE),
-    'weight' => 5,
+    'weight' => 6,
   );
   $menu['ces/admin/transaction'] = array(
     'title' => 'Transactions',

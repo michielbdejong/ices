@@ -1505,6 +1505,54 @@ function ces_bank_account_delete_confirm_form_submit($form, &$form_state) {
   }
   $form_state['redirect'] = 'ces/admin/account';
 }
+
+/**
+ * Form to create a new user from exchange administration.
+ */
+function ces_bank_newuser_form($form, &$form_state) {
+  global $user;
+  // Give to $user the 'administer users' permission temporaly
+  // to be able to access to user_register_form.
+  // When the form html is created, the original permission is restored.
+  $permissions = &drupal_static('user_access');
+  if (!isset($permissions[$user->uid]['administer users'])) {
+    $cleanup = 'unset';
+  }
+  else {
+    $cleanup = $permissions[$user->uid]['administer users'];
+  }
+  $permissions[$user->uid]['administer users'] = TRUE;
+
+  // Generate the form normally with a special submit callback.
+  module_load_include('module', 'user');
+  $form = user_register_form($form, $form_state);
+  $form['actions']['submit']['#submit'] = array('ces_bank_newuser_form_submit');
+
+  // Restore the user permissions to their default state
+  if ($cleanup === 'unset') {
+    unset($permissions[$user->uid]['administer users']);
+  }
+  else {
+    $permissions[$user->uid]['administer users'] = $cleanup;
+  }
+
+  return $form;
+}
+
+/**
+ * Submit form to create a new user.
+ */
+function ces_bank_newuser_form_submit($form, &$form_state) {
+  user_register_submit($form, $form_state);
+  $bank = new CesBank();
+  $exchange = ces_bank_get_current_exchange();
+  $newaccount = $bank->getDefaultAccount($exchange['id']);
+  $newaccount['users'][0]['user'] = intval($form_state['values']['uid']);
+  $newaccount['state'] = 1;
+  $bank->createAccount($newaccount);
+  $form_state['redirect'] = 'ces/admin/account';
+}
+
 /**
  * Single transaction form.
  *
