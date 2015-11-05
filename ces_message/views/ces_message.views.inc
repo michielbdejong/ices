@@ -3,7 +3,7 @@
  * @file
  * Implements the ces_message view message.
  *
- * @defgroup ces_message_view_data Ces Message View
+ * @defgroup ces_message_view_data Ces Message View data
  * @ingroup ces_message
  * @{
  * View from message.

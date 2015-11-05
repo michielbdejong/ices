@@ -306,5 +306,5 @@ function ces_message_list_page($all = FALSE) {
 
 }
 /**
- * @} End of "defgroup ces_message".
+ * @}
  */

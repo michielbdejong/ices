@@ -1,0 +1,66 @@
+/**
+@file
+Documentación de ces_interop.
+
+@defgroup ces_interop Ces Interop
+@ingroup ices
+@{
+
+
+## ICES web services
+
+El módulo CES Interop para el proyecto ICES viene con dos web services que
+permiten a terceras aplicaciones comunicarse con el servidor del banco. Estos
+dos servicios son:
+
+- OpenTransact: Un protocolo simple para transacciones financieras.
+- Resources: Un servidor JSON simple para recuperar recursos del ICES.
+
+### OpenTransact
+
+ICES comes with an implementation of the OpenTransact (www.opentransact.org) protocol. The OpenTransact protocol is an extension of the OAuth2 (http://oauth.net/2/) protocol adding some fields to define the transactions. We refer to the specification of the protocol at http://www.opentransact.org/core.html.
+
+There are some minor differences between the official specification and the implementation in this module:
+
+- The Transfer request link has not been implemented due to the ease for an 
+  attacker to provide a payment link that will be done with a single click. 
+  We restrict the use of the opentransact services to authorized clients.
+
+- The validity attribute is not fully supported. We do no support repeating 
+  intervals. We don't reserve the amount so the transfer is not guaranteed to
+  be accepted in the moment of application.
+
+The endpoint of the service, or the asset URI in opentransct terms, is:
+
+https://[site name]/ces/interop/opentransact/XXXX
+
+where XXXX is the code of the exchange where the transaction takes place.
+
+The token endpoint is
+
+https://[site name]/ces/interop/opentransact/token
+
+See the test file ces_interop.test included in this module for a complete example on how to use this service.
+
+In order to use the service a client must be granted with a client_id and a client_key that should be provided by the system administrator of the ICES instance. For http://www.integralces.net please contact with info@integralces.net.
+
+### Resources
+
+The resources service is a simple JSON web service to access to some objects in ICES. The authorization of this service is OAuth2 (http://oauth.net/2/) similar to the opentransact protocol.
+
+The authorization endpoint is
+
+https://[site name]/oauth2/authorize
+
+The scope attribute is required and must be set to resources. The token endpoint is
+
+https://[site name]/oauth2/token
+
+There are three available resources:
+
+- https://[site name]/ces/interop/resources/user/N: where N is the identifier of the user.
+- https://[site name]/ces/interop/resources/account/N: where N is the identifier of the account.
+- https://[site name]/ces/interop/resources/transaction/N: where N is the identifier of the transaction.
+
+@}
+*/

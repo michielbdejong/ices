@@ -3,8 +3,8 @@
 @file
 Documentation of ces_interop.
 
-@defgroup ces_interop_doc Ces Interop documentation
-@ingroup ces_interop
+@defgroup ces_interop Ces Interop
+@ingroup ices
 @{
 
 

@@ -5,13 +5,9 @@
  */
 
 /**
- * 
- * @defgroup ces_message_doc Ces Message documentation
- * @ingroup ces_message
+ * @defgroup ces_message Ces Message
+ * @ingroup ices
  * @{
- * 
- * Ces Message
- * ===========
  * 
  * Ces Message gestiona el envío de notificaciones a los usuarios.
  * 

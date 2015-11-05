@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Implements the ces_message actions functionality.

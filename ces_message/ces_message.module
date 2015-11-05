@@ -1,13 +1,12 @@
 <?php
-
 /**
- * @file
+ * @file ces_message.module
  * Implements the ces_message functionality.
  */
 
 /**
- * @defgroup ces_message Ces Message
- * @ingroup ices
+ * @defgroup ces_message_module Ces Message Module
+ * @ingroup ces_message
  * @{
  * Management application notifications.
  */
@@ -501,5 +500,5 @@ function ces_message_cron() {
 }
 
 /**
- * @} End of "defgroup ces_message".
+ * @}
  */

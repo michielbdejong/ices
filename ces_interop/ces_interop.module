@@ -5,6 +5,13 @@
  */
 
 /**
+ * @defgroup ces_interop_module Ces Interop Module
+ * @ingroup ces_interop
+ * @{
+ * ICES interoperability services module.
+ */
+
+/**
  * Name of the opentransact OAuth2 server.
  */
 define('CES_INTEROP_OAUTH2_SERVER_NAME', 'interop');
@@ -1266,3 +1273,7 @@ function ces_interop_cenip_error($number, $txid) {
   );
   ces_interop_send_httpquery('200 OK', $message);
 }
+
+/**
+ * @}
+ */

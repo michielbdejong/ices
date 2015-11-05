@@ -3,7 +3,7 @@
  * @file
  * @brief Views to ces message
  *
- * @defgroup ces_message_views Ces Message View
+ * @defgroup ces_message_views_default Ces Message Views defaults
  * @ingroup ces_message
  * @{
  * View from message.
@@ -450,5 +450,5 @@ function ces_message_views_default_views() {
   return $export;
 }
 /**
- * @} End of "defgroup ces_message_view".
+ * @}
  */
