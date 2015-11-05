@@ -512,6 +512,14 @@ function ces_bank_menu() {
     ),
     'page callback' => 'ces_bank_user_autocomplete',
   );
+  $menu['ces/bank/allusers/autocomplete'] = array(
+    'type' => MENU_CALLBACK,
+    'access callback' => 'ces_bank_access',
+    'access arguments' => array('view', 'exchange accounts',
+      CES_BANK_CURRENT_EXCHANGE,
+    ),
+    'page callback' => 'ces_bank_allusers_autocomplete',
+  );
   $menu['ces/admin/exchange'] = array(
     'title' => 'Edit exchange',
     'description' => 'Edit exchange',
@@ -1545,6 +1553,54 @@ function ces_bank_user_autocomplete($string) {
     ->execute();
   foreach ($return as $row) {
     $matches[$row->name] = check_plain($row->name);
+  }
+  // Return for JS.
+  drupal_json_output($matches);
+}
+/**
+ * AJAX autocomplete callback.
+ *
+ * @param string $string
+ *   All users in drupal installation, by username or complete name..
+ */
+function ces_bank_allusers_autocomplete($string) {
+  $matches = array();
+  $return = db_query("
+    SELECT u.name AS username,
+    f.ces_firstname_value as firstname,
+    s.ces_surname_value as surname
+    FROM {users} u
+    LEFT JOIN {field_data_ces_firstname} f
+    ON f.entity_id = u.uid
+    LEFT JOIN {field_data_ces_surname} s
+    ON s.entity_id = u.uid
+    WHERE u.name LIKE :string
+    UNION
+    SELECT u.name AS username,
+    f.ces_firstname_value as firstname,
+    s.ces_surname_value as surname
+    FROM {field_data_ces_firstname} f
+    LEFT JOIN {users} u
+    ON u.uid = f.entity_id
+    LEFT JOIN {field_data_ces_surname} s
+    ON s.entity_id = f.entity_id
+    WHERE f.ces_firstname_value LIKE :string
+    UNION
+    SELECT u.name AS username,
+    f.ces_firstname_value as firstname,
+    s.ces_surname_value as surname
+    FROM {field_data_ces_surname} s
+    LEFT JOIN {users} u
+    ON u.uid = s.entity_id
+    LEFT JOIN {field_data_ces_firstname} f
+    ON f.entity_id = s.entity_id
+    WHERE s.ces_surname_value LIKE :string
+    LIMIT 10",
+    array(
+      ':string' => '%' . db_like($string) . '%',
+    ));
+  foreach ($return as $row) {
+    $matches[$row->username] = check_plain($row->username) . ' -- ' . check_plain($row->firstname) . check_plain($row->surname);
   }
   // Return for JS.
   drupal_json_output($matches);

@@ -1043,7 +1043,7 @@ function ces_bank_account_form($form, &$form_state, $account = NULL) {
         '#title' => t('Username'),
         '#description' => t('The username of the owner of this account.'),
         '#type' => 'textfield',
-        '#autocomplete_path' => 'ces/bank/user/autocomplete',
+        '#autocomplete_path' => 'ces/bank/allusers/autocomplete',
         '#default_value' => isset($accuser['username']) ? $accuser['username'] : '',
       );
     }
