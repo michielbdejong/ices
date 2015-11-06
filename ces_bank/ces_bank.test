@@ -913,6 +913,8 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->drupalLogin($this->admin2);
     $this->drupalGet('ces/admin/account');
     $this->assertText('BCNA000');
+    $this->assertLink('adminbcna');
+    $this->assertLink('test.admin...');
     $this->clickLink(t('View'));
     $this->assertText('adminbcna');
     // Edited from admin.
@@ -945,6 +947,27 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->drupalPost(NULL, NULL, t('Close account'));
     $this->drupalPost(NULL, NULL, t('Confirm'));
     $this->assertText(t('The account BCNA9001 has been closed'));
+    // Create new user+account.
+    $this->drupalGet('ces/admin/account/newuser');
+    $this->drupalPost(NULL, array('name' => 'testuser', 'mail' => 'testuser@test.com', 'pass[pass1]' => 'passwd',
+      'pass[pass2]' => 'passwd', 'ces_firstname[und][0][value]' => 'firstname', 'ces_town[und][0][value]' => 'town',
+      'ces_postcode[und][0][value]' => 'postcode'), t('Create new account'));
+    $this->assertText(t('Created a new user account for'));
+    $this->assertText(t('BCNA0003'));
+    $this->assertLink(t('testuser'));
+    $this->assertLink(t('testuser@t...'));
+    // Create new account related to an user of another network.
+    $this->drupalGet('ces/admin/account/new');
+    $this->drupalPost(NULL, array('users[0][username]' => 'account12'), t('Save'));
+    $this->assertText(t('Account successfully created.'));
+    $this->drupalLogout();
+    // Transactions of an account.
+    $this->drupalLogin($this->admin1);
+    $this->drupalGet('ces/admin/account');
+    $this->clickLink(t('Transactions'), 2);
+    $this->assertText(t('HORA0002'));
+    $this->assertText(t('HORA0001'));
+    $this->assertLink(t('First test transaction.'));
     $this->drupalLogout();
   }
   /**
