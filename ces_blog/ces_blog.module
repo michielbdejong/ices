@@ -44,6 +44,17 @@ function ces_blog_menu() {
     'expanded' => TRUE,
     'weight' => 0,
   );
+  $menu['ces/bank/exchange/otherexchanges/%ces_exchange/blog'] = array(
+    'title' => 'Blog',
+    'description' => 'View other exchange blog.',
+    'page callback' => 'ces_blog_page',
+    'page arguments' => array(4),
+    'access callback' => 'ces_bank_access',
+    'access arguments' => array('view', 'exchange details',
+      CES_BANK_CURRENT_EXCHANGE),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
   return $menu;
 }
 /**
@@ -67,10 +78,15 @@ function ces_blog_node_info() {
 /**
  * Current exchange blog posts teaser page.
  */
-function ces_blog_page() {
+function ces_blog_page($exchange = NULL) {
   $page = array();
   $query = new EntityFieldQuery();
-  $exchange = ces_bank_get_current_exchange();
+  if ($exchange == NULL) {
+    $exchange = ces_bank_get_current_exchange();
+  }
+  else {
+    drupal_set_title($exchange['name'] . ' (' . $exchange['code'] . ')');
+  }
   $query->entityCondition('entity_type', 'node')
         ->entityCondition('bundle', 'ces_blog')
         ->propertyCondition('status', 1)

@@ -503,7 +503,33 @@ function ces_bank_menu() {
     'access arguments' => array('view', 'global statistics', 0),
     'type' => MENU_CALLBACK,
   );
-
+  $menu['ces/bank/exchange/otherexchanges/list'] = array(
+    'title' => 'Other exchanges',
+    'description' => 'List of exchanges in this site',
+    'page callback' => 'ces_bank_exchange_list_page',
+    'file' => 'ces_bank.pages.inc',
+    'file path' => drupal_get_path('module', 'ces_bank'),
+    'access callback' => 'ces_bank_access',
+    'access arguments' => array('view', 'exchange details',
+      CES_BANK_CURRENT_EXCHANGE,
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 260,
+  );
+  $menu['ces/bank/exchange/otherexchanges/%ces_exchange/accounts'] = array(
+    'title' => 'Accounts',
+    'description' => 'List of accounts of other exchange',
+    'page callback' => 'ces_bank_exchange_accounts_page',
+    'page arguments' => array(4),
+    'file' => 'ces_bank.pages.inc',
+    'file path' => drupal_get_path('module', 'ces_bank'),
+    'access callback' => 'ces_bank_access',
+    'access arguments' => array('view', 'exchange details',
+      CES_BANK_CURRENT_EXCHANGE,
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
+  );
   $menu['ces/bank/user/autocomplete'] = array(
     'type' => MENU_CALLBACK,
     'access callback' => 'ces_bank_access',
@@ -822,6 +848,17 @@ function ces_account_load($id = NULL) {
   $bank = new CesBank();
   $account = $bank->getAccount($id);
   return $account;
+}
+function ces_exchange_load($code = NULL) {
+  if (empty($code)) {
+    return NULL;
+  }
+  $bank = new CesBank();
+  $exchange = $bank->getExchangeByName($code);
+  if ($exchange == FALSE) {
+      $exchange = ces_bank_get_current_exchange();
+    }
+  return $exchange;
 }
 /**
  * Calls drupal_get_form() with appropriate parameters.

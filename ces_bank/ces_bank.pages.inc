@@ -186,7 +186,8 @@ function ces_bank_accounts_admin($exchange_id) {
 /**
  * Page with the list of all exchanges organized by country.
  */
-function ces_bank_exchange_list_page($country) {
+function ces_bank_exchange_list_page($country = NULL) {
+  global $user;
   $exchanges = ces_bank_get_exchanges($country);
   $page = array();
   if (empty($exchanges)) {
@@ -238,9 +239,15 @@ function ces_bank_exchange_list_page($country) {
       '#rows' => array(),
     );
     foreach ($exchanges as $exchange) {
+      if ($user->uid == 0) {
+        $link_exchange = l($exchange['name'], 'user/register/' . $exchange['code'], array('title' => t('Click to open an account in this exchange')));
+      }
+      else {
+        $link_exchange = l($exchange['name'], 'ces/bank/exchange/otherexchanges/' . $exchange['code'] . '/accounts', array('title' => t('Info about this exchange')));
+      }
       $row = array(
         $exchange['code'],
-        l($exchange['name'], 'user/register/' . $exchange['code'], array('title' => t('Click to open an account in this exchange'))),
+        $link_exchange,
         $exchange['region'],
         $exchange['town'],
         $exchange['accounts'],
@@ -254,9 +261,14 @@ function ces_bank_exchange_list_page($country) {
 /**
  * Page with a table of all accounts with the user name and balance.
  */
-function ces_bank_exchange_accounts_page() {
+function ces_bank_exchange_accounts_page($exchange = NULL) {
   $bank = new CesBank();
-  $exchange = ces_bank_get_current_exchange();
+  if ($exchange == NULL) {
+    $exchange = ces_bank_get_current_exchange();
+  }
+  else {
+    drupal_set_title($exchange['name'] . ' (' . $exchange['code'] . ')');
+  }
   $accounts = $bank->getAllAccounts(array(
     'exchange' => $exchange['id'],
     'state' => 1,
