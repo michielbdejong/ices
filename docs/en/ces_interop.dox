@@ -10,16 +10,23 @@ Documentation of ces_interop.
 
 ## ICES web services
 
-The module ces_iterop from ICES project comes with two web services that allows third applications to communicate with the banking server. These two web services are:
+The module ces_iterop from ICES project comes with two web services that allows
+third applications to communicate with the banking server. These two web
+services are:
 
 - OpenTransact: A simple protocol for financial transactions
 - Resources: A simple JSON service to retrieve some resources in ICES.
 
 ### OpenTransact
 
-ICES comes with an implementation of the OpenTransact (www.opentransact.org) protocol. The OpenTransact protocol is an extension of the OAuth2 (http://oauth.net/2/) protocol adding some fields to define the transactions. We refer to the specification of the protocol at http://www.opentransact.org/core.html.
+ICES comes with an implementation of the OpenTransact (www.opentransact.org)
+protocol. The OpenTransact protocol is an extension of the OAuth2
+(http://oauth.net/2/) protocol adding some fields to define the transactions.
+We refer to the specification of the protocol at
+http://www.opentransact.org/core.html.
 
-There are some minor differences between the official specification and the implementation in this module:
+There are some minor differences between the official specification and the
+implementation in this module:
 
 - The Transfer request link has not been implemented due to the ease for an 
   attacker to provide a payment link that will be done with a single click. 
@@ -39,13 +46,19 @@ The token endpoint is
 
 https://[site name]/ces/interop/opentransact/token
 
-See the test file ces_interop.test included in this module for a complete example on how to use this service.
+See the test file ces_interop.test included in this module for a complete
+example on how to use this service.
 
-In order to use the service a client must be granted with a client_id and a client_key that should be provided by the system administrator of the ICES instance. For http://www.integralces.net please contact with info@integralces.net.
+In order to use the service a client must be granted with a client_id and a
+client_key that should be provided by the system administrator of the ICES
+instance. For http://www.integralces.net please contact with
+info@integralces.net.
 
 ### Resources
 
-The resources service is a simple JSON web service to access to some objects in ICES. The authorization of this service is OAuth2 (http://oauth.net/2/) similar to the opentransact protocol.
+The resources service is a simple JSON web service to access to some objects in
+ICES. The authorization of this service is OAuth2 (http://oauth.net/2/) similar
+to the opentransact protocol.
 
 The authorization endpoint is
 
