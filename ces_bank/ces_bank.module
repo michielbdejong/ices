@@ -1652,5 +1652,37 @@ function ces_bank_views_api() {
   );
 }
 /**
+ * Implements hook_view_pre_render().
+ */
+function ces_bank_views_pre_render(&$view) {
+  if ($view->name == 'ces_bank_accounts_list') {
+    $view_noduplicates = array();
+    $ids_and_keys = array();
+    foreach ($view->result as $key => $result) {
+      $result->users_ces_accountuser_name = '<a href="/user/' . $result->users_ces_accountuser_uid . '">' . $result->users_ces_accountuser_name . '</a>';
+      if (isset($result->field_ces_firstname[0]['raw']['safe_value'])) {
+        $result->users_ces_accountuser_name .= ' (' . $result->field_ces_firstname[0]['raw']['safe_value'];
+        if (isset($result->field_ces_surname[0]['raw']['safe_value'])) {
+          $result->users_ces_accountuser_name .= ' ' . $result->field_ces_surname[0]['raw']['safe_value'] . ')';
+        }
+        else {
+          $result->users_ces_accountuser_name .= ')';
+        }
+      }
+      if (array_key_exists($result->id, $ids_and_keys)) {
+        $duplicate_key = $ids_and_keys[$result->id];
+        $view_noduplicates[$duplicate_key]->users_ces_accountuser_name .= ', ' . $result->users_ces_accountuser_name;
+        $view_noduplicates[$duplicate_key]->users_ces_accountuser_mail .= ', ' . $result->users_ces_accountuser_mail;
+      }
+      else {
+        $ids_and_keys[$result->id] = $key;
+        $view_noduplicates[$key] = $result;
+
+      }
+    }
+    $view->result = $view_noduplicates;
+  }
+}
+/**
  * @}
  */
