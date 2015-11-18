@@ -18,7 +18,7 @@ $views = array();
 $view = new view();
 $view->name = 'ces_bank_accounts_list';
 $view->description = 'Accounts\' list of an exchange.';
-$view->tag = 'default';
+$view->tag = 'ices';
 $view->base_table = 'ces_account';
 $view->human_name = 'Accounts list';
 $view->core = 7;
@@ -29,7 +29,11 @@ $view->disabled = FALSE; /* Edit this to true to make a default view disabled in
 $handler = $view->new_display('default', 'Master', 'default');
 $handler->display->display_options['use_ajax'] = TRUE;
 $handler->display->display_options['use_more_always'] = FALSE;
-$handler->display->display_options['access']['type'] = 'none';
+$handler->display->display_options['access']['type'] = 'role';
+$handler->display->display_options['access']['role'] = array(
+  3 => '3',
+  2 => '2',
+);
 $handler->display->display_options['cache']['type'] = 'none';
 $handler->display->display_options['query']['type'] = 'views_query';
 $handler->display->display_options['exposed_form']['type'] = 'basic';
@@ -174,7 +178,6 @@ $handler->display->display_options['filters']['combine']['operator'] = 'contains
 $handler->display->display_options['filters']['combine']['exposed'] = TRUE;
 $handler->display->display_options['filters']['combine']['expose']['operator_id'] = 'combine_op';
 $handler->display->display_options['filters']['combine']['expose']['label'] = 'Search for account, user or email';
-$handler->display->display_options['filters']['combine']['expose']['description'] = 'Write some letters of what you are looking for and press Enter or the button.';
 $handler->display->display_options['filters']['combine']['expose']['operator'] = 'combine_op';
 $handler->display->display_options['filters']['combine']['expose']['identifier'] = 'combine';
 $handler->display->display_options['filters']['combine']['expose']['remember_roles'] = array(
@@ -189,10 +192,21 @@ $handler->display->display_options['filters']['combine']['fields'] = array(
   'ces_surname' => 'ces_surname',
   'mail' => 'mail',
 );
+/* Filter criterion: Ces Account: Account state */
+$handler->display->display_options['filters']['state']['id'] = 'state';
+$handler->display->display_options['filters']['state']['table'] = 'ces_account';
+$handler->display->display_options['filters']['state']['field'] = 'state';
+$handler->display->display_options['filters']['state']['value']['value'] = '1';
+/* Filter criterion: Ces Account: Account kind */
+$handler->display->display_options['filters']['kind']['id'] = 'kind';
+$handler->display->display_options['filters']['kind']['table'] = 'ces_account';
+$handler->display->display_options['filters']['kind']['field'] = 'kind';
+$handler->display->display_options['filters']['kind']['operator'] = '!=';
+$handler->display->display_options['filters']['kind']['value']['value'] = '5';
 
-/* Display: Page */
-$handler = $view->new_display('page', 'Page', 'page');
-$handler->display->display_options['path'] = 'accounts-list';
+/* Display: Accounts  */
+$handler = $view->new_display('block', 'Accounts ', 'block');
+$handler->display->display_options['display_description'] = 'Accounts list, display for auth-users.';
 $translatables['ces_bank_accounts_list'] = array(
   t('Master'),
   t('more'),
@@ -222,8 +236,8 @@ $translatables['ces_bank_accounts_list'] = array(
   t('All'),
   t('Exchange'),
   t('Search for account, user or email'),
-  t('Write some letters of what you are looking for and press Enter or the button.'),
-  t('Page'),
+  t('Accounts '),
+  t('Accounts list, display for auth-users.'),
 );
 
 $views['accounts_list'] = $view;
