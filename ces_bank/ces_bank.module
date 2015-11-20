@@ -1655,23 +1655,57 @@ function ces_bank_views_api() {
  * Implements hook_view_pre_render().
  */
 function ces_bank_views_pre_render(&$view) {
-  if ($view->name == 'ces_bank_accounts_list') {
+  if ($view->name == 'ces_bank_accounts_list' || $view->name == 'ces_bank_accounts_list_for_admins') {
+
+    if ($view->name == 'ces_bank_accounts_list_for_admins') {
+      $bank = new CesBank();
+      $kinds = array(
+        0 => t('Individual'),
+        1 => t('Shared'),
+        2 => t('Organization'),
+        3 => t('Company'),
+        4 => t('Public'),
+        5 => t('Virtual'),
+      );
+      $states = array(
+        0 => t('Hidden'),
+        1 => t('Active'),
+        2 => t('Closed'),
+        3 => t('Locked'),
+      );
+      $limitchains = $bank->getAllLimitChains($view->result[0]->ces_account_exchange);
+      $limits = array();
+      foreach ($limitchains as $id => $limit) {
+        $limits[$id] = $limit['name'];
+      }
+    }
+
     $view_noduplicates = array();
     $ids_and_keys = array();
     foreach ($view->result as $key => $result) {
+
+      if ($view->name == 'ces_bank_accounts_list_for_admins') {
+        $result->ces_account_kind = substr($kinds[$result->ces_account_kind], 0, 3) . '.';
+        $result->ces_account_state = substr($states[$result->ces_account_state], 0, 3) . '.';
+        $result->ces_account_limitchain = substr($limits[$result->ces_account_limitchain], 0, 10);
+      }
+
       $result->users_ces_accountuser_name = '<a href="/user/' . $result->users_ces_accountuser_uid . '">' . $result->users_ces_accountuser_name . '</a>';
+      $fsname = '';
       if (isset($result->field_ces_firstname[0]['raw']['safe_value'])) {
-        $result->users_ces_accountuser_name .= ' (' . $result->field_ces_firstname[0]['raw']['safe_value'];
+        $fsname = $result->field_ces_firstname[0]['raw']['safe_value'];
         if (isset($result->field_ces_surname[0]['raw']['safe_value'])) {
-          $result->users_ces_accountuser_name .= ' ' . $result->field_ces_surname[0]['raw']['safe_value'] . ')';
+          $fsname .= ' ' . $result->field_ces_surname[0]['raw']['safe_value'];
         }
-        else {
-          $result->users_ces_accountuser_name .= ')';
-        }
+        $fsname = strlen($fsname) > 18 ? substr($fsname, 0, 14) . '...' : $fsname;
+        $result->users_ces_accountuser_name .= ' <span class="ces_bank_list_accounts_name">(' . $fsname . ')</span>';
+      }
+      if (strlen($result->users_ces_accountuser_mail) > 20) {
+        $result->users_ces_accountuser_mail = substr($result->users_ces_accountuser_mail, 0, 16) . '...';
       }
       if (array_key_exists($result->id, $ids_and_keys)) {
         $duplicate_key = $ids_and_keys[$result->id];
-        $view_noduplicates[$duplicate_key]->users_ces_accountuser_name .= ', ' . $result->users_ces_accountuser_name;
+        $view_noduplicates[$duplicate_key]->users_ces_accountuser_name .= '<br />' . $result->users_ces_accountuser_name;
         $view_noduplicates[$duplicate_key]->users_ces_accountuser_mail .= ', ' . $result->users_ces_accountuser_mail;
       }
       else {
