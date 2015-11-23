@@ -365,12 +365,11 @@ function ces_bank_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 1,
   );
-  $menu['ces/bank/account/sell/multiple/autocomplete'] = array(
-    'title' => 'Autocomplete for multiple transactions',
-    'description' => 'Autocomplete for multiple transactions.',
-    'page callback' => 'ces_bank_multipletransactions_form_autocomplete_callback',
-    'file' => 'ces_bank.forms.inc',
-    'file path' => drupal_get_path('module', 'ces_bank'),
+  $menu['ces/bank/exchangeaccounts/autocomplete/%'] = array(
+    'title' => 'Autocomplete for accounts in a exchange',
+    'description' => 'Autocomplete for accounts in a exchange.',
+    'page callback' => 'ces_bank_exchangeaccounts_autocomplete_callback',
+    'page arguments' => array(4),
     'access callback' => 'ces_bank_access',
     'access arguments' => array('use', 'account seller',
       CES_BANK_CURRENT_ACCOUNT,
@@ -1639,6 +1638,42 @@ function ces_bank_allusers_autocomplete($string) {
   foreach ($return as $row) {
     $matches[$row->username] = check_plain($row->username) . ' -- ' . check_plain($row->firstname) . check_plain($row->surname);
   }
+  // Return for JS.
+  drupal_json_output($matches);
+}
+/**
+ * AJAX autocomplete callback.
+ * @return string
+ *   Accounts in an exchange.
+ */
+function ces_bank_exchangeaccounts_autocomplete_callback($exchangeid, $string = "") {
+  $exchange = ces_bank_get_exchange($exchangeid);
+  if (!$exchange) {
+    return drupal_json_output('');
+  }
+  $string = urldecode($string);
+  $matches = array();
+  $return = db_query("
+    SELECT a.name AS accountname,
+    u.name AS username,
+    f.ces_firstname_value AS firstname,
+    s.ces_surname_value AS surname
+    FROM {ces_account} a
+    LEFT JOIN {ces_accountuser} au ON a.id = au.account
+    LEFT JOIN {users} u ON au.user = u.uid
+    LEFT JOIN {field_data_ces_firstname} f ON u.uid = f.entity_id
+    LEFT JOIN {field_data_ces_surname} s ON u.uid = s.entity_id
+    WHERE ( (a.exchange = :exchangeid) AND ( (CONCAT_WS(' ', a.name, ' ', u.name, ' ', f.ces_firstname_value, ' ', s.ces_surname_value) LIKE :string) AND (a.state = '1') AND (a.kind != '5') ))
+    ORDER BY a.name ASC
+    LIMIT 10 OFFSET 0",
+    array(
+      ':exchangeid' => $exchangeid,
+      ':string' => '%' . db_like($string) . '%',
+    ));
+    foreach ($return as $row) {
+      $matches[$row->accountname] = check_plain($row->accountname) . ': ' . check_plain($row->username) . ' ' . check_plain($row->firstname) . ' ' . check_plain($row->surname);
+    }
+
   // Return for JS.
   drupal_json_output($matches);
 }

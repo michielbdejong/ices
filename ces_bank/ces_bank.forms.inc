@@ -1641,16 +1641,6 @@ function ces_bank_transaction_form($form, &$form_state, $op, $arg, $to_account_i
     // Select seller's exchange.
     $toexchangeid = isset($form_state['values']['toexchange']) ? $form_state['values']['toexchange'] : $exchangeid;
     $toexchange = $exchanges[$toexchangeid];
-    $accountconditions = array(
-      'state' => 1,
-      'kind' => array(
-        CesBankLocalAccount::TYPE_INDIVIDUAL,
-        CesBankLocalAccount::TYPE_SHARED,
-        CesBankLocalAccount::TYPE_ORGANIZATION,
-        CesBankLocalAccount::TYPE_COMPANY,
-        CesBankLocalAccount::TYPE_PUBLIC,
-      ),
-    );
     if ($to_account_id == NULL) {
       $form['toexchange'] = array(
         '#title' => t('Seller exchange'),
@@ -1663,19 +1653,12 @@ function ces_bank_transaction_form($form, &$form_state, $op, $arg, $to_account_i
         ),
         '#weight' => 30,
       );
-      // Select seller's account.
-      $accountconditions['exchange'] = $toexchangeid;
-      $accounts = $bank->getAllAccounts($accountconditions);
-      $tooptions = array();
-      foreach ($accounts as $account) {
-        $useracc = reset($account['users']);
-        $tooptions[$account['name']] = $account['name'] . ' - ' . ces_user_get_name(user_load($useracc['user']));
-      }
       $form['toaccountname'] = array(
         '#title' => t('Seller account'),
-        '#description' => t('The recipient of the transaction. The Exchange four letters code plus four numbers.'),
-        '#type' => 'select',
-        '#options' => $tooptions,
+        '#description' => t('The recipient of the transaction. You can search by account or user name.'),
+        '#type' => 'textfield',
+        '#maxlength' => 32,
+        '#autocomplete_path' => 'ces/bank/exchangeaccounts/autocomplete/' . $toexchangeid,
         '#prefix' => '<div id="dropdown-toaccountname-replace">',
         '#suffix' => '</div>',
         '#weight' => 40,
@@ -1714,26 +1697,14 @@ function ces_bank_transaction_form($form, &$form_state, $op, $arg, $to_account_i
         ),
         '#weight' => 10,
       );
-      // Select buyer's account.
-      if ($fromexchangeid == $toexchangeid && !empty($tooptions)) {
-        $fromoptions = &$tooptions;
-      }
-      else {
-        $fromoptions = array();
-        $accountconditions['exchange'] = $fromexchangeid;
-        $accounts = $bank->getAllAccounts($accountconditions);
-        foreach ($accounts as $account) {
-          $useracc = reset($account['users']);
-          $fromoptions[$account['name']] = $account['name'] . ' - ' . ces_user_get_name(user_load($useracc['user']));
-        }
-      }
       $form['fromaccountname'] = array(
         '#title' => t('Buyer account'),
-        '#description' => t('The payer of the transaction. The Exchange four letters code plus four numbers.'),
-        '#type' => 'select',
-        '#options' => $fromoptions,
+        '#description' => t('The payer of the transaction. You can search by account or user name.'),
         '#prefix' => '<div id="dropdown-fromaccountname-replace">',
         '#suffix' => '</div>',
+        '#type' => 'textfield',
+        '#maxlength' => 32,
+        '#autocomplete_path' => 'ces/bank/exchangeaccounts/autocomplete/' . $fromexchangeid,
         '#weight' => 20,
       );
       if (isset($form_state['values']['fromaccountname'])) {
@@ -2198,7 +2169,7 @@ function ces_bank_multipletransactions_form($form, &$form_state) {
       '#suffix' => '</td>',
       '#type' => 'textfield',
       '#maxlength' => 32,
-      '#autocomplete_path' => 'ces/bank/account/sell/multiple/autocomplete',
+      '#autocomplete_path' => 'ces/bank/exchangeaccounts/autocomplete/' . $exchangeid,
       '#default_value' => isset($form_state['values']['fromaccountname-' . $i]) ? $form_state['values']['fromaccountname-' . $i] : '',
     );
     $form['transaction_fieldset']['concept-' . $i] = array(
@@ -2237,47 +2208,6 @@ function ces_bank_multipletransactions_form($form, &$form_state) {
  */
 function ces_bank_multipletransactions_form_numtrans_callback($form, $form_state) {
   return $form['transaction_fieldset'];
-}
-/**
- * AJAX autocomplete callback.
- * @return string
- *   Accounts in current exchange.
- */
-function ces_bank_multipletransactions_form_autocomplete_callback($string) {
-  $exchange = ces_bank_get_current_exchange();
-  $bank = new CesBank();
-  $accountconditions = array(
-    'exchange' => $exchange['id'],
-    'state' => 1,
-    'kind' => array(
-      CesBankLocalAccount::TYPE_INDIVIDUAL,
-      CesBankLocalAccount::TYPE_SHARED,
-      CesBankLocalAccount::TYPE_ORGANIZATION,
-      CesBankLocalAccount::TYPE_COMPANY,
-      CesBankLocalAccount::TYPE_PUBLIC,
-    ));
-  $accounts = $bank->getAllAccounts($accountconditions);
-  $string = strtoupper($string);
-  $matches = array();
-  $items = 0;
-  foreach ($accounts as $acc) {
-    $accname = strtoupper($acc['name']);
-    $name_user_account = '';
-    foreach ($acc['users'] as $u) {
-      $name_user_account .= ces_user_get_name(user_load($u['user'])) . ' ';
-    }
-    $accname .= ' ' . strtoupper($name_user_account);
-    $pos = strpos($accname, $string);
-    if ($pos !== FALSE) {
-      $matches[$acc['name']] = $acc['name'] . ' ' . $name_user_account;
-      $items++;
-    }
-    if ($items > 10) {
-      break;
-    }
-  }
-  // Return for JS.
-  drupal_json_output($matches);
 }
 /**
  * Validate multiple transactions form.
