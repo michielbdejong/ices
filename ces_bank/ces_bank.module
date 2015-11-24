@@ -1725,16 +1725,18 @@ function ces_bank_views_pre_render(&$view) {
         $result->ces_account_limitchain = substr($limits[$result->ces_account_limitchain], 0, 10);
       }
 
-      $result->users_ces_accountuser_name = '<a href="/user/' . $result->users_ces_accountuser_uid . '">' . $result->users_ces_accountuser_name . '</a>';
+      $result->ces_account_balance = number_format(floatval($result->ces_account_balance), 2);
+
       $fsname = '';
       if (isset($result->field_ces_firstname[0]['raw']['safe_value'])) {
         $fsname = $result->field_ces_firstname[0]['raw']['safe_value'];
         if (isset($result->field_ces_surname[0]['raw']['safe_value'])) {
           $fsname .= ' ' . $result->field_ces_surname[0]['raw']['safe_value'];
         }
-        $fsname = strlen($fsname) > 18 ? substr($fsname, 0, 14) . '...' : $fsname;
-        $result->users_ces_accountuser_name .= ' <span class="ces_bank_list_accounts_name">(' . $fsname . ')</span>';
       }
+      $result->users_ces_accountuser_name = '<a href="/user/' . $result->users_ces_accountuser_uid . '" title="' . $fsname . '">' . $result->users_ces_accountuser_name . '</a>';
+      $fsname = strlen($fsname) > 18 ? substr($fsname, 0, 14) . '...' : $fsname;
+      $result->users_ces_accountuser_name .= ' <span class="ces_bank_list_accounts_name">(' . $fsname . ')</span>';
       if (strlen($result->users_ces_accountuser_mail) > 20) {
         $result->users_ces_accountuser_mail = substr($result->users_ces_accountuser_mail, 0, 16) . '...';
       }
@@ -1746,7 +1748,6 @@ function ces_bank_views_pre_render(&$view) {
       else {
         $ids_and_keys[$result->id] = $key;
         $view_noduplicates[$key] = $result;
-
       }
     }
     $view->result = $view_noduplicates;
