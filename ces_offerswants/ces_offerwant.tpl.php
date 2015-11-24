@@ -17,7 +17,7 @@
     <div class="ces-offerwant-title"><?php echo $ces_offerwant_title; ?></div>
     <div class="ces-offerwant-content">
       <div class="ces-offerwant-image"><?php echo $ces_offerwant_image; ?></div>
-      <div class="ces-offerwant-body"><?php echo $ces_offerwant_body; ?></div>
+      <div class="ces-offerwant-body"><?php echo nl2br($ces_offerwant_body); ?></div>
       <?php if (isset($ces_offer_rate)): ?>
       <div class="ces-offerwant-rate"><?php echo $ces_offer_rate ?></div>
       <?php endif; ?>
