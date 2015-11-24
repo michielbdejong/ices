@@ -18,6 +18,34 @@ nombre de usuario y un enlace para añadir una nueva contraseña.
 
 ![](/../img/recuperar_contrasena-03.png)
 
+@section faq_cambiar_nombre_usuario ¿Como puedo cambiar el nombre de mi usuario?
+
+No hay que confundir el nombre de usuario con el nombre real del usuario.
+
+El usuario es el identificador que tiene cada persona para ser reconocido por la
+aplicación. Y el que nos pide para autenticarnos.
+
+Si deseamos cambiarlo podemos ir a nuestro perfil desde el enlace que se nos
+presenta arriba a la derecha junto a nuestro nombre real.
+
+![](/../img/cambio_nombre_usuario-01.png)
+
+Una vez en nuestro perfil veremos el botón de "Editar".
+
+![](/../img/cambio_nombre_usuario-02.png)
+
+El primer campo que se nos presenta es el de usuario.
+
+![](/../img/cambio_nombre_usuario-03.png)
+
+Cambiamos al que deseamos y si la aplicación no encuentra que ya este en uso
+se nos cambiara.
+
+![](/../img/cambio_nombre_usuario-04.png)
+
+Una vez cambiado, cuando volvamos a entrar, en la casilla de usuario deberemos
+poner el nuevo.
+
 @section porque_no_correos ¿Porque no puedo tener más de un usuario con el mismo correo?
 
 Una de las diferencias del CES con respecto a integralCES en que podemos
