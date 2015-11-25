@@ -47,7 +47,7 @@ class CesInteropTestCase extends CesBankTestCase {
     $client->server = 'interop';
     $client->label = 'Test client';
     $client->client_key = $this->clientKey;
-    $client->client_secret = $this->clientSecret;
+    $client->client_secret = oauth2_server_hash_client_secret($this->clientSecret);
     $client->redirect_uri = $this->clientUri;
     $client->automatic_authorization = FALSE;
     $client->save();
@@ -259,7 +259,11 @@ class CesInteropTestCase extends CesBankTestCase {
    */
   protected function httpRequest($url, $options = array()) {
     $options += array('max_redirects' => 0);
-    return drupal_http_request($url, $options);
+    $result = drupal_http_request($url, $options);
+    $this->verbose('HTTP request to ' . $url .
+                   '<hr/> Options: ' . highlight_string('<?php ' . var_export($options, TRUE), TRUE) .
+                   '<hr/> Result: '  . highlight_string('<?php ' . var_export($result, TRUE), TRUE));
+    return $result;
   }
   /**
    * Deletes an exception assertion thrown by oauth2_server.
