@@ -947,8 +947,8 @@ function ces_bank_account_statement_page() {
  */
 function _ces_bank_get_transaction_states() {
   return array(
-    0 => t('New'),
-    1 => t('Triggered'),
+    0 => t('Not performed'),
+    1 => t('Awaiting acceptance'),
     2 => t('Accepted'),
     3 => t('Committed'),
     4 => t('Archived'),

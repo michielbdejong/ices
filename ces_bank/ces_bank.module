@@ -692,8 +692,8 @@ function ces_bank_menu() {
     'weight' => 10,
   );
   $menu['ces/bank/account/transaction/%ces_transaction/accept'] = array(
-    'title' => 'Accept',
-    'description' => 'Accept transaction.',
+    'title' => 'Accept/Reject',
+    'description' => 'Accept or reject transaction.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ces_bank_transaction_accept_form', 4),
     'file' => 'ces_bank.forms.inc',

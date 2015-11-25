@@ -424,8 +424,8 @@ class CesBankTestCase extends DrupalWebTestCase {
     );
     $this->doTransaction($user2, $transaction, FALSE, t('The transaction must be manually authorized.'));
     // Check tansaction state from both sides.
-    $this->checkTransactionState($user1, $transaction, t('Triggered'));
-    $this->checkTransactionState($user2, $transaction, t('Triggered'));
+    $this->checkTransactionState($user1, $transaction, t('Awaiting acceptance'));
+    $this->checkTransactionState($user2, $transaction, t('Awaiting acceptance'));
     $this->acceptTransaction($user1, $transaction);
     $this->checkTransactionState($user1, $transaction, t('Committed'));
     $this->checkTransactionState($user2, $transaction, t('Committed'));
@@ -900,7 +900,7 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->drupalLogin($user);
     $this->drupalGet('ces/bank/account/transaction');
     $this->clickLink($transaction['concept']);
-    $this->clickLink(t('Accept'));
+    $this->clickLink(t('Accept/Reject'));
     $this->drupalPost(NULL, array(), t('Accept'));
     $this->assertText(t('Transaction successfully applied.'));
   }
