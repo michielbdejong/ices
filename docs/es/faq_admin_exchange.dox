@@ -1,0 +1,31 @@
+/**
+
+@page faq_admin FAQ Para administradores de redes.
+
+@section faq_nueva_cuenta_usuario_existente ¿Como puedo crearle una cuenta a un usuario que ya existe?
+
+Si quieres crear una cuenta a un usuario que ya existe en tu red o en otra red 
+interna de integralces, puedes hacerlo desde el menú.
+
+** Administración/cuentas
+
+![](/../img/nueva_cuenta_usuario_existente-01.png)
+
+** Entramos en "New Account"
+
+Se aconseja dejar el nombre de cuenta que nos sugiere.
+
+En la casilla de "Nombre de usuario" podremos seleccionar a un usuario
+existente.
+
+![](/../img/nueva_cuenta_usuario_existente-02.png)
+
+@section faq_nuevo_usuario ¿Como puedo crear un nuevo usuario?
+
+Al crear un nuevo usuario, el sistema le asignara una nueva cuenta.
+
+![](/../img/nuevo_usuario-01.png)
+![](/../img/nuevo_usuario-02.png)
+![](/../img/nuevo_usuario-03.png)
+
+*/
