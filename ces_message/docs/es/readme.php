@@ -78,9 +78,5 @@
  * @todo Crear ces_message_send_account() para enviar el mensaje a todos los
  *       usuarios de una cuenta.
  * 
- * @todo Estudiar la forma de evitar el exceso de acumulación de mensajes. Por
- *       ejemplo poniendo un limite a los mensajes guardados de cada usuario y
- *       en el caso de sobrepasarlo borrar una cantidad de los más antiguos.
- *       Se debería de estudiar la mejor estrategia.
  * @}
  */

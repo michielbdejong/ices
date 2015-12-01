@@ -64,123 +64,9 @@ function ces_bank_accounts_admin($exchange_id) {
       ),
     );
   }
-  $page = array();
-  $page['table'] = array(
-    '#theme' => 'table',
-    '#attributes' => array(
-      'class' => array('ces-table'),
-    ),
-    '#header' => array(
-      array(
-        'data' => t('Account'),
-        'sort' => 'asc',
-        'field' => 'name',
-      ),
-      array(
-        'data' => t('User'),
-        'sort' => 'asc',
-        'field' => 'user',
-      ),
-      array(
-        'data' => t('Email'),
-        'sort' => 'asc',
-        'field' => 'mail',
-      ),
-      array(
-        'data' => t('Type'),
-        'sort' => 'asc',
-        'field' => 'kind',
-      ),
-      array(
-        'data' => t('State'),
-        'sort' => 'asc',
-        'field' => 'state',
-      ),
-      array(
-        'data' => t('Limit'),
-        'sort' => 'asc',
-        'field' => 'limitchain',
-      ),
-      array(
-        'data' => t('Balance'),
-        'sort' => 'asc',
-        'field' => 'balance',
-      ),
-      array(
-        'data' => t('Actions'),
-      ),
-    ),
-    '#rows' => array(),
-  );
-  $accounts = $bank->getAllAccounts(array('exchange' => $exchange['id']));
-  $kinds = array(
-    0 => t('Individual'),
-    1 => t('Shared'),
-    2 => t('Organization'),
-    3 => t('Company'),
-    4 => t('Public'),
-    5 => t('Virtual'),
-  );
-  $states = array(
-    0 => t('Hidden'),
-    1 => t('Active'),
-    2 => t('Closed'),
-    3 => t('Locked'),
-  );
-  $limitchains = $bank->getAllLimitChains($exchange['id']);
-  $limits = array();
-  foreach ($limitchains as $id => $limit) {
-    $limits[$id] = $limit['name'];
-  }
-  $rows = array();
-  $order_table = tablesort_get_order($page['table']['#header']);
-  foreach ($accounts as $account) {
-    $users = '';
-    $mails = '';
-    $result = db_query('SELECT user FROM {ces_accountuser} WHERE account = :aid', array(':aid' => $account['id']));
-    foreach ($result as $index => $record) {
-      if ($index > 0) {
-        $users .= '<br />';
-        $mails .= '<br />';
-      }
-      $result2 = db_query('SELECT uid, name, mail FROM {users} WHERE uid = :uid', array(':uid' => $record->user));
-      foreach ($result2 as $user) {
-        $user_short = strlen($user->name) > 10 ? substr($user->name, 0, 6) . '...' : $user->name;
-        $mail_short = strlen($user->mail) > 14 ? substr($user->mail, 0, 10) . '...' : $user->mail;
-        // Insert 10 chars of the name to sort properly. Later they'll be removed.
-        if ($order_table['sql'] == 'user' && $index == 0) {
-          $users .= str_pad(strtolower($user_short), 10);
-        }
-        $users .= '<a title="' . $user->name . '" href="/user/' . $user->uid . '">' . $user_short . '</a>';
-        $mails .= '<a title="' . $user->mail . '" href="mailto:' . $user->mail . '">' . $mail_short . '</a>';
-      }
-    }
-    $row = array(
-      $account['name'],
-      $users,
-      $mails,
-      $kinds[$account['kind']],
-      $states[$account['state']],
-      $limits[$account['limitchain']],
-      // Quitamos moneda de la cantidad para poder ser ordenado.
-      // @code
-      // $bank->formatAmount($account['balance'], $exchange, TRUE),
-      // @endcode
-      number_format($account['balance'], 2),
-      l(t('View'), 'ces/admin/account/' . $account['id'] . '/view') . ' ' .
-      l(t('Edit'), 'ces/admin/account/' . $account['id'] . '/edit') . ' ' .
-      l(t('Delete'), 'ces/admin/account/' . $account['id'] . '/delete') . ' ' .
-      l(t('Transactions'), 'ces/admin/account/' . $account['id'] . '/transactions'),
-    );
-    $rows[] = $row;
-  }
-  _ces_bank_sort_table($page['table']['#header'], $rows);
-  if ($order_table['sql'] == 'user') {
-    for ($i=0; $i < count($rows); $i++) {
-      $rows[$i][1] = substr($rows[$i][1], 10);
-    }
-  }
-  $page['table']['#rows'] = $rows;
+
+  $page = views_embed_view('ces_bank_accounts_list_for_admins', 'default', $exchange['id']);
+
   return $page;
 }
 /**
@@ -1061,8 +947,8 @@ function ces_bank_account_statement_page() {
  */
 function _ces_bank_get_transaction_states() {
   return array(
-    0 => t('New'),
-    1 => t('Triggered'),
+    0 => t('Not performed'),
+    1 => t('Awaiting acceptance'),
     2 => t('Accepted'),
     3 => t('Committed'),
     4 => t('Archived'),

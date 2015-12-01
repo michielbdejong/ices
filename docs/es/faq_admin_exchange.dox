@@ -1,0 +1,83 @@
+/**
+
+@page faq_admin FAQ Para administradores de redes.
+
+@section faq_admin_nueva_cuenta_usuario ¿Como puedo crear un nuevo usuario?
+
+Como administrador de una ecored puedes crear un usuario desde Administración / cuentas
+
+![](/../img/faq_admin/admin_nuevo_usuario-01.png)
+
+Entras en "New User" o "Nuevo usuario".
+
+![](/../img/faq_admin/admin_nuevo_usuario-02.png)
+
+Rellenas los datos del usuario.
+
+![](/../img/faq_admin/admin_nuevo_usuario-04.png)
+
+Te en cuenta que los campos que contienen un asterisco rojo son obligatorios.
+
+![](/../img/faq_admin/admin_nuevo_usuario-03.png)
+
+Si seleccionas notificar al usuario, se le enviará un correo con los datos
+al nuevo usuario con un enlace temporal para que establezca una nueva 
+contraseña.
+
+![](/../img/faq_admin/admin_nuevo_usuario-05.png)
+
+Al crear un nuevo usuario, el sistema le asignara una nueva cuenta.
+
+@section faq_admin_nueva_cuenta_usuario_existente ¿Como puedo crearle una cuenta a un usuario que ya existe?
+
+Si quieres crear una cuenta a un usuario que ya existe en tu red o en otra red 
+interna de integralces, puedes hacerlo desde el menú.
+
+** Administración/cuentas
+
+![](/../img/faq_admin/nueva_cuenta_usuario_existente-01.png)
+
+** Entramos en "New Account"
+
+Se aconseja dejar el nombre de cuenta que nos sugiere.
+
+En la casilla de "Nombre de usuario" podremos seleccionar a un usuario
+existente.
+
+![](/../img/faq_admin/nueva_cuenta_usuario_existente-02.png)
+
+Automáticamente el usuario recibirá un correo avisándole de su nueva cuenta.
+
+@section faq_admin_templates ¿Como puedo personalizar los mensajes que reciben los usuarios?
+
+Como administrador de una ecored puedes personalizar todos los mensajes que recibe el usuario.
+
+Para ello tienes que direigirte a [Administración /
+Templates](http://www.integralces.net/ces/admin/message)  donde encontraras una
+lista de las direferentes acciones que generán mensajes y los diferentes
+idiomas.
+
+![](/../img/faq_admin/admin_templates-01.png)
+
+Cada idioma es un enlace que nos permite gestionarlo.
+
+![](/../img/faq_admin/admin_templates-02.png)
+
+Una vez seleccionado un idioma podemos editarlo y modificar la plantilla.
+
+![](/../img/faq_admin/admin_templates-03.png)
+
+Los token son referencias a campos, en el momento de enviar el correo
+electrónico serán sustituidos por el valor correspondiente.
+
+Por ejemplo:
+
+[[exchange:shortname]] hace referencia al nombre corto de la red.
+
+Abajo del formulario tienes una lista con todos los tokens posibles y su referencia.
+
+
+
+
+
+*/

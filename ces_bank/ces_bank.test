@@ -257,7 +257,7 @@ class CesBankTestCase extends DrupalWebTestCase {
       ),
     );
     $this->createAccount($this->account11);
-    $this->activateAccount($this->account11, $this->admin1, 1);
+    $this->activateAccount($this->account11, $this->admin1,'HORA0001');
     $this->account12 = array(
       'exchange' => $this->exchange1,
       'account' => array(
@@ -294,7 +294,7 @@ class CesBankTestCase extends DrupalWebTestCase {
       ),
     );
     $this->createAccount($this->account12);
-    $this->activateAccount($this->account12, $this->admin1, 2);
+    $this->activateAccount($this->account12, $this->admin1, 'HORA0002');
     $this->account21 = array(
       'exchange' => $this->exchange2,
       'account' => array(
@@ -318,7 +318,7 @@ class CesBankTestCase extends DrupalWebTestCase {
       'want' => array(),
     );
     $this->createAccount($this->account21);
-    $this->activateAccount($this->account21, $this->admin2, 1);
+    $this->activateAccount($this->account21, $this->admin2, 'BCNA0001');
     $this->account22 = array(
       'exchange' => $this->exchange2,
       'account' => array(
@@ -342,7 +342,7 @@ class CesBankTestCase extends DrupalWebTestCase {
       'want' => array(),
     );
     $this->createAccount($this->account22);
-    $this->activateAccount($this->account22, $this->admin2, 1);
+    $this->activateAccount($this->account22, $this->admin2, 'BCNA0002');
   }
   /**
    * Do several transactions.
@@ -393,12 +393,12 @@ class CesBankTestCase extends DrupalWebTestCase {
     // Activated virtual accounts from interexchange.
     $this->drupalLogin($this->admin1);
     $this->drupalGet('ces/admin/account');
-    $this->clickLink(t('Edit'), 3);
+    $this->clickLink('HORABCNA');
     $this->drupalPost(NULL, array('state' => 1), t('Save'));
     $this->drupalLogout();
     $this->drupalLogin($this->admin2);
     $this->drupalGet('ces/admin/account');
-    $this->clickLink(t('Edit'), 3);
+    $this->clickLink('BCNAHORA');
     $this->drupalPost(NULL, array('state' => 1), t('Save'));
     $this->drupalLogout();
     // Confirm transaction.
@@ -424,8 +424,8 @@ class CesBankTestCase extends DrupalWebTestCase {
     );
     $this->doTransaction($user2, $transaction, FALSE, t('The transaction must be manually authorized.'));
     // Check tansaction state from both sides.
-    $this->checkTransactionState($user1, $transaction, t('Triggered'));
-    $this->checkTransactionState($user2, $transaction, t('Triggered'));
+    $this->checkTransactionState($user1, $transaction, t('Awaiting acceptance'));
+    $this->checkTransactionState($user2, $transaction, t('Awaiting acceptance'));
     $this->acceptTransaction($user1, $transaction);
     $this->checkTransactionState($user1, $transaction, t('Committed'));
     $this->checkTransactionState($user2, $transaction, t('Committed'));
@@ -605,13 +605,13 @@ class CesBankTestCase extends DrupalWebTestCase {
    *   The index of this user in the ces/admin/account page, in order to click
    *   the proper 'Edit' link.
    */
-  protected function activateAccount($record, $admin, $index) {
+  protected function activateAccount($record, $admin, $account_name) {
     // Login exchange admin.
     $this->drupalLogin($admin);
     // Go to accounts admin page.
     $this->drupalGet('ces/admin/account');
-    $this->assertText(t('Hidden'));
-    $this->clickLink(t('Edit'), $index);
+    $this->assertText(t('Hid.'));
+    $this->clickLink($account_name);
     $this->drupalPost(NULL, array('state' => '1'), t('Save'));
     $this->drupalLogout();
   }
@@ -848,8 +848,7 @@ class CesBankTestCase extends DrupalWebTestCase {
     // Go to account edit form.
     $this->drupalLogin($admin);
     $this->drupalGet('ces/admin/account');
-    $a = $this->xpath("//td[text()=:account]/..//a[text()='Edit']", array(':account' => $accountname));
-    $this->drupalGet($this->getAbsoluteUrl($a[0]['href']));
+    $this->clickLink('HORA0002');
     // Setup account.
     $limit = $this->xpath('//option[text()=:limitname]', array(':limitname' => $limitname));
     $edit = array('limitchain' => $limit[0]['value']);
@@ -901,7 +900,7 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->drupalLogin($user);
     $this->drupalGet('ces/bank/account/transaction');
     $this->clickLink($transaction['concept']);
-    $this->clickLink(t('Accept'));
+    $this->clickLink(t('Accept/Reject'));
     $this->drupalPost(NULL, array(), t('Accept'));
     $this->assertText(t('Transaction successfully applied.'));
   }
@@ -912,13 +911,12 @@ class CesBankTestCase extends DrupalWebTestCase {
     // CRUD accounts from admin.
     $this->drupalLogin($this->admin2);
     $this->drupalGet('ces/admin/account');
-    $this->assertText('BCNA000');
+    $this->assertLink('BCNA0000');
     $this->assertLink('adminbcna');
-    $this->assertLink('test.admin...');
-    $this->clickLink(t('View'));
-    $this->assertText('adminbcna');
+    $this->assertText('test.admin');
+    $this->clickLink('BCNA0000');
+    $this->assertText('BCNA - Ecoxarxa de Barcelona');
     // Edited from admin.
-    $this->clickLink(t('Edit'));
     // The administrator (0000) should not be able to change the code.
     $this->drupalPost(NULL, array('name' => 'BCNA9001'), t('Save'));
     $this->assertText(t('account can not be changed'));
@@ -931,19 +929,20 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->assertText(t('The last four digits must be a number'));
     // Edited from admin another account.
     $this->drupalGet('ces/admin/account');
-    $this->clickLink(t('Edit'), 1);
+    $this->clickLink('BCNA0001');
     $this->drupalPost(NULL, array('name' => 'BCNA9001'), t('Save'));
     $this->assertText(t('Account successfully update'));
     // Add account users.
     $this->drupalGet('ces/admin/account');
-    $this->clickLink(t('Edit'), 2);
+    $this->clickLink('BCNA9001');
     $this->clickLink(t('List users'));
     $this->assertText(t('account21@integralces.net'));
     $this->clickLink(t('Add account users'));
     $this->drupalPost(NULL, array('users[0][username]' => 'account22', 'privilege' => 1), t('Save'));
     // Delete.
     $this->drupalGet('ces/admin/account');
-    $this->clickLink(t('Delete'), 2);
+    $this->clickLink('BCNA9001');
+    $this->clickLink(t('Delete'));
     $this->drupalPost(NULL, NULL, t('Close account'));
     $this->drupalPost(NULL, NULL, t('Confirm'));
     $this->assertText(t('The account BCNA9001 has been closed'));
@@ -955,7 +954,7 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->assertText(t('Created a new user account for'));
     $this->assertText(t('BCNA0003'));
     $this->assertLink(t('testuser'));
-    $this->assertLink(t('testuser@t...'));
+    $this->assertText(t('testuser@t'));
     // Create new account related to an user of another network.
     $this->drupalGet('ces/admin/account/new');
     $this->drupalPost(NULL, array('users[0][username]' => 'account12'), t('Save'));
@@ -964,9 +963,10 @@ class CesBankTestCase extends DrupalWebTestCase {
     // Transactions of an account.
     $this->drupalLogin($this->admin1);
     $this->drupalGet('ces/admin/account');
-    $this->clickLink(t('Transactions'), 2);
-    $this->assertText(t('HORA0002'));
-    $this->assertText(t('HORA0001'));
+    $this->clickLink('HORA0002');
+    $this->clickLink(t('Transactions'));
+    $this->assertText('HORA0002');
+    $this->assertText('HORA0001');
     $this->assertLink(t('First test transaction.'));
     $this->drupalLogout();
   }

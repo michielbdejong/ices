@@ -365,12 +365,11 @@ function ces_bank_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 1,
   );
-  $menu['ces/bank/account/sell/multiple/autocomplete'] = array(
-    'title' => 'Autocomplete for multiple transactions',
-    'description' => 'Autocomplete for multiple transactions.',
-    'page callback' => 'ces_bank_multipletransactions_form_autocomplete_callback',
-    'file' => 'ces_bank.forms.inc',
-    'file path' => drupal_get_path('module', 'ces_bank'),
+  $menu['ces/bank/exchangeaccounts/autocomplete/%'] = array(
+    'title' => 'Autocomplete for accounts in a exchange',
+    'description' => 'Autocomplete for accounts in a exchange.',
+    'page callback' => 'ces_bank_exchangeaccounts_autocomplete_callback',
+    'page arguments' => array(4),
     'access callback' => 'ces_bank_access',
     'access arguments' => array('use', 'account seller',
       CES_BANK_CURRENT_ACCOUNT,
@@ -693,8 +692,8 @@ function ces_bank_menu() {
     'weight' => 10,
   );
   $menu['ces/bank/account/transaction/%ces_transaction/accept'] = array(
-    'title' => 'Accept',
-    'description' => 'Accept transaction.',
+    'title' => 'Accept/Reject',
+    'description' => 'Accept or reject transaction.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ces_bank_transaction_accept_form', 4),
     'file' => 'ces_bank.forms.inc',
@@ -1643,6 +1642,42 @@ function ces_bank_allusers_autocomplete($string) {
   drupal_json_output($matches);
 }
 /**
+ * AJAX autocomplete callback.
+ * @return string
+ *   Accounts in an exchange.
+ */
+function ces_bank_exchangeaccounts_autocomplete_callback($exchangeid, $string = "") {
+  $exchange = ces_bank_get_exchange($exchangeid);
+  if (!$exchange) {
+    return drupal_json_output('');
+  }
+  $string = urldecode($string);
+  $matches = array();
+  $return = db_query("
+    SELECT a.name AS accountname,
+    u.name AS username,
+    f.ces_firstname_value AS firstname,
+    s.ces_surname_value AS surname
+    FROM {ces_account} a
+    LEFT JOIN {ces_accountuser} au ON a.id = au.account
+    LEFT JOIN {users} u ON au.user = u.uid
+    LEFT JOIN {field_data_ces_firstname} f ON u.uid = f.entity_id
+    LEFT JOIN {field_data_ces_surname} s ON u.uid = s.entity_id
+    WHERE ( (a.exchange = :exchangeid) AND ( (CONCAT_WS(' ', a.name, ' ', u.name, ' ', f.ces_firstname_value, ' ', s.ces_surname_value) LIKE :string) AND (a.state = '1') AND (a.kind != '5') ))
+    ORDER BY a.name ASC
+    LIMIT 10 OFFSET 0",
+    array(
+      ':exchangeid' => $exchangeid,
+      ':string' => '%' . db_like($string) . '%',
+    ));
+    foreach ($return as $row) {
+      $matches[$row->accountname] = check_plain($row->accountname) . ': ' . check_plain($row->username) . ' ' . check_plain($row->firstname) . ' ' . check_plain($row->surname);
+    }
+
+  // Return for JS.
+  drupal_json_output($matches);
+}
+/**
  * Implements hook_views_api().
  */
 function ces_bank_views_api() {
@@ -1655,29 +1690,64 @@ function ces_bank_views_api() {
  * Implements hook_view_pre_render().
  */
 function ces_bank_views_pre_render(&$view) {
-  if ($view->name == 'ces_bank_accounts_list') {
+  if ($view->name == 'ces_bank_accounts_list' || $view->name == 'ces_bank_accounts_list_for_admins') {
+
+    if ($view->name == 'ces_bank_accounts_list_for_admins') {
+      $bank = new CesBank();
+      $kinds = array(
+        0 => t('Individual'),
+        1 => t('Shared'),
+        2 => t('Organization'),
+        3 => t('Company'),
+        4 => t('Public'),
+        5 => t('Virtual'),
+      );
+      $states = array(
+        0 => t('Hidden'),
+        1 => t('Active'),
+        2 => t('Closed'),
+        3 => t('Locked'),
+      );
+      $limitchains = $bank->getAllLimitChains($view->result[0]->ces_account_exchange);
+      $limits = array();
+      foreach ($limitchains as $id => $limit) {
+        $limits[$id] = $limit['name'];
+      }
+    }
+
     $view_noduplicates = array();
     $ids_and_keys = array();
     foreach ($view->result as $key => $result) {
-      $result->users_ces_accountuser_name = '<a href="/user/' . $result->users_ces_accountuser_uid . '">' . $result->users_ces_accountuser_name . '</a>';
+
+      if ($view->name == 'ces_bank_accounts_list_for_admins') {
+        $result->ces_account_kind = substr($kinds[$result->ces_account_kind], 0, 3) . '.';
+        $result->ces_account_state = substr($states[$result->ces_account_state], 0, 3) . '.';
+        $result->ces_account_limitchain = substr($limits[$result->ces_account_limitchain], 0, 10);
+      }
+
+      $result->ces_account_balance = number_format(floatval($result->ces_account_balance), 2);
+
+      $fsname = '';
       if (isset($result->field_ces_firstname[0]['raw']['safe_value'])) {
-        $result->users_ces_accountuser_name .= ' (' . $result->field_ces_firstname[0]['raw']['safe_value'];
+        $fsname = $result->field_ces_firstname[0]['raw']['safe_value'];
         if (isset($result->field_ces_surname[0]['raw']['safe_value'])) {
-          $result->users_ces_accountuser_name .= ' ' . $result->field_ces_surname[0]['raw']['safe_value'] . ')';
+          $fsname .= ' ' . $result->field_ces_surname[0]['raw']['safe_value'];
         }
-        else {
-          $result->users_ces_accountuser_name .= ')';
-        }
+      }
+      $result->users_ces_accountuser_name = '<a href="/user/' . $result->users_ces_accountuser_uid . '" title="' . $fsname . '">' . $result->users_ces_accountuser_name . '</a>';
+      $fsname = strlen($fsname) > 18 ? substr($fsname, 0, 14) . '...' : $fsname;
+      $result->users_ces_accountuser_name .= ' <span class="ces_bank_list_accounts_name">(' . $fsname . ')</span>';
+      if (strlen($result->users_ces_accountuser_mail) > 20) {
+        $result->users_ces_accountuser_mail = substr($result->users_ces_accountuser_mail, 0, 16) . '...';
       }
       if (array_key_exists($result->id, $ids_and_keys)) {
         $duplicate_key = $ids_and_keys[$result->id];
-        $view_noduplicates[$duplicate_key]->users_ces_accountuser_name .= ', ' . $result->users_ces_accountuser_name;
+        $view_noduplicates[$duplicate_key]->users_ces_accountuser_name .= '<br />' . $result->users_ces_accountuser_name;
         $view_noduplicates[$duplicate_key]->users_ces_accountuser_mail .= ', ' . $result->users_ces_accountuser_mail;
       }
       else {
         $ids_and_keys[$result->id] = $key;
         $view_noduplicates[$key] = $result;
-
       }
     }
     $view->result = $view_noduplicates;

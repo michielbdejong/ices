@@ -186,7 +186,7 @@ class CesOffersWantsTestCase extends DrupalWebTestCase {
       ),
     );
     $this->createAccount($this->account11);
-    $this->activateAccount($this->account11, $this->admin1, 1);
+    $this->activateAccount($this->account11, $this->admin1,'TEST0001');
   }
 
   /**
@@ -256,13 +256,13 @@ class CesOffersWantsTestCase extends DrupalWebTestCase {
    *   The index of this user in the ces/admin/account page, in order to click
    *   the proper 'Edit' link.
    */
-  protected function activateAccount($record, $admin, $index) {
+  protected function activateAccount($record, $admin, $accountname) {
     // Login exchange admin.
     $this->drupalLogin($admin);
     // Go to accounts admin page.
     $this->drupalGet('ces/admin/account');
-    $this->assertText(t('Hidden'));
-    $this->clickLink(t('Edit'), $index);
+    $this->assertText('Hid.');
+    $this->clickLink($accountname);
     $this->drupalPost(NULL, array('state' => '1'), t('Save'));
     $this->drupalLogout();
   }

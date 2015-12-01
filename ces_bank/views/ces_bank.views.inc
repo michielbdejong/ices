@@ -105,6 +105,33 @@ function ces_bank_views_data() {
       'click sortable' => TRUE,
     ),
   );
+  $data['ces_account']['state'] = array(
+    'title' => t('Account state'),
+    'help' => t('Account state.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+  );
+  $data['ces_account']['kind'] = array(
+    'title' => t('Account kind'),
+    'help' => t('Account kind.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+  );
+  $data['ces_account']['limitchain'] = array(
+    'title' => t('Account limit'),
+    'help' => t('Account limit.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+  );
   $data['ces_account']['exchange'] = array(
     'title' => t('Account exchange'),
     'help' => t('Account exchange.'),
@@ -175,21 +202,7 @@ function ces_bank_views_data() {
       'help' => t('More information on this relationship'),
     ),
   );
-  $data['ces_transaction']['table']['group'] = t('Ces Transactions');
-  $data['ces_accountuser']['table']['base'] = array(
-    'field' => 'id',
-    'title' => t('Ces Transaction table'),
-    'help' => t('Ces Transaction view.'),
-    'weight' => -10,
-  );
-  $data['ces_transaction']['amount'] = array(
-    'title' => t('Transactions amount'),
-    'help' => t('Transactions amount.'),
-    'field' => array(
-      'handler' => 'views_handler_field',
-      'click sortable' => TRUE,
-    ),
-  );
+
   return $data;
 }
 /**
