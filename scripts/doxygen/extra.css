@@ -1,4 +1,5 @@
 /** customize for integralces */
 
 .title, h1, h2, h3 {color: #8a2;}
-img { max-width: 100%;}
+img { max-width: 100% !important;}
+.image {text-align: left !important}

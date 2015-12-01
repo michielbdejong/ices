@@ -7,16 +7,16 @@
 Si has olvidado la contraseña de tu cuenta, deberás ir a integralces.net y
 darle al enlace 'Forgot password?'.
 
-![](/../img/recuperar_contrasena-01.png)
+![](/../img/faq/recuperar_contrasena-01.png)
 
 Añadir tu correo electrónico y darle al botón de 'Enviar una nueva contraseña'.
 
-![](/../img/recuperar_contrasena-02.png)
+![](/../img/faq/recuperar_contrasena-02.png)
 
 Si realmente existe un usuario con el correo asignado recibirás un mail con tu
 nombre de usuario y un enlace para añadir una nueva contraseña.
 
-![](/../img/recuperar_contrasena-03.png)
+![](/../img/faq/recuperar_contrasena-03.png)
 
 @section faq_cambiar_nombre_usuario ¿Como puedo cambiar el nombre de mi usuario?
 
@@ -28,20 +28,20 @@ aplicación. Y el que nos pide para autenticarnos.
 Si deseamos cambiarlo podemos ir a nuestro perfil desde el enlace que se nos
 presenta arriba a la derecha junto a nuestro nombre real.
 
-![](/../img/cambio_nombre_usuario-01.png)
+![](/../img/faq/cambio_nombre_usuario-01.png)
 
 Una vez en nuestro perfil veremos el botón de "Editar".
 
-![](/../img/cambio_nombre_usuario-02.png)
+![](/../img/faq/cambio_nombre_usuario-02.png)
 
 El primer campo que se nos presenta es el de usuario.
 
-![](/../img/cambio_nombre_usuario-03.png)
+![](/../img/faq/cambio_nombre_usuario-03.png)
 
 Cambiamos al que deseamos y si la aplicación no encuentra que ya este en uso
 se nos cambiara.
 
-![](/../img/cambio_nombre_usuario-04.png)
+![](/../img/faq/cambio_nombre_usuario-04.png)
 
 Una vez cambiado, cuando volvamos a entrar, en la casilla de usuario deberemos
 poner el nuevo.
@@ -60,7 +60,7 @@ mismo correo electrónico.
 Este caso se da cuando tenemos más de un usuario en drupal con el mismo correo
 electrónico.
 
-![](/../img/correo_en_uso.png)
+![](/../img/faq/correo_en_uso.png)
 
 Al importar las redes del CES al integralCES los usuarios son creados 
 automáticamente y eso puede producir duplicaciones.
@@ -90,26 +90,26 @@ una cuenta con un solo usuario.
 Una vez dentro del integralCES podemos ir a nuestro perfil desde el enlace
 de la parte superior derecha.
 
-![](/../img/enlace_perfil.png)
+![](/../img/faq/enlace_perfil.png)
 
 Le damos a 'Edita' y nos mostrará el formulario con nuestros datos personales.
 
-![](/../img/editar_perfil-01.png)
+![](/../img/faq/editar_perfil-01.png)
 
 @section faq_mas_de_una_cuenta ¿Como puedo añadir mi usuario a otra cuenta?
 
 Desde la pagina de editar perfil, podemos administrar los usuarios de las cuentas.
 
-![](/../img/editar_cuenta-01.png)
+![](/../img/faq/editar_cuenta-01.png)
 
 Desde el botón 'Manage account users' entramos a gestionar usuarios.
 
-![](/../img/editar_cuenta-02.png)
+![](/../img/faq/editar_cuenta-02.png)
 
 Desde 'Add acount user' añadimos tantos usuarios como queramos, pudiendo 
 darles privilegios en la cuenta o no.
 
 
-![](/../img/editar_cuenta-03.png)
+![](/../img/faq/editar_cuenta-03.png)
 
 */
