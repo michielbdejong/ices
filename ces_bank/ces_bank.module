@@ -1603,6 +1603,7 @@ function ces_bank_allusers_autocomplete($string) {
   $matches = array();
   $return = db_query("
     SELECT u.name AS username,
+    u.mail AS mail,
     f.ces_firstname_value as firstname,
     s.ces_surname_value as surname
     FROM {users} u
@@ -1611,8 +1612,10 @@ function ces_bank_allusers_autocomplete($string) {
     LEFT JOIN {field_data_ces_surname} s
     ON s.entity_id = u.uid
     WHERE u.name LIKE :string
+    OR u.mail LIKE :string
     UNION
     SELECT u.name AS username,
+    u.mail AS mail,
     f.ces_firstname_value as firstname,
     s.ces_surname_value as surname
     FROM {field_data_ces_firstname} f
@@ -1623,6 +1626,7 @@ function ces_bank_allusers_autocomplete($string) {
     WHERE f.ces_firstname_value LIKE :string
     UNION
     SELECT u.name AS username,
+    u.mail AS mail,
     f.ces_firstname_value as firstname,
     s.ces_surname_value as surname
     FROM {field_data_ces_surname} s
@@ -1636,7 +1640,11 @@ function ces_bank_allusers_autocomplete($string) {
       ':string' => '%' . db_like($string) . '%',
     ));
   foreach ($return as $row) {
-    $matches[$row->username] = check_plain($row->username) . ' -- ' . check_plain($row->firstname) . check_plain($row->surname);
+    $fsname = check_plain($row->firstname) . check_plain($row->surname);
+    $fsname = strlen($fsname) > 20 ? substr($fsname, 0, 16) . '...' : $fsname;
+    $email = check_plain($row->mail);
+    $email = strlen($email) > 20 ? substr($email, 0, 16) . '...' : $email;
+    $matches[$row->username] = check_plain($row->username) . ': ' . $fsname . ' -- ' . $email;
   }
   // Return for JS.
   drupal_json_output($matches);
