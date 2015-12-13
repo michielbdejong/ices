@@ -187,6 +187,131 @@ function ces_offerswants_schema() {
     ),
     'primary key' => array('cid'),
   );
+  $schema['ces_alerts'] = array(
+    'description' => 'Table for offers&wants alerts of each exchange.',
+    'fields' => array(
+      'id' => array(
+        'description' => 'Primary Key: Unique alert ID.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'exchange' => array(
+        'description' => 'The {ces_exchange}.id of the alerts.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'expired_status' => array(
+        'description' => 'Enabled/disabled alert offerwant expired.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'expired_lasttime' => array(
+        'description' => 'Last time cron runs alert offerwant expired, as a Unix timestamp.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'expired_noalertusers' => array(
+        'description' => 'Users not to send alert offerwant expired.',
+        'type' => 'blob',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+      ),
+      'newoffer_status' => array(
+        'description' => 'Enabled/disabled alert newoffer.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'newoffer_lasttime' => array(
+        'description' => 'Last time cron runs alert newoffer, as a Unix timestamp.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'newoffer_onlyusers' => array(
+        'description' => 'Users to send alert newoffer.',
+        'type' => 'blob',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+      ),
+      'newwant_status' => array(
+        'description' => 'Enabled/disabled alert newwant.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'newwant_lasttime' => array(
+        'description' => 'Last time cron runs alert newwant, as a Unix timestamp.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'newwant_onlyusers' => array(
+        'description' => 'Users to send alert newwant.',
+        'type' => 'blob',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+      ),
+      'offersperiodical_status' => array(
+        'description' => 'Alert offers periodical: disabled(0), weekly(1), biweekly(2), monthly(3), bimonthly(4).',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'offersperiodical_lasttime' => array(
+        'description' => 'Last time cron runs alert offers periodical, as a Unix timestamp.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'offersperiodical_onlyusers' => array(
+        'description' => 'Users to send alert offers periodical.',
+        'type' => 'blob',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+      ),
+      'wantsperiodical_status' => array(
+        'description' => 'Alert wants periodical: disabled(0), weekly(1), biweekly(2), monthly(3), bimonthly(4).',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'wantsperiodical_lasttime' => array(
+        'description' => 'Last time cron runs alert wants periodical, as a Unix timestamp.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'wantsperiodical_onlyusers' => array(
+        'description' => 'Users to send alert wants periodical.',
+        'type' => 'blob',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+      ),
+      'created' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The time that the alerts for this exchange were created, as a Unix timestamp.',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
   return $schema;
 }
 
@@ -239,6 +364,137 @@ function ces_offerswants_update_7100() {
   db_create_table('ces_offercomment', $schema['ces_offercomment']);
 }
 
+/**
+ * Implements hook_update_N().
+ */
+function ces_offerswants_update_7101() {
+  $schema['ces_alerts'] = array(
+    'description' => 'Table for offers&wants alerts of each exchange.',
+    'fields' => array(
+      'id' => array(
+        'description' => 'Primary Key: Unique alert ID.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'exchange' => array(
+        'description' => 'The {ces_exchange}.id of the alerts.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'expired_status' => array(
+        'description' => 'Enabled/disabled alert offerwant expired.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'expired_lasttime' => array(
+        'description' => 'Last time cron runs alert offerwant expired, as a Unix timestamp.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'expired_noalertusers' => array(
+        'description' => 'Users not to send alert offerwant expired.',
+        'type' => 'blob',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+      ),
+      'newoffer_status' => array(
+        'description' => 'Enabled/disabled alert newoffer.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'newoffer_lasttime' => array(
+        'description' => 'Last time cron runs alert newoffer, as a Unix timestamp.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'newoffer_onlyusers' => array(
+        'description' => 'Users to send alert newoffer.',
+        'type' => 'blob',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+      ),
+      'newwant_status' => array(
+        'description' => 'Enabled/disabled alert newwant.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'newwant_lasttime' => array(
+        'description' => 'Last time cron runs alert newwant, as a Unix timestamp.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'newwant_onlyusers' => array(
+        'description' => 'Users to send alert newwant.',
+        'type' => 'blob',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+      ),
+      'offersperiodical_status' => array(
+        'description' => 'Alert offers periodical: disabled(0), weekly(1), biweekly(2), monthly(3), bimonthly(4).',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'offersperiodical_lasttime' => array(
+        'description' => 'Last time cron runs alert offers periodical, as a Unix timestamp.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'offersperiodical_onlyusers' => array(
+        'description' => 'Users to send alert offers periodical.',
+        'type' => 'blob',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+      ),
+      'wantsperiodical_status' => array(
+        'description' => 'Alert wants periodical: disabled(0), weekly(1), biweekly(2), monthly(3), bimonthly(4).',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'wantsperiodical_lasttime' => array(
+        'description' => 'Last time cron runs alert wants periodical, as a Unix timestamp.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'wantsperiodical_onlyusers' => array(
+        'description' => 'Users to send alert wants periodical.',
+        'type' => 'blob',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+      ),
+      'created' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The time that the alerts for this exchange were created, as a Unix timestamp.',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  db_create_table('ces_alerts', $schema['ces_alerts']);
+}
 /**
  * Implements hook_install().
  */

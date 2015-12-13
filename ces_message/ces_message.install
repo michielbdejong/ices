@@ -215,6 +215,11 @@ function ces_message_install() {
   ces_message_install_action('account_debit_pending', 'Account debit pending');
   ces_message_install_action('account_debit_rejected', 'Account debit rejected');
   ces_message_install_action('account_credit_rejected', 'Account credit rejected');
+  ces_message_install_action('alert_offerwant_expired', 'Offer/want expired');
+  ces_message_install_action('alert_offerwant_newoffer', 'New offering in the exchange');
+  ces_message_install_action('alert_offerwant_newwant', 'New want in the exchange');
+  ces_message_install_action('alert_offerwant_offersperiodical', 'Periodical list of offerings');
+  ces_message_install_action('alert_offerwant_wantsperiodical', 'Periodical list of wants');
 
   ces_message_install_default_templates();
 }
@@ -240,9 +245,21 @@ function ces_message_update_7102() {
   ces_message_install_default_templates();
 }
 /**
- * Quirt update 10/7/2014.
+ * Fourth update 10/7/2014.
  */
 function ces_message_update_7103() {
+  ces_message_install_default_templates();
+}
+/**
+ * Fiveth update 10/12/2015.
+ */
+function ces_message_update_7110() {
+  ces_message_install_action('alert_offerwant_expired', 'Offer/want expired');
+  ces_message_install_action('alert_offerwant_newoffer', 'New offering in the exchange');
+  ces_message_install_action('alert_offerwant_newwant', 'New want in the exchange');
+  ces_message_install_action('alert_offerwant_offersperiodical', 'Periodical list of offerings');
+  ces_message_install_action('alert_offerwant_wantsperiodical', 'Periodical list of wants');
+
   ces_message_install_default_templates();
 }
 /**

@@ -398,7 +398,6 @@ function ces_message_send_notify($action, $params, $recipient = array(), $sender
 
   }
 }
-
 /**
  * Implements hook_mail().
  */
