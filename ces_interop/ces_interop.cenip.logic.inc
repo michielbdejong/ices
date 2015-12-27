@@ -252,6 +252,28 @@ class CesInteropCENIPOutgoingTransaction extends CesInteropCENIPTransaction {
   public $buyer_country;
 
   /**
+   * Helper function to call the Clearing Central web service.
+   * **/
+  private function callClearingCentralService($data) {
+    $url = variable_get(CES_INTEROP_CEN_CLEARING_CENTRAL_URL, CES_INTEROP_CEN_CLEARING_CENTRAL_URL_DEFAULT);
+    $url .= '/' . CES_INTEROP_CEN_CLEARING_CENTRAL_TXINPUT;
+    $response = drupal_http_request($url, array(
+      'data' => drupal_http_build_query($data),
+      'method' => 'POST',
+      'headers' => array(
+        'Content-Type' => 'application/x-www-form-urlencoded',
+      ),
+    ));
+    if (!empty($response->data)) {
+      // The response is url-encoded.
+      $response = drupal_get_query_array($response->data);
+    }
+    else {
+      $response = NULL;
+    }
+    return $response;
+  }
+  /**
    * Implements apply().
    */
   public function apply() {
@@ -276,106 +298,41 @@ class CesInteropCENIPOutgoingTransaction extends CesInteropCENIPTransaction {
       'description' => $this->getConcept(),
       'amount' => $this->getAmount(),
     );
-    $url = variable_get(CES_INTEROP_CEN_CLEARING_CENTRAL_URL, CES_INTEROP_CEN_CLEARING_CENTRAL_URL_DEFAULT);
-    $url .= '/' . CES_INTEROP_CEN_CLEARING_CENTRAL_TXINPUT;
-    $response = drupal_http_request($url, array(
-      'data' => drupal_http_build_query($data),
-      'method' => 'POST',
-      'headers' => array(
-        'Content-Type' => 'application/x-www-form-urlencoded',
-      ),
-    ));
-    if (!empty($response->data)) {
-      // The response is url-encoded.
-      $response = drupal_get_query_array($response->data);
+    // Make the remote call.
+    $response = $this->callClearingCentralService($data);
+    
+    if (!empty($response)) {
       // In the response attribute is the transaction status or error code.
-      switch ($response['response']) {
+      if ($response['response'] == 1) {
         // Tansaction successfully applied.
-        case 1:
-          // Save return values for better review.
-          if (isset($response['txid'])) {
-            $this->txid = $response['txid'];
-          }
-          if (isset($response['buyer_name'])) {
-            $this->buyer_name = $response['buyer_name'];
-          }
-          if (isset($response['buyer_email'])) {
-            $this->buyer_email = $response['buyer_email'];
-          }
-          if (isset($response['buyer_xname'])) {
-            $this->buyer_xname = $response['buyer_xname'];
-          }
-          if (isset($response['buyer_country'])) {
-            $this->buyer_country = $response['buyer_country'];
-          }
-          // Update amount with the remote answer just in case there is any
-          // change (in rounding for example).
-          if (isset($response['amount'])) {
-            $this->getParent()->amount = $response['amount'];
-          }
-          // Apply the local transaction between the virtual account and the
-          // local account.
-          parent::apply();
-          break;
-
-        // Error cases:
-        case 2:
-          $message = t('Buyer account does not exist.');
-          break;
-
-        case 3:
-          $message = t('Network ID does not exist.');
-          break;
-
-        case 4:
-          $message = t('Transaction denied by remote exchange.');
-          break;
-
-        case 5:
-          $message = t('Faulty data.');
-          break;
-
-        case 6:
-          $message = t('The transaction has repeated ID.');
-          break;
-
-        case 7:
-          $message = t('URL error.');
-          break;
-
-        case 8:
-          $message = t('Remote conversion rate not set.');
-          break;
-
-        case 9:
-          $message = t('Remote server error.');
-          break;
-
-        case 10:
-          $message = t('Password incorrect.');
-          break;
-
-        case 11:
-          $message = t('Invalid IP of incoming server.');
-          break;
-
-        case 12:
-          $message = t('No Transaction ID provided.');
-          break;
-
-        case 13:
-          $message = t('Transaction ID does not exist.');
-          break;
-
-        case 14:
-          $message = t('Unable to connect to remote server.');
-          break;
-
-        default:
-          $message = t('Unknown error in remote transaction.');
+        // Save return values for better review.
+        if (isset($response['txid'])) {
+          $this->txid = $response['txid'];
+        }
+        if (isset($response['buyer_name'])) {
+          $this->buyer_name = $response['buyer_name'];
+        }
+        if (isset($response['buyer_email'])) {
+          $this->buyer_email = $response['buyer_email'];
+        }
+        if (isset($response['buyer_xname'])) {
+          $this->buyer_xname = $response['buyer_xname'];
+        }
+        if (isset($response['buyer_country'])) {
+          $this->buyer_country = $response['buyer_country'];
+        }
+        // Update amount with the remote answer just in case there is any
+        // change (in rounding for example).
+        if (isset($response['amount'])) {
+          $this->getParent()->amount = $response['amount'];
+        }
+        // Apply the local transaction between the virtual account and the
+        // local account.
+        parent::apply();
       }
-      if ($response['response'] != 1) {
+      else {
         $this->setState(CesBankTransactionInterface::STATE_ERROR);
+        $message = $this->getErrorMessage($response['response']);
         $this->log(array($message));
       }
     }
@@ -388,10 +345,81 @@ class CesInteropCENIPOutgoingTransaction extends CesInteropCENIPTransaction {
    * Implements revoke().
    */
   public function revoke() {
-    // TODO: remotely revoke.
-    parent::revoke();
+    // Remotely revoke.
+    $as = new IcesSerializer('CesBankLocalAccount');
+    $toaccount = $as->loadFromUniqueKey('name', $this->getToAccountName());
+    $es = new IcesSerializer('CesBankExchange');
+    $toexchange = $es->load($toaccount->exchange);
+    $data = array(
+      'txid' => $this->txid,
+      'password' => $toexchange->data['cenip_pass'],
+      'description' => '',
+      'amount' => '0',
+    );
+    $response = $this->callClearingCentralService($data);
+    if (!empty($response)) {
+      if ($response['response'] == 1) {
+        // Success. Locally revoke.
+        parent::revoke();
+      }
+      else {
+        // Error.
+        $this->setState(CesBankTransactionInterface::STATE_ERROR);
+        $message = $this->getErrorMessage($response['response']);
+        $this->log(array($message));
+      }
+    }
+    else {
+      // Network error.
+      throw new Exception(t('Network error connecting with Clearing Central. Try again later or contact your exchange administrator.'));
+    }
   }
+  
+  private function getErrorMessage($code) {
+    switch ($code) {
+      case 2:
+        return t('Buyer account does not exist.');
 
+      case 3:
+        return t('Network ID does not exist.');
+
+      case 4:
+        return t('Transaction denied by remote exchange.');
+
+      case 5:
+        return t('Faulty data.');
+
+      case 6:
+        return t('The transaction has repeated ID.');
+
+      case 7:
+        return t('URL error.');
+
+      case 8:
+        return t('Remote conversion rate not set.');
+
+      case 9:
+        return t('Remote server error.');
+
+      case 10:
+        return t('Password incorrect.');
+
+      case 11:
+        return t('Invalid IP of incoming server.');
+
+      case 12:
+        return t('No Transaction ID provided.');
+
+      case 13:
+        return t('Transaction ID does not exist.');
+
+      case 14:
+        return t('Unable to connect to remote server.');
+
+      default:
+        return t('Unknown error in remote transaction.');
+    }
+  }
 }
 /**
  * Class for CENIP remote transactions where the local account is the buyer.

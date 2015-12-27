@@ -743,26 +743,17 @@ function ces_interop_form_ces_bank_transaction_form_alter(&$form, &$form_state) 
         $form_state['values']['fromcenexchange'] = $transaction['decoration'][0]['data']['nid'];
         $form_state['values']['fromcenaccountname'] = $transaction['decoration'][0]['data']['buyer_id'];
         $form['fromexchange']['#default_value'] = 'cenip';
-        if ($transaction['state'] == CesBankTransactionInterface::STATE_COMMITTED) {
-          $forbid_edit = !ces_bank_access('admin', 'exchange', CES_BANK_CURRENT_EXCHANGE);
-          $cenip_warning = t('Warning: This is a remote transaction using the Community Exchage Network protocol and can not be updated. This will update the transaction only from the local system and therefore you may cause inconsistency in balances.');
-        }
       }
-      // If this is incomming transaction, forbid edditing.
+      // If this is incomming transaction, forbid editing.
       if (ces_interop_is_cenip_incoming_transaction($transaction)) {
-        $forbid_edit = TRUE;
-      }
-      if ($forbid_edit) {
-        $cenip_warning = t('Remote transactions can not be edited.');
-        $form['submit'] = array(
-          '#markup' => l(t('Cancel'), 'ces/bank/account/transaction'),
-          '#weight' => 100,
-        );
-      }
-      if (isset($cenip_warning)) {
+        $cenip_warning = t('Remote transactions can only be edited by the seller account.');
         $form['ces_interop_cenip_warning'] = array(
           '#weight' => -100,
           '#markup' => '<p><strong>' . $cenip_warning . '</strong></p>',
+        );
+        $form['submit'] = array(
+          '#markup' => l(t('Cancel'), 'ces/bank/account/transaction'),
+          '#weight' => 100,
         );
       }
     }
@@ -781,7 +772,7 @@ function ces_interop_form_ces_bank_transaction_form_alter(&$form, &$form_state) 
         '#required' => TRUE,
         '#default_value' => isset($form_state['values']['fromcenexchange']) ? $form_state['values']['fromcenexchange'] : '',
       );
-      // Remove buyer account and add a field for remote buyer ccount.
+      // Remove buyer account and add a field for remote buyer account.
       $form['fromcenaccountname'] = array(
         '#type' => 'textfield',
         '#size' => 10,
@@ -994,7 +985,7 @@ function ces_interop_transaction_confirm_form_submit($form, &$form_state) {
  */
 function ces_interop_form_ces_bank_transaction_delete_form_alter(&$form, &$form_state) {
   $transaction = $form_state['build_info']['args'][0];
-  if (ces_interop_is_cenip_transaction($transaction)) {
+  if (ces_interop_is_cenip_incomming_transaction($transaction)) {
     if ($transaction['state'] == CesBankTransactionInterface::STATE_COMMITTED) {
       // Alter the confirm_form.
       if (ces_bank_access('admin', 'exchange', CES_BANK_CURRENT_EXCHANGE)) {
@@ -1067,55 +1058,58 @@ function ces_interop_menu_alter(&$items) {
  */
 function ces_interop_transaction_view($transaction) {
   $page = ces_bank_transaction_view($transaction);
-  if (ces_interop_is_cenip_outgoing_transaction($transaction)) {
+  if (ces_interop_is_cenip_transaction($transaction)) {
     $cenipfields = $transaction['decoration'][0]['data'];
-    $fromaccountname = $cenipfields['buyer_id'];
-    if (!empty($cenipfields['buyer_name'])) {
-      $fromaccountname .= ' - ' . $cenipfields['buyer_name'];
+    
+    if (ces_interop_is_cenip_outgoing_transaction($transaction)) {
+      $fromaccountname = $cenipfields['buyer_id'];
+      if (!empty($cenipfields['buyer_name'])) {
+        $fromaccountname .= ' - ' . $cenipfields['buyer_name'];
+      }
+      if (!empty($cenipfields['buyer_email'])) {
+        $fromaccountname .= ' <' . $cenipfields['buyer_email'] . '>';
+      }
+      $page['fromaccount'] = array(
+        'name' => $fromaccountname,
+        'users' => array(),
+      );
+      $fromexchangename = $cenipfields['nid'];
+      if (!empty($cenipfields['buyer_xname'])) {
+        $fromexchangename .= ' - ' . $cenipfields['buyer_xname'];
+      }
+      if (!empty($cenipfields['buyer_country'])) {
+        $fromexchangename .= ' (' . $cenipfields['buyer_country'] . ')';
+      }
+      $page['fromexchange'] = array(
+        'name' => $fromexchangename,
+        'id' => $cenipfields['nid'],
+      );
     }
-    if (!empty($cenipfields['buyer_email'])) {
-      $fromaccountname .= ' <' . $cenipfields['buyer_email'] . '>';
+    if (ces_interop_is_cenip_incoming_transaction($transaction)) {
+      $cenipfields = $transaction['decoration'][0]['data'];
+      $toaccountname = $cenipfields['seller_id'];
+      if (!empty($cenipfields['seller_name'])) {
+        $toaccountname .= ' - ' . $cenipfields['seller_name'];
+      }
+      if (!empty($cenipfields['seller_email'])) {
+        $toaccountname .= ' <' . $cenipfields['seller_email'] . '>';
+      }
+      $page['toaccount'] = array(
+        'name' => $toaccountname,
+        'users' => array(),
+      );
+      $toexchangename = $cenipfields['nid'];
+      if (!empty($cenipfields['seller_xname'])) {
+        $toexchangename .= ' - ' . $cenipfields['seller_xname'];
+      }
+      if (!empty($cenipfields['seller_country'])) {
+        $toexchangename .= ' (' . $cenipfields['seller_country'] . ')';
+      }
+      $page['toexchange'] = array(
+        'name' => $toexchangename,
+        'id' => $cenipfields['nid'],
+      );
     }
-    $page['fromaccount'] = array(
-      'name' => $fromaccountname,
-      'users' => array(),
-    );
-    $fromexchangename = $cenipfields['nid'];
-    if (!empty($cenipfields['buyer_xname'])) {
-      $fromexchangename .= ' - ' . $cenipfields['buyer_xname'];
-    }
-    if (!empty($cenipfields['buyer_country'])) {
-      $fromexchangename .= ' (' . $cenipfields['buyer_country'] . ')';
-    }
-    $page['fromexchange'] = array(
-      'name' => $fromexchangename,
-      'id' => $cenipfields['nid'],
-    );
-  }
-  if (ces_interop_is_cenip_incoming_transaction($transaction)) {
-    $cenipfields = $transaction['decoration'][0]['data'];
-    $toaccountname = $cenipfields['seller_id'];
-    if (!empty($cenipfields['seller_name'])) {
-      $toaccountname .= ' - ' . $cenipfields['seller_name'];
-    }
-    if (!empty($cenipfields['seller_email'])) {
-      $toaccountname .= ' <' . $cenipfields['seller_email'] . '>';
-    }
-    $page['toaccount'] = array(
-      'name' => $toaccountname,
-      'users' => array(),
-    );
-    $toexchangename = $cenipfields['nid'];
-    if (!empty($cenipfields['seller_xname'])) {
-      $toexchangename .= ' - ' . $cenipfields['seller_xname'];
-    }
-    if (!empty($cenipfields['seller_country'])) {
-      $toexchangename .= ' (' . $cenipfields['seller_country'] . ')';
-    }
-    $page['toexchange'] = array(
-      'name' => $toexchangename,
-      'id' => $cenipfields['nid'],
-    );
   }
   return $page;
 }
@@ -1160,8 +1154,36 @@ function ces_interop_cenip() {
   $bank = new CesInteropCENIPBank();
   $transaction = $bank->getTransactionByTxid($txid);
   if ($transaction !== FALSE) {
-    // Transaction already exists.
-    return ces_interop_cenip_error(CES_INTEROP_CEN_ERR_REPEATED_TXID, $txid);
+    if (($transaction['amount'] == $amount && $transaction['description'] == $description)
+      || !ces_interop_is_cenip_incoming_transaction($transaction)) {
+      return ces_interop_cenip_error(CES_INTEROP_CEN_ERR_REPEATED_TXID, $txid);
+    }
+    else {
+      // This is an edit or delete request.
+      try {
+        if (empty($amount) && empty($description)) {
+          // Delete request.
+          $bank->deleteTransaction($transaction['id']);
+        }
+        else {
+          // Edit transaction.
+          $transaction['amount'] = $amount;
+          $transaction['description'] = $description;
+          $success = $bank->updateTransaction($transaction);
+          if (!$success) {
+            ces_interop_cenip_error(CES_INTEROP_CEN_ERR_TRANSACTION_DENIED, $txid);
+          }
+        }
+        $receipt = array(
+          'txid' => $txid,
+          'response' => '1',
+        );
+        ces_interop_send_httpquery('200 OK ', $receipt);
+      }
+      catch (Exception $e) {
+        ces_interop_cenip_error(CES_INTEROP_CEN_ERR_SERVER_ERROR, $txid);
+      }
+    }
   }
   // Check description and amount.
   if (empty($description) || !is_numeric($amount)) {
