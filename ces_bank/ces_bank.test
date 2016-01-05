@@ -91,6 +91,7 @@ class CesBankTestCase extends DrupalWebTestCase {
       'administer blocks',
       'access administration pages',
       'administer users',
+      'administer site configuration',
     ));
     $this->drupalLogin($this->globalAdminUser);
     // Setup blocks.
@@ -257,7 +258,7 @@ class CesBankTestCase extends DrupalWebTestCase {
       ),
     );
     $this->createAccount($this->account11);
-    $this->activateAccount($this->account11, $this->admin1,'HORA0001');
+    $this->activateAccount($this->admin1, 'HORA0001');
     $this->account12 = array(
       'exchange' => $this->exchange1,
       'account' => array(
@@ -294,7 +295,7 @@ class CesBankTestCase extends DrupalWebTestCase {
       ),
     );
     $this->createAccount($this->account12);
-    $this->activateAccount($this->account12, $this->admin1, 'HORA0002');
+    $this->activateAccount($this->admin1, 'HORA0002');
     $this->account21 = array(
       'exchange' => $this->exchange2,
       'account' => array(
@@ -318,7 +319,7 @@ class CesBankTestCase extends DrupalWebTestCase {
       'want' => array(),
     );
     $this->createAccount($this->account21);
-    $this->activateAccount($this->account21, $this->admin2, 'BCNA0001');
+    $this->activateAccount($this->admin2, 'BCNA0001');
     $this->account22 = array(
       'exchange' => $this->exchange2,
       'account' => array(
@@ -342,7 +343,7 @@ class CesBankTestCase extends DrupalWebTestCase {
       'want' => array(),
     );
     $this->createAccount($this->account22);
-    $this->activateAccount($this->account22, $this->admin2, 'BCNA0002');
+    $this->activateAccount($this->admin2, 'BCNA0002');
   }
   /**
    * Do several transactions.
@@ -390,7 +391,7 @@ class CesBankTestCase extends DrupalWebTestCase {
       'amount' => '0.5',
     );
     $this->doTransaction($user1, $record, TRUE, 'The transaction has NOT been applied');
-    // Activated virtual accounts from interexchange.
+    // Activate virtual accounts from interexchange.
     $this->drupalLogin($this->admin1);
     $this->drupalGet('ces/admin/account');
     $this->clickLink('HORABCNA');
@@ -605,7 +606,7 @@ class CesBankTestCase extends DrupalWebTestCase {
    *   The index of this user in the ces/admin/account page, in order to click
    *   the proper 'Edit' link.
    */
-  protected function activateAccount($record, $admin, $account_name) {
+  protected function activateAccount($admin, $account_name) {
     // Login exchange admin.
     $this->drupalLogin($admin);
     // Go to accounts admin page.

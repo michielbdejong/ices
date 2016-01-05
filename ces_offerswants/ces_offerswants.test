@@ -186,7 +186,7 @@ class CesOffersWantsTestCase extends DrupalWebTestCase {
       ),
     );
     $this->createAccount($this->account11);
-    $this->activateAccount($this->account11, $this->admin1,'TEST0001');
+    $this->activateAccount($this->admin1,'TEST0001');
   }
 
   /**
@@ -248,15 +248,13 @@ class CesOffersWantsTestCase extends DrupalWebTestCase {
   /**
    * Activate a requested account.
    *
-   * @param array $record
-   *   The account record.
    * @param object $admin
    *   The exchange admin user.
    * @param int $index
    *   The index of this user in the ces/admin/account page, in order to click
    *   the proper 'Edit' link.
    */
-  protected function activateAccount($record, $admin, $accountname) {
+  protected function activateAccount($admin, $accountname) {
     // Login exchange admin.
     $this->drupalLogin($admin);
     // Go to accounts admin page.

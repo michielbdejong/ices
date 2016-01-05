@@ -646,6 +646,7 @@ function ces_interop_exchange_form_validate($form, &$form_state) {
     // Check user field.
     if (empty($form_state['values']['cenip_user'])) {
       form_set_error('cenip_user', t('Specify the NID (Network Identifier) to be able to trade with remote echanges within the Community Echange Network.'));
+      return;
     }
     // Get old name/pass values.
     if (!empty($form_state['values']['id'])) {
@@ -664,6 +665,7 @@ function ces_interop_exchange_form_validate($form, &$form_state) {
     // Check password field.
     if (empty($form_state['values']['cenip_pass'])) {
       form_set_error('cenip_pass', t('Specify the password for this Community Exchange Network.'));
+      return;
     }
     // Check whether the user and password are correct. Simulate a login to the
     // clearing central web page and check the redirect URL. Check it only when
@@ -1154,7 +1156,7 @@ function ces_interop_cenip() {
   $bank = new CesInteropCENIPBank();
   $transaction = $bank->getTransactionByTxid($txid);
   if ($transaction !== FALSE) {
-    if (($transaction['amount'] == $amount && $transaction['description'] == $description)
+    if ((($transaction['amount'] == $amount) && ($transaction['concept'] == $description))
       || !ces_interop_is_cenip_incoming_transaction($transaction)) {
       return ces_interop_cenip_error(CES_INTEROP_CEN_ERR_REPEATED_TXID, $txid);
     }
@@ -1168,7 +1170,7 @@ function ces_interop_cenip() {
         else {
           // Edit transaction.
           $transaction['amount'] = $amount;
-          $transaction['description'] = $description;
+          $transaction['concept'] = $description;
           $success = $bank->updateTransaction($transaction);
           if (!$success) {
             ces_interop_cenip_error(CES_INTEROP_CEN_ERR_TRANSACTION_DENIED, $txid);
@@ -1238,7 +1240,7 @@ function ces_interop_cenip() {
     else {
       $receipt = array(
         'txid' => $transaction['txid'],
-        'result' => CES_INTEROP_CEN_ERR_TRANSACTION_DENIED,
+        'response' => CES_INTEROP_CEN_ERR_TRANSACTION_DENIED,
         'buyer_nid' => $fromexchange['data']['cenip_user'],
         'buyer_xname' => $fromexchange['name'],
         'buyer_id' => $fromaccount['name'],
@@ -1290,7 +1292,7 @@ function _ces_interop_check_nid($nid) {
  */
 function ces_interop_cenip_error($number, $txid) {
   $message = array(
-    'result' => $number,
+    'response' => $number,
     'txid' => $txid,
   );
   ces_interop_send_httpquery('200 OK', $message);

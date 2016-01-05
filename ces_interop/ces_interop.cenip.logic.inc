@@ -155,8 +155,10 @@ class CesInteropCENIPTransaction extends CesBankDecoratedTransaction {
   public function deleteExtraData() {
     if (isset($this->txid)) {
       $s = new IcesSerializer('CesInteropCENIPTransactionId');
-      $txid = $s->load('id', $this->getParent()->getId());
-      $s->delete($txid);
+      $txid = $s->load($this->getId());
+      if ($txid !== FALSE) {
+        $s->delete($txid);
+      }
     }
   }
   /**

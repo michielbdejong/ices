@@ -76,6 +76,10 @@ class CesInteropTestCase extends CesBankTestCase {
     $modules[] = 'ces_interop';
     return $modules;
   }
+  
+  protected function testAll() {
+    // Override parent testAll() so it do nothing.
+  }
 
   /**
    * This function performs all tests.
@@ -84,7 +88,7 @@ class CesInteropTestCase extends CesBankTestCase {
    * accounts, etc) before we can actually test critical features we join all in
    * one test function to save resources.
    */
-  protected function testAll() {
+  protected function testAllOpenTransact() {
     if (!TEST_INTEROP) {
       return TRUE;
     }
@@ -283,5 +287,63 @@ class CesInteropTestCase extends CesBankTestCase {
       $this->assert('debug', 'Deleted exceptions from oauth2_server module.');
     }
   }
-
+  /**
+   * Test (part of) the Community Exchange Network Interexchange protocol.
+   * **/
+  protected function testAllCENIP() {
+    $this->configureCENIP();
+    $this->doIncommingTransaction('0000', FALSE);
+    $user1 = $this->accountUser($this->account11);
+    $this->assertBalance($user1, '0.0');
+    $this->activateAccount($this->admin1, 'HORAcen0746');
+    $this->doIncommingTransaction('0001', TRUE);
+    $this->assertBalance($user1, '-1.50');
+  }
+  /**
+   * Configure the system to allow transactions from all IP and configure the
+   * exchange HORA to allow CENIP transactions.
+   * **/
+  protected function configureCENIP() {
+    // Create data.
+    $this->createExchanges();
+    $this->createAccounts();
+    // Configure exchange HORA.
+    $this->drupalLogin($this->admin1);
+    $this->drupalGet('ces/admin/exchange');
+    $this->drupalPostAJAX(NULL, array('cenip' => TRUE), 'cenip');
+    // This is a real account in clearing central used only for integralCES test purposes.
+    $this->drupalPost(NULL, array('cenip' => TRUE, 'cenip_user' => 'cen0998', 'cenip_pass' => 'test@ices2011'), t('Update exchange'));
+    // Configure the system not to block requests from outside Clearing Central.
+    $this->drupalLogin($this->globalAdminUser);
+    $this->drupalPost('admin/config/services/ces_interop', array('ces_interop_debug' => TRUE), t('Save configuration'));
+    $this->drupalLogout();
+  }
+  /**
+   * Test incomming transactions from Clearing Central.
+   **/
+  protected function doIncommingTransaction($id, $success = TRUE) {
+    $url = url('ces/interop/cenip', array('absolute' => TRUE));
+    $data = array(
+      'txid' => 'test-txid-' . $id,
+      'buyer_nid' => 'cen0998',
+      'seller_nid' => 'cen0746',
+      'description' => 'Remote test transaction',
+      'amount' => '1.50',
+      'seller_xname' => 'Test Exchange',
+      'seller_country' => 'za',
+      'seller_id' => 'TEST0001',
+      'seller_name' => 'Extern User',
+      'seller_email' => 'externuser@mail.com',
+      'buyer_id' => 'HORA0001',
+    );
+    $options = array(
+      'method' => 'POST',
+      'data' => http_build_query($data),
+      'headers' => array(
+        'Content-Type' => 'application/x-www-form-urlencoded',
+      ),
+    );
+    parse_str($this->httpRequest($url, $options)->data, $response);
+    $this->assertEqual($success, $response['response'] == '1', 'Incomming transaction ' . ($success ? 'succeeded' : 'failed') . '.');
+  }
 }
