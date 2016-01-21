@@ -493,8 +493,8 @@ function ces_message_cron() {
     ->condition('created', $date_delete, '<')
     ->execute();
   if ($num_deleted && $num_deleted > 0) {
-    $msg = 'Delete ' . $num_deleted . ' old messages';
-    watchdog('cron', $msg);
+    $msg = t('Delete @num_deleted old message' . array('@num_deleted' => $num_deleted));
+    watchdog('cron', '@msg', array('@msg' => $msg));
   }
 }
 
