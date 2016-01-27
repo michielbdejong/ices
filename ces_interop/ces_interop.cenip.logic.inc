@@ -198,6 +198,16 @@ class CesInteropCENIPTransaction extends CesBankDecoratedTransaction {
       }
     }
   }
+  /**
+   * Overrides the default check() method so it always sets the stransaction 
+   * state to one of ACCEPTED or REJECTED.
+   * */
+  public function check() {
+    $this->getParent()->check();
+    if ($this->getState() !== CesBankBasicTransaction::STATE_ACCEPTED) {
+      $this->setState(CesBankBasicTransaction::STATE_REJECTED);
+    }
+  }
 }
 /**
  * Remote Transaction identifier.
