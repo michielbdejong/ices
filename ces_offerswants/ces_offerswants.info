@@ -7,3 +7,4 @@ dependencies[] = ces_bank
 dependencies[] = ces_message
 dependencies[] = image
 files[] = ces_offerswants.test
+version = "7.x-1.3"

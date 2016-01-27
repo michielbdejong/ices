@@ -607,7 +607,7 @@ function _ces_import4ces_batch_import_csv_finished($success, $results,
   elseif (!empty($results['error'])) {
     drupal_set_message($results['error'], 'error');
     // Save message to database, go to admin/reports/dblog to view.
-    watchdog('ces_import4ces', $results['error'], array(), WATCHDOG_WARNING);
+    watchdog('ces_import4ces', '@error', array('@error' => $results['error']), WATCHDOG_WARNING);
     if (!empty($results['row'])) {
       // Manually fix the row.
       $batch['form_state']['row'] = $results['row'];
