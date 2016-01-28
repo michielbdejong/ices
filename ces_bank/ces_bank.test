@@ -598,13 +598,10 @@ class CesBankTestCase extends DrupalWebTestCase {
   /**
    * Activate a requested account.
    *
-   * @param array $record
-   *   The account record.
    * @param object $admin
    *   The exchange admin user.
-   * @param int $index
-   *   The index of this user in the ces/admin/account page, in order to click
-   *   the proper 'Edit' link.
+   * @param staring $account_name
+   *   The Account name.
    */
   protected function activateAccount($admin, $account_name) {
     // Login exchange admin.
@@ -949,9 +946,17 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->assertText(t('The account BCNA9001 has been closed'));
     // Create new user+account.
     $this->drupalGet('ces/admin/account/newuser');
-    $this->drupalPost(NULL, array('name' => 'testuser', 'mail' => 'testuser@test.com', 'pass[pass1]' => 'passwd',
-      'pass[pass2]' => 'passwd', 'ces_firstname[und][0][value]' => 'firstname', 'ces_town[und][0][value]' => 'town',
-      'ces_postcode[und][0][value]' => 'postcode'), t('Create new account'));
+    $this->drupalPost(NULL, array(
+      'name' => 'testuser',
+      'mail' => 'testuser@test.com',
+      'pass[pass1]' => 'passwd',
+      'pass[pass2]' => 'passwd',
+      'ces_firstname[und][0][value]' => 'firstname',
+      'ces_town[und][0][value]' => 'town',
+      'ces_postcode[und][0][value]' => 'postcode',
+      ),
+      t('Create new account')
+    );
     $this->assertText(t('Created a new user account for'));
     $this->assertText(t('BCNA0003'));
     $this->assertLink(t('testuser'));

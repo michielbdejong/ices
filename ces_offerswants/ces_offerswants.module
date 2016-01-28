@@ -402,7 +402,7 @@ function ces_offerswants_menu() {
     'page arguments' => array(4),
     'access callback' => TRUE,
   );
-    $menu['ces/admin/alerts'] = array(
+  $menu['ces/admin/alerts'] = array(
     'title' => 'Email alerts',
     'description' => 'Preferences about offers and wants email alerts',
     'page callback' => 'drupal_get_form',
@@ -1229,10 +1229,12 @@ function ces_alerts_form_submit($form, &$form_state) {
   $alerts = db_query("SELECT * FROM {ces_alerts} WHERE exchange = :exchange",
     array(':exchange' => $exchange['id']));
   $new_alerts = FALSE;
-  if ($alerts->rowCount() == 0) { // A new row for this exchange needs to be created in db.
+  if ($alerts->rowCount() == 0) {
+    // A new row for this exchange needs to be created in db.
     $new_alerts = TRUE;
   }
-  else { // The row for this exchange needs to be updated.
+  else {
+    // The row for this exchange needs to be updated.
     foreach ($alerts as $row) {
       $alert = $row;
     }
@@ -1246,8 +1248,10 @@ function ces_alerts_form_submit($form, &$form_state) {
   );
   if ($new_alerts) {
     $fields['exchange'] = $exchange['id'];
-    $anonymous_and_admin = serialize('0,1'); // Init no sending users list with anonymous(0) and admin(1).
-    $exchange_admin = serialize($exchange['admin']); // Init only sending users list with exchange admin.
+    // Init no sending users list with anonymous(0) and admin(1).
+    $anonymous_and_admin = serialize('0,1');
+    // Init only sending users list with exchange admin.
+    $exchange_admin = serialize($exchange['admin']);
     $fields['expired_noalertusers'] = $anonymous_and_admin;
     $fields['newoffer_onlyusers'] = $exchange_admin;
     $fields['newwant_onlyusers'] = $exchange_admin;
@@ -1265,49 +1269,72 @@ function ces_alerts_form_submit($form, &$form_state) {
     $fields['newwant_lasttime'] = REQUEST_TIME;
   }
   if ($new_alerts || ($alert->offersperiodical_status == 0 && $fields['offersperiodical_status'] > 0)) {
-    switch ($fields['offersperiodical_status']) { // Prepare first mailing for today.
+    // Prepare first mailing for today.
+    switch ($fields['offersperiodical_status']) {
       case '0':
-        $fields['offersperiodical_lasttime'] = REQUEST_TIME; // New alert but disabled.
+        // New alert but disabled.
+        $fields['offersperiodical_lasttime'] = REQUEST_TIME;
         break;
+
       case '1':
-        $fields['offersperiodical_lasttime'] = REQUEST_TIME - 3600*24*7; // One week ago.
+        // One week ago.
+        $fields['offersperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 7;
         break;
+
       case '2':
-        $fields['offersperiodical_lasttime'] = REQUEST_TIME - 3600*24*14; // Two weeks ago.
+        // Two weeks ago.
+        $fields['offersperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 14;
         break;
+
       case '3':
-        $fields['offersperiodical_lasttime'] = REQUEST_TIME - 3600*24*30; // One month ago.
+        // One month ago.
+        $fields['offersperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 30;
         break;
+
       case '4':
-        $fields['offersperiodical_lasttime'] = REQUEST_TIME - 3600*24*60; // Two months ago.
+        // Two months ago.
+        $fields['offersperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 60;
         break;
+
     }
   }
   if ($new_alerts || ($alert->wantsperiodical_status == 0 && $fields['wantsperiodical_status'] > 0)) {
-    switch ($fields['wantsperiodical_status']) { // Prepare first mailing for today.
+    // Prepare first mailing for today.
+    switch ($fields['wantsperiodical_status']) {
       case '0':
-        $fields['wantsperiodical_lasttime'] = REQUEST_TIME; // New alert but disabled.
+        // New alert but disabled.
+        $fields['wantsperiodical_lasttime'] = REQUEST_TIME;
         break;
+
       case '1':
-        $fields['wantsperiodical_lasttime'] = REQUEST_TIME - 3600*24*7; // One week ago.
+        // One week ago.
+        $fields['wantsperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 7;
         break;
+
       case '2':
-        $fields['wantsperiodical_lasttime'] = REQUEST_TIME - 3600*24*14; // Two weeks ago.
+        // Two weeks ago.
+        $fields['wantsperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 14;
         break;
+
       case '3':
-        $fields['wantsperiodical_lasttime'] = REQUEST_TIME - 3600*24*30; // One month ago.
+        // One month ago.
+        $fields['wantsperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 30;
         break;
+
       case '4':
-        $fields['wantsperiodical_lasttime'] = REQUEST_TIME - 3600*24*60; // Two months ago.
+        // Two months ago.
+        $fields['wantsperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 60;
         break;
+
     }
   }
   if ($new_alerts) {
     $id = db_insert('ces_alerts')
       ->fields($fields)
       ->execute();
-      drupal_set_message(t('The email alerts for exchange :excode have been created.',
-        array(':excode' => $exchange['code'])));
+    drupal_set_message(t('The email alerts for exchange :excode have been created.',
+      array(':excode' => $exchange['code']))
+    );
   }
   else {
     $updated = db_update('ces_alerts')
@@ -1318,7 +1345,7 @@ function ces_alerts_form_submit($form, &$form_state) {
       array(':excode' => $exchange['code'])));
   }
 }
-/*
+/**
  * Implements hook_cron().
  */
 function ces_offerswants_cron() {
@@ -1329,9 +1356,15 @@ function ces_offerswants_cron() {
   foreach ($all_exchanges_alerts as $alerts) {
     $exchange = ces_bank_get_exchange($alerts->exchange);
     $alerts_done = array();
-    $frequency = array(0, 3600*24*7, 3600*24*14, 3600*24*30, 3600*24*60);
+    $frequency = array(
+      0,
+      3600 * 24 * 7,
+      3600 * 24 * 14,
+      3600 * 24 * 30,
+      3600 * 24 * 60,
+    );
 
-     // Expired alert: sends message and email with ces_message_send_notify.
+    // Expired alert: sends message and email with ces_message_send_notify.
     if ($alerts->expired_status == 1) {
       $expireds = db_query("
         SELECT ow.id, ow.title, ow.type, ow.user
@@ -1403,13 +1436,15 @@ function ces_offerswants_cron() {
         foreach ($users_onlysend as $user) {
           $data['recipient'][] = $user;
           $series++;
-          if ($series == 50) { // Send a serie of 50 users to queue cron.
+          if ($series == 50) {
+            // Send a serie of 50 users to queue cron.
             $queue->createItem($data);
             $series = 0;
             $data['recipient'] = array();
           }
         }
-        if ($series > 0) { // Send last serie of users (minor than 50) to queue cron. 
+        if ($series > 0) {
+          // Send last serie of users (minor than 50) to queue cron.
           $queue->createItem($data);
         }
       }
@@ -1455,13 +1490,15 @@ function ces_offerswants_cron() {
         foreach ($users_onlysend as $user) {
           $data['recipient'][] = $user;
           $series++;
-          if ($series == 50) { // Send a serie of 50 users to queue cron.
+          if ($series == 50) {
+            // Send a serie of 50 users to queue cron.
             $queue->createItem($data);
             $series = 0;
             $data['recipient'] = array();
           }
         }
-        if ($series > 0) { // Send last serie of users (minor than 50) to queue cron. 
+        if ($series > 0) {
+          // Send last serie of users (minor than 50) to queue cron.
           $queue->createItem($data);
         }
       }
@@ -1506,13 +1543,15 @@ function ces_offerswants_cron() {
         foreach ($users_onlysend as $user) {
           $data['recipient'][] = $user;
           $series++;
-          if ($series == 50) { // Send a serie of 50 users to queue cron.
+          if ($series == 50) {
+            // Send a serie of 50 users to queue cron.
             $queue->createItem($data);
             $series = 0;
             $data['recipient'] = array();
           }
         }
-        if ($series > 0) { // Send last serie of users (minor than 50) to queue cron. 
+        if ($series > 0) {
+          // Send last serie of users (minor than 50) to queue cron.
           $queue->createItem($data);
         }
       }
@@ -1557,13 +1596,15 @@ function ces_offerswants_cron() {
         foreach ($users_onlysend as $user) {
           $data['recipient'][] = $user;
           $series++;
-          if ($series == 50) { // Send a serie of 50 users to queue cron.
+          if ($series == 50) {
+            // Send a serie of 50 users to queue cron.
             $queue->createItem($data);
             $series = 0;
             $data['recipient'] = array();
           }
         }
-        if ($series > 0) { // Send last serie of users (minor than 50) to queue cron. 
+        if ($series > 0) {
+          // Send last serie of users (minor than 50) to queue cron.
           $queue->createItem($data);
         }
       }
@@ -1579,7 +1620,7 @@ function ces_offerswants_cron() {
     }
   }
 }
-/*
+/**
  * Implements hook_cron_queue_info().
  */
 function ces_offerswants_cron_queue_info() {
@@ -1589,27 +1630,31 @@ function ces_offerswants_cron_queue_info() {
   );
   return $queues;
 }
-/*
+/**
  * Cron queue for mailing.
  */
 function ces_offerswants_send_alert_email($data) {
-switch ($data['alert']) {
-  case 'expired':
-    ces_message_send_notify('alert_offerwant_expired', $data['params'], $data['recipient'], $data['sender_id'], TRUE);
-    break;
-  case 'newoffer':
-    ces_offerswants_queue_send_alert_email('alert_offerwant_newoffer', $data['params'], $data['recipient']);
-    break;
-  case 'newwant':
-    ces_offerswants_queue_send_alert_email('alert_offerwant_newwant', $data['params'], $data['recipient']);
-    break;
-  case 'offersperiodical':
-    ces_offerswants_queue_send_alert_email('alert_offerwant_offersperiodical', $data['params'], $data['recipient']);
-    break;
-  case 'wantsperiodical':
-    ces_offerswants_queue_send_alert_email('alert_offerwant_wantsperiodical', $data['params'], $data['recipient']);
-    break;
-}
+  switch ($data['alert']) {
+    case 'expired':
+      ces_message_send_notify('alert_offerwant_expired', $data['params'], $data['recipient'], $data['sender_id'], TRUE);
+      break;
+
+    case 'newoffer':
+      ces_offerswants_queue_send_alert_email('alert_offerwant_newoffer', $data['params'], $data['recipient']);
+      break;
+
+    case 'newwant':
+      ces_offerswants_queue_send_alert_email('alert_offerwant_newwant', $data['params'], $data['recipient']);
+      break;
+
+    case 'offersperiodical':
+      ces_offerswants_queue_send_alert_email('alert_offerwant_offersperiodical', $data['params'], $data['recipient']);
+      break;
+
+    case 'wantsperiodical':
+      ces_offerswants_queue_send_alert_email('alert_offerwant_wantsperiodical', $data['params'], $data['recipient']);
+      break;
+  }
 }
 /**
  * Send email for alerts.
@@ -1649,12 +1694,13 @@ function ces_offerswants_mail($key, &$message, $params) {
   $message['body'][] = token_replace($template->body, $params);
   $message['body'][] = $params['attachment'];
 }
-/**
- * Implements hook_form_alter().
- */
-//function ces_offerswants_form_alter(&$form, $form_state, $form_id) {
-//
-//}
+
+/*
+  Implements hook_form_alter().
+  function ces_offerswants_form_alter(&$form, $form_state, $form_id) {
+  }
+*/
+
 /**
  * Returns current exchange id.
  *
@@ -2459,7 +2505,13 @@ function ces_offerswants_form_alter(&$form, &$form_state, $form_id) {
       )
     );
     $exchanges_edit = array();
-    $periodicity = array(t('disabled'), t('every week'), t('every two weeks'), t('every month'), t('every two months'));
+    $periodicity = array(
+      t('disabled'),
+      t('every week'),
+      t('every two weeks'),
+      t('every month'),
+      t('every two months'),
+    );
     foreach ($all_accounts_user as $account) {
       if (!in_array($account->exchange, $exchanges_edit)) {
         $alerts = db_query("SELECT * FROM {ces_alerts} WHERE exchange = :exchange",
@@ -2474,7 +2526,7 @@ function ces_offerswants_form_alter(&$form, &$form_state, $form_id) {
             $exchange = ces_bank_get_exchange($alert->exchange);
             $form['alerts_' . $alert->exchange] = array(
               '#type' => 'fieldset',
-              '#title' => t('Email alerts for') . ' ' . check_plain($exchange['name']),
+              '#title' => check_plain(t('Email alerts for') . ' ' . $exchange['name']),
               '#collapsible' => FALSE,
             );
             if ($alert->expired_status == 1) {
@@ -2499,18 +2551,23 @@ function ces_offerswants_form_alter(&$form, &$form_state, $form_id) {
               $newwant_onlyusers = explode(',', unserialize($alert->newwant_onlyusers));
               $form['alerts_' . $alert->exchange]['alert_newwant' . $alert->exchange] = array(
                 '#type' => 'checkbox',
-                '#title' => t('New want alert.'),
+                '#title' => check_plain(t('New want alert.')),
                 '#default_value' => in_array($user_edit->uid, $newwant_onlyusers) ? 1 : 0,
-                '#description' => t('The system will send you an email when a new want is created in your exchange.'),
+                '#description' => check_plain(t('The system will send you an email when a new want is created in your exchange.')),
               );
             }
             if ($alert->offersperiodical_status > 0) {
               $offersperiodical_onlyusers = explode(',', unserialize($alert->offersperiodical_onlyusers));
               $form['alerts_' . $alert->exchange]['alert_offersperiodical' . $alert->exchange] = array(
                 '#type' => 'checkbox',
-                '#title' => t('Offers periodical alert.'),
+                '#title' => check_plain(t('Offers periodical alert.')),
                 '#default_value' => in_array($user_edit->uid, $offersperiodical_onlyusers) ? 1 : 0,
-                '#description' => t('The system will send you an email') . ' ' . check_plain($periodicity[$alert->offersperiodical_status]) . ' ' . t('with last updated offers in your exchange.'),
+                '#description' => check_plain(t('The system will send you an email') .
+                  ' ' .
+                  $periodicity[$alert->offersperiodical_status] .
+                  ' ' .
+                  t('with last updated offers in your exchange.')
+                ),
               );
             }
             if ($alert->wantsperiodical_status > 0) {
@@ -2519,7 +2576,13 @@ function ces_offerswants_form_alter(&$form, &$form_state, $form_id) {
                 '#type' => 'checkbox',
                 '#title' => t('Wants periodical alert.'),
                 '#default_value' => in_array($user_edit->uid, $wantsperiodical_onlyusers) ? 1 : 0,
-                '#description' => t('The system will send you an email') . ' ' . check_plain($periodicity[$alert->offersperiodical_status]) . ' ' . t('with last updated wants in your exchange.'),
+                '#description' => check_plain(
+                  t('The system will send you an email') .
+                  ' ' .
+                  $periodicity[$alert->offersperiodical_status] .
+                  ' ' .
+                  t('with last updated wants in your exchange.')
+                ),
               );
             }
             if (!in_array('ces_offerswants_alerts_profile_submit', $form['#submit'])) {

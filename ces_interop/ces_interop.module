@@ -1062,7 +1062,7 @@ function ces_interop_transaction_view($transaction) {
   $page = ces_bank_transaction_view($transaction);
   if (ces_interop_is_cenip_transaction($transaction)) {
     $cenipfields = $transaction['decoration'][0]['data'];
-    
+
     if (ces_interop_is_cenip_outgoing_transaction($transaction)) {
       $fromaccountname = $cenipfields['buyer_id'];
       if (!empty($cenipfields['buyer_name'])) {

@@ -199,9 +199,11 @@ class CesInteropCENIPTransaction extends CesBankDecoratedTransaction {
     }
   }
   /**
+   * Check.
+   *
    * Overrides the default check() method so it always sets the stransaction 
    * state to one of ACCEPTED or REJECTED.
-   * */
+   */
   public function check() {
     $this->getParent()->check();
     if ($this->getState() !== CesBankBasicTransaction::STATE_ACCEPTED) {
@@ -233,13 +235,13 @@ class CesInteropCENIPTransactionId extends IcesDBObject {
 }
 /**
  * Class for CENIP remote transactions where the local account is the seller.
+ *
+ * We are breaking the drupal naming conventions to match the variable names
+ * to the protocol argument names.
  */
 class CesInteropCENIPOutgoingTransaction extends CesInteropCENIPTransaction {
-  // We are breaking the drupal naming conventions to match the variable names
-  // to the protocol argument names.
   /**
-   * @var string
-   *   The remote account id.
+   * The remote account id.
    */
   public $buyer_id;
   /**
@@ -265,7 +267,7 @@ class CesInteropCENIPOutgoingTransaction extends CesInteropCENIPTransaction {
 
   /**
    * Helper function to call the Clearing Central web service.
-   * **/
+   */
   private function callClearingCentralService($data) {
     $url = variable_get(CES_INTEROP_CEN_CLEARING_CENTRAL_URL, CES_INTEROP_CEN_CLEARING_CENTRAL_URL_DEFAULT);
     $url .= '/' . CES_INTEROP_CEN_CLEARING_CENTRAL_TXINPUT;
@@ -312,7 +314,7 @@ class CesInteropCENIPOutgoingTransaction extends CesInteropCENIPTransaction {
     );
     // Make the remote call.
     $response = $this->callClearingCentralService($data);
-    
+
     if (!empty($response)) {
       // In the response attribute is the transaction status or error code.
       if ($response['response'] == 1) {
@@ -386,7 +388,10 @@ class CesInteropCENIPOutgoingTransaction extends CesInteropCENIPTransaction {
       throw new Exception(t('Network error connecting with Clearing Central. Try again later or contact your exchange administrator.'));
     }
   }
-  
+
+  /**
+   * Get error message.
+   */
   private function getErrorMessage($code) {
     switch ($code) {
       case 2:

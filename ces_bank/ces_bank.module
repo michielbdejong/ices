@@ -848,6 +848,9 @@ function ces_account_load($id = NULL) {
   $account = $bank->getAccount($id);
   return $account;
 }
+/**
+ * Implements hook_load().
+ */
 function ces_exchange_load($code = NULL) {
   if (empty($code)) {
     return NULL;
@@ -855,8 +858,8 @@ function ces_exchange_load($code = NULL) {
   $bank = new CesBank();
   $exchange = $bank->getExchangeByName($code);
   if ($exchange == FALSE) {
-      $exchange = ces_bank_get_current_exchange();
-    }
+    $exchange = ces_bank_get_current_exchange();
+  }
   return $exchange;
 }
 /**
@@ -1678,9 +1681,9 @@ function ces_bank_exchangeaccounts_autocomplete_callback($exchangeid, $string = 
       ':exchangeid' => $exchangeid,
       ':string' => '%' . db_like($string) . '%',
     ));
-    foreach ($return as $row) {
-      $matches[$row->accountname] = check_plain($row->accountname) . ': ' . check_plain($row->username) . ' ' . check_plain($row->firstname) . ' ' . check_plain($row->surname);
-    }
+  foreach ($return as $row) {
+    $matches[$row->accountname] = check_plain($row->accountname) . ': ' . check_plain($row->username) . ' ' . check_plain($row->firstname) . ' ' . check_plain($row->surname);
+  }
 
   // Return for JS.
   drupal_json_output($matches);
