@@ -1528,7 +1528,7 @@ function ces_bank_newuser_form($form, &$form_state) {
   $form = user_register_form($form, $form_state);
   $form['actions']['submit']['#submit'] = array('ces_bank_newuser_form_submit');
 
-  // Restore the user permissions to their default state
+  // Restore the user permissions to their default state.
   if ($cleanup === 'unset') {
     unset($permissions[$user->uid]['administer users']);
   }
