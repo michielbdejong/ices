@@ -85,7 +85,6 @@ class CesBankTestCase extends DrupalWebTestCase {
   public function setUp() {
     // Enable any modules required for the test.
     parent::setUp($this->getNeededModules());
-    $bank = new CesBank();
     // Create global bank administrator.
     $this->globalAdminUser = $this->drupalCreateUser(array(
       'administer blocks',
@@ -110,6 +109,7 @@ class CesBankTestCase extends DrupalWebTestCase {
       'scope' => 'user',
       'scopeid' => $this->globalAdminUser->uid,
     );
+    $bank = new CesBank();
     $bank->createPermission($permission);
     $this->drupalLogout();
   }
@@ -143,6 +143,10 @@ class CesBankTestCase extends DrupalWebTestCase {
     // Balance: HORA0001: 11.40, HORA0002: -11.00.
     $this->doEditInterexchangeTransactions();
     // Balance: HORA0001: 12.40, BCNA0001: -14.00.
+    $this->doRemoveInterexchangeTransactions();
+    // Balance: HORA0001: 10.90, BCNA0001: 1.00.
+    $this->doRemoveTransactions();
+    // Balance: HORA0001: 9.40, HORA0002: -9.50.
     $this->adminAccounts();
   }
   /**
@@ -716,6 +720,21 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->drupalLogout();
   }
   /**
+   * Remove a transaction.
+   * */
+  protected function removeTransaction($user, $record, $linkindex = 0) {
+    $this->drupalLogin($user);
+    $this->clickLink(t('My account'));
+    $this->clickLink(t('Account statement'));
+    $this->clickLink($record['concept'], $linkindex);
+    $this->clickLink(t('Delete'));
+    $this->assertText(t('Are you sure you want to delete the transaction?'));
+    $this->assertText($record['concept']);
+    $this->assertText($record['buyer']);
+    $this->drupalPost(NULL, array(), t('Delete'));
+    $this->assertText('has been deleted');
+  }
+  /**
    * Check that the given user has the given balance in his/her default account.
    */
   public function assertBalance($user, $amount) {
@@ -973,7 +992,7 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->clickLink(t('Transactions'));
     $this->assertText('HORA0002');
     $this->assertText('HORA0001');
-    $this->assertLink(t('First test transaction.'));
+    $this->assertLink(t('Second test transaction.'));
     $this->drupalLogout();
   }
   /**
@@ -1021,7 +1040,34 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->assertBalance($user1, '12.40');
     $this->assertBalance($user2, '-14.00');
   }
-
+  /**
+   * Test remove local transaction.
+   * **/
+  protected function doRemoveTransactions() {
+      $user1 = $this->accountUser($this->account11);
+      $user2 = $this->accountUser($this->account12);
+      $record = array(
+        'buyer' => 'HORA0002',
+        'concept' => 'First test transaction.',
+      );
+      $this->removeTransaction($user1, $record, 1);
+      $this->assertBalance($user1, '9.40');
+      $this->assertBalance($user2, '-9.50');
+  }
+  /**
+   * Test remove interexchange transaction.
+   * **/
+   protected function doRemoveInterexchangeTransactions() {
+      $user1 = $this->accountUser($this->account11);
+      $user2 = $this->accountUser($this->account21);
+      $record = array(
+        'buyer' => 'BCNA0001',
+        'concept' => 'Fourth test transaction.',
+      );
+      $this->removeTransaction($user1, $record, 1);
+      $this->assertBalance($user1, '10.90');
+      $this->assertBalance($user2, '1.00');
+  }
 }
 /**
  * @}

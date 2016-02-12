@@ -987,7 +987,7 @@ function ces_interop_transaction_confirm_form_submit($form, &$form_state) {
  */
 function ces_interop_form_ces_bank_transaction_delete_form_alter(&$form, &$form_state) {
   $transaction = $form_state['build_info']['args'][0];
-  if (ces_interop_is_cenip_incomming_transaction($transaction)) {
+  if (ces_interop_is_cenip_incoming_transaction($transaction)) {
     if ($transaction['state'] == CesBankTransactionInterface::STATE_COMMITTED) {
       // Alter the confirm_form.
       if (ces_bank_access('admin', 'exchange', CES_BANK_CURRENT_EXCHANGE)) {
