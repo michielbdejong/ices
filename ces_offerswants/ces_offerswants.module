@@ -1509,10 +1509,11 @@ function ces_offerswants_cron() {
     if ($alerts->offersperiodical_status > 0 &&
       (intval($alerts->offersperiodical_lasttime) + $frequency[$alerts->offersperiodical_status]) < $nowtime) {
       $last_offers = db_query("
-        SELECT ow.id, ow.title
+        SELECT ow.id, ow.title, ow.body, r.ces_offer_rate_value
         FROM {ces_offerwant} ow
         LEFT JOIN {ces_accountuser} au ON ow.user = au.user
         LEFT JOIN {ces_account} a ON au.account = a.id
+        LEFT JOIN {field_data_ces_offer_rate} r ON ow.id = r.entity_id
         WHERE a.exchange = :exchange
         AND ow.state = 1
         AND ow.type = 'offer'
@@ -1524,12 +1525,16 @@ function ces_offerswants_cron() {
         )
       );
       if ($last_offers->rowCount() > 0) {
-        $attachment = '<p>';
+        $attachment = '<table style="width:100%;border:0;border-spacing:1px;border-collapse:separate;"><tbody>';
         foreach ($last_offers as $lasto) {
-          $attachment .= '<br /><a href="' . $base_url . '/ces/bank/account/myoffers/' . $lasto->id . '/view">' .
-            $lasto->title . '</a>';
+          $attachment .= '<tr style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
+          $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt>';
+          $attachment .= '<a href="' . $base_url . '/ces/bank/account/myoffers/' . $lasto->id . '/view">' .
+            $lasto->title . '</a></td>';
+          $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt>';
+          $attachment .= trim(preg_replace('/\s+/', ' ', $lasto->body)) . '</td><td>' . $lasto->ces_offer_rate_value . '</td></tr>';
         }
-        $attachment .= '</p>';
+        $attachment .= '</tbody></table>';
         $data = array(
           'alert' => 'offersperiodical',
           'params' => array(
@@ -1562,7 +1567,7 @@ function ces_offerswants_cron() {
     if ($alerts->wantsperiodical_status > 0 &&
       (intval($alerts->wantsperiodical_lasttime) + $frequency[$alerts->wantsperiodical_status]) < $nowtime) {
       $last_wants = db_query("
-        SELECT ow.id, ow.title
+        SELECT ow.id, ow.title, ow.body
         FROM {ces_offerwant} ow
         LEFT JOIN {ces_accountuser} au ON ow.user = au.user
         LEFT JOIN {ces_account} a ON au.account = a.id
@@ -1577,12 +1582,16 @@ function ces_offerswants_cron() {
         )
       );
       if ($last_wants->rowCount() > 0) {
-        $attachment = '<p>';
+        $attachment = '<table style="width:100%;border:0;border-spacing:1px;border-collapse:separate;"><tbody>';
         foreach ($last_wants as $lastw) {
-          $attachment .= '<br /><a href="' . $base_url . '/ces/bank/account/mywants/' . $lastw->id . '/view">' .
-            $lastw->title . '</a>';
+          $attachment .= '<tr style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
+          $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
+          $attachment .= '<a href="' . $base_url . '/ces/bank/account/mywants/' . $lastw->id . '/view">' .
+            $lastw->title . '</a></td>';
+          $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
+          $attachment .= trim(preg_replace('/\s+/', ' ', $lastw->body)) . '</td></tr>';
         }
-        $attachment .= '</p>';
+        $attachment .= '</tbody></table>';
         $data = array(
           'alert' => 'wantsperiodical',
           'params' => array(
