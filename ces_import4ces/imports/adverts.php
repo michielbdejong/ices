@@ -1,20 +1,20 @@
 <?php
 /**
  * @file
- * Functions from parse offers and category
+ * Functions from parse adverts and category
  */
 
 /**
- * @defgroup ces_import4ces_offers Parse offers from CES
+ * @defgroup ces_import4ces_adverts Parse offers and wants from CES
  * @ingroup ces_import4ces
  * @{
- * Functions from parse offers
+ * Functions from parse offers and wants
  */
 
 /**
- * Parse setting.
+ * Parse adverts.
  */
-function ces_import4ces_parse_offers($import_id, $data, $row, &$context, $width_ajax = TRUE) {
+function ces_import4ces_parse_adverts($import_id, $data, $row, &$context, $width_ajax = TRUE) {
 
   if (isset($context['results']['error'])) {
     return;
@@ -27,37 +27,39 @@ function ces_import4ces_parse_offers($import_id, $data, $row, &$context, $width_
     $import->row = $row;
 
     // Having no category offers, create one for which indicates the lack of it.
-    $category = !empty($data['Category']) ? $data['Category'] : 'unclassified';
+    $category = !empty($data['category']) ? $data['category'] : 'unclassified';
 
     $category_id = ces_import4ces_get_category($category, $import);
-    $offer = array(
-      'type' => 'offer',
-      'user' => $data['Advertiser'],
-      'title' => $data['Title'],
-      'body' => $data['Description'],
-      'category' => $category_id,
-      'keywords' => $data['Keys'],
-      'state' => (($data['Hidden'] == 0) ? 1 : 0),
-      'created' => strtotime($data['DateAdded']),
-      'modified' => time(),
-      'expire' => strtotime($data['DateExpires']),
-      'rate' => $data['Rate'],
-      'image' => $data['Image'],
+
+    $ad_type = array(
+      'o' => 'offer',
+      'w' => 'want'
     );
 
-    $extra_info = array(
-      'UID' => $offer['user'],
-      'Subcat' => $data['Keys'],
-      'ConRate' => $data['ConRate'],
+    $offer = array(
+      'type' => $ad_type[$data['ad_type']],
+      'user' => $data['uid'],
+      'title' => $data['title'],
+      'body' => $data['description'],
+      'category' => $category_id,
+      'keywords' => $data['keywords'],
+      'state' => (($data['hide'] == 0) ? 1 : 0),
+      'created' => strtotime($data['date_added']),
+      'modified' => time(),
+      'expire' => strtotime($data['date_expires']),
+      'rate' => $data['talent_rate'],
+      'image' => $data['image'],
     );
+
+    $extra_info = $data;
 
     // Find uid from user.
     $query = db_query('SELECT uid FROM {users} where name=:name', array(':name' => $offer['user']));
     $offer_user_id = $query->fetchColumn(0);
 
     if (empty($offer_user_id) || !$offer_user_id) {
-      $m = t('The user @user was not found in offer import row @row. It may be a
-      user from another exchange not yet imported.', array('@user' => $data['Advertiser'], '@row' => $row));
+      $m = t('The user @user was not found in advert import row @row. It may be a
+      user from another exchange not yet imported.', array('@user' => $data['uid'], '@row' => $row));
       $context['results']['error'] = $m;
       throw new Exception($m);
     }
@@ -71,7 +73,7 @@ function ces_import4ces_parse_offers($import_id, $data, $row, &$context, $width_
 
     if (!empty($offer->image)) {
 
-      $file = 'https://www.community-exchange.org/pics/' . $data['Image'];
+      $file = 'https://www.community-exchange.org/pics/' . $data['image'];
       $parts = explode(".", $file);
       $extension = end($parts);
       $directory = file_default_scheme() . '://' . variable_get('ces_offerswants_picture_path', 'ces_offerswants_pictures');

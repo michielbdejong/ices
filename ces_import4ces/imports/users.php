@@ -28,7 +28,7 @@ function ces_import4ces_parse_users($import_id, $data, $row, &$context, $width_a
       $password = user_password(8);
     }
     else {
-      $password = $data['Password'];
+      $password = $data['password'];
     }
 
     /*
@@ -62,14 +62,14 @@ function ces_import4ces_parse_users($import_id, $data, $row, &$context, $width_a
       'pub' => CesBankLocalAccount::TYPE_PUBLIC,
       'vir' => CesBankLocalAccount::TYPE_VIRTUAL,
     );
-    $language = _ces_import4ces_get_language($data['Lang']);
+    $language = _ces_import4ces_get_language($data['language_short']);
 
     // Set up the user fields.
     $fields = array(
-      'name' => $data['UID'],
-      'mail' => ($import->anonymous) ? 'test-' . $data['UID'] . '@test.com' : $data['Email'],
+      'name' => $data['uid'],
+      'mail' => ($import->anonymous) ? 'test-' . $data['uid'] . '@test.com' : $data['email'],
       'pass' => $password,
-      'status' => ($data['Locked'] == 0) ? 1 : 0,
+      'status' => ($data['locked'] == 0) ? 1 : 0,
       // 'init' => ( $GLOBALS['anonymous'] ) ? 'test-'.$data['UID'].'@test.com'
       // : $data['Email'],
       'language' => $language,
@@ -77,64 +77,24 @@ function ces_import4ces_parse_users($import_id, $data, $row, &$context, $width_a
         DRUPAL_AUTHENTICATED_RID => 'authenticated user',
       ),
       // User custom fields.
-      'ces_firstname' => array(LANGUAGE_NONE => array(array('value' => $data['Firstname']))),
-      'ces_surname' => array(LANGUAGE_NONE => array(array('value' => $data['Surname']))),
-      'ces_address' => array(LANGUAGE_NONE => array(array('value' => $data['Address1'] . "\n" . $data['Address2']))),
-      'ces_town' => array(LANGUAGE_NONE => array(array('value' => $data['Address3']))),
-      'ces_postcode' => array(LANGUAGE_NONE => array(array('value' => $data['Postcode']))),
-      'ces_phonemobile' => array(LANGUAGE_NONE => array(array('value' => $data['PhoneM']))),
-      'ces_phonework' => array(LANGUAGE_NONE => array(array('value' => $data['PhoneW']))),
-      'ces_phonehome' => array(LANGUAGE_NONE => array(array('value' => $data['PhoneH']))),
-      'ces_website' => array(LANGUAGE_NONE => array(array('value' => $data['WebSite']))),
-      'created' => strtotime($data['Created']),
+      'ces_firstname' => array(LANGUAGE_NONE => array(array('value' => $data['firstname']))),
+      'ces_surname' => array(LANGUAGE_NONE => array(array('value' => $data['surname']))),
+      'ces_address' => array(LANGUAGE_NONE => array(array('value' => $data['address1'] . "\n" . $data['address2']))),
+      'ces_town' => array(LANGUAGE_NONE => array(array('value' => $data['address3']))),
+      'ces_postcode' => array(LANGUAGE_NONE => array(array('value' => $data['postcode']))),
+      'ces_phonemobile' => array(LANGUAGE_NONE => array(array('value' => $data['phone_m']))),
+      'ces_phonework' => array(LANGUAGE_NONE => array(array('value' => $data['phone_w']))),
+      'ces_phonehome' => array(LANGUAGE_NONE => array(array('value' => $data['phone_h']))),
+      'ces_website' => array(LANGUAGE_NONE => array(array('value' => $data['website']))),
+      'created' => strtotime($data['date_created']),
     );
 
-    $extra_data = array(
-      'OrgNameShort' => $data['OrgNameShort'],
-      'OrgNameLong' => $data['OrgNameLong'],
-      'SubArea' => $data['SubArea'],
-      'DefaultSub' => $data['DefaultSub'],
-      'PhoneF' => $data['PhoneF'],
-      'IM' => $data['IM'],
-      'DOB' => $data['DOB'],
-      'NoEmail1' => $data['NoEmail1'],
-      'NoEmail2' => $data['NoEmail2'],
-      'NoEmail3' => $data['NoEmail3'],
-      'NoEmail4' => $data['NoEmail4'],
-      'Hidden' => $data['Hidden'],
-      'Created' => $data['Created'],
-      'LastAccess' => $data['LastAccess'],
-      'LastEdited' => $data['LastEdited'],
-      'EditedBy' => $data['EditedBy'],
-      'InvNo' => $data['InvNo'],
-      'OrdNo' => $data['OrdNo'],
-      'Coord' => $data['Coord'],
-      'LocalOnly' => $data['LocalOnly'],
-      'Notes' => $data['Notes'],
-      'Photo' => $data['Photo'],
-      'HideAddr1' => $data['HideAddr1'],
-      'HideAddr2' => $data['HideAddr2'],
-      'HideAddr3' => $data['HideAddr3'],
-      'HideArea' => $data['HideArea'],
-      'HideCode' => $data['HideCode'],
-      'HidePhoneH' => $data['HidePhoneH'],
-      'HidePhoneW' => $data['HidePhoneW'],
-      'HidePhoneF' => $data['HidePhoneF'],
-      'HidePhoneM' => $data['HidePhoneM'],
-      'HideEmail' => $data['HideEmail'],
-      'IdNo' => $data['IdNo'],
-      'LoginCount' => $data['LoginCount'],
-      'SubsDue' => $data['SubsDue'],
-      'Closed' => $data['Closed'],
-      'DateClosed' => $data['DateClosed'],
-      'Translate' => $data['Translate'],
-      'Buddy' => $data['Buddy'],
-    );
+    $extra_data = $data;
 
     // Admin user has already been created in the first step, but we now
     // are completing the record with the user info.
-    if (substr($data['UID'], -4) == '0000') {
-      $user_drupal = user_load_by_name($data['UID']);
+    if (substr($data['uid'], -4) == '0000') {
+      $user_drupal = user_load_by_name($data['uid']);
     }
     else {
       $user_drupal = FALSE;
@@ -153,12 +113,12 @@ function ces_import4ces_parse_users($import_id, $data, $row, &$context, $width_a
     if (substr($user_drupal->name, -4) != '0000') {
       $bank = new CesBank();
       $limit = _ces_import4ces_get_limitchain($import->exchange_id,
-        $data['DebLimit'], $data['CredLimit']);
+        $data['debit_limit'], $data['credit_limit']);
       $account = array(
         'exchange' => $import->exchange_id,
-        'name' => $data['UID'],
+        'name' => $data['uid'],
         'limitchain' => $limit['id'],
-        'kind' => $type_user[$data['UserType']],
+        'kind' => $type_user[$data['usertype']],
         'state' => CesBankLocalAccount::STATE_HIDDEN,
         'users' => array(
           array(
@@ -166,8 +126,8 @@ function ces_import4ces_parse_users($import_id, $data, $row, &$context, $width_a
             'role' => CesBankAccountUser::ROLE_ACCOUNT_ADMINISTRATOR,
           ),
         ),
-        'created' => strtotime($data['Created']),
-        'modified' => strtotime($data['Created']),
+        'created' => strtotime($data['date_created']),
+        'modified' => strtotime($data['date_edited']),
       );
       $bank->createAccount($account, FALSE);
       $bank->activateAccount($account);

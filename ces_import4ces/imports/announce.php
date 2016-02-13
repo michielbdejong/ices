@@ -19,6 +19,7 @@ function ces_import4ces_parse_announce($import_id, $data, $row, &$context, $widt
   if (isset($context['results']['error'])) {
     return;
   }
+  echo '<pre>data: ' ; print_r($data) ; echo '</pre>';  exit() ; // DEV  
   $tx = db_transaction();
   try {
     ob_start();

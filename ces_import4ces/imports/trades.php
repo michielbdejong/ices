@@ -24,38 +24,31 @@ function ces_import4ces_parse_trades($import_id, $data, $row, &$context, $width_
     ob_start();
     $context['results']['import_id'] = $import_id;
     $bank = new CesBank();
-    $account_seller = _ces_import4ces_trades_get_account($import_id, $data['Seller'], $data);
+    $account_seller = _ces_import4ces_trades_get_account($import_id, $data['seller'], $data);
     if ($account_seller === FALSE) {
-      throw new Exception(t('Acount @account not found.', array('@account' => $data['Seller'])));
+      throw new Exception(t('Acount @account not found.', array('@account' => $data['seller'])));
     }
-    $account_buyer = _ces_import4ces_trades_get_account($import_id, $data['Buyer'], $data);
+    $account_buyer = _ces_import4ces_trades_get_account($import_id, $data['buyer'], $data);
     if ($account_buyer === FALSE) {
-      throw new Exception(t('Acount @account not found.', array('@account' => $data['Buyer'])));
+      throw new Exception(t('Acount @account not found.', array('@account' => $data['buyer'])));
     }
     // Find uid from user.
-    $query = db_query('SELECT uid FROM {users} where name=:name', array(':name' => $data['EnteredBy']));
+    $query = db_query('SELECT uid FROM {users} where name=:name', array(':name' => $data['entered_by']));
     $trade_user_id = $query->fetchColumn(0);
     if (!$trade_user_id) {
       $trade_user_id = $user->uid;
     }
 
-    $extra_info = array(
-      'ID' => $data['ID'],
-      'RemoteExchange' => $data['RemoteExchange'],
-      'RemoteBuyer' => $data['RemoteBuyer'],
-      'RecordID' => $data['RecordID'],
-      'Levy' => $data['Levy'],
-      'LevyRate' => $data['LevyRate'],
-    );
+    $extra_info = $data;
 
     $trans = array(
       'fromaccountname' => $account_buyer['name'],
       'toaccountname' => $account_seller['name'],
-      'amount' => $data['Amount'],
-      'concept' => $data['Description'],
+      'amount' => $data['seller_amount'],
+      'concept' => $data['description'],
       'user' => $trade_user_id,
-      'created' => strtotime($data['DateEntered']),
-      'modified' => strtotime($data['DateEntered']),
+      'created' => strtotime($data['date_entered']),
+      'modified' => strtotime($data['date_entered']),
     );
     variable_set('ces_import4ces_mail', FALSE);
     $bank->createTransaction($trans);
@@ -117,7 +110,7 @@ function _ces_import4ces_trades_get_account($import_id, $name, $data) {
     }
     else {
       // This is a remote transaction. The cen ID appears to be in the RecordID.
-      $offset = ($name == $data['Seller']) ? 0 : 4;
+      $offset = ($name == $data['seller']) ? 0 : 4;
       $name = substr($name, 0, 4) . 'cen' . substr($data['RecordID'], $offset, 4);
     }
     $account_seller = $bank->getAccountByName($name);

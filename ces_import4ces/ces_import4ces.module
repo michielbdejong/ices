@@ -15,7 +15,7 @@
 /**
  * Set to 0 in production.
  */
-define('CES_IMPORT4CES_ANONYMOUS', 0);
+define('CES_IMPORT4CES_ANONYMOUS', 1);
 /**
  * Reset passwords or keep old CES passwords.
  */
@@ -23,7 +23,7 @@ define('CES_IMPORT4CES_RESET_PASSWORD', 0);
 /**
  * Send welcome mails to all users.
  */
-define('CES_IMPORT4CES_SEND_MAILS', 1);
+define('CES_IMPORT4CES_SEND_MAILS', 0);
 /**
  * Where to save import CSV files.
  */
@@ -117,7 +117,7 @@ function ces_import4ces_admin_page() {
     $row[] = !empty($record->row) ? $record->row : '';
 
     $actions = '';
-    if ($step < 8) {
+    if ($step < 7) {
       $actions .= l(t('Continue'), 'ces/admin/import/' . $id . '/continue');
       $actions .= ' ';
     }
@@ -164,29 +164,25 @@ function ces_import4ces_import_form($form, &$form_state, $import_id = FALSE) {
       '#title' => 'Import name',
       '#description' => t('A good name is the four letter code of the exchange to be imported.'),
     );
-    $form['settings'] = array(
+    $form['exchanges'] = array(
       '#type' => 'file',
-      '#title' => 'settings.csv',
+      '#title' => 'exchanges.csv',
     );
     $form['users'] = array(
       '#type' => 'file',
       '#title' => 'users.csv',
     );
-    $form['offers'] = array(
+    $form['adverts'] = array(
       '#type' => 'file',
-      '#title' => 'offers.csv',
+      '#title' => 'adverts.csv',
     );
-    $form['wants'] = array(
+    $form['transactions'] = array(
       '#type' => 'file',
-      '#title' => 'wants.csv',
+      '#title' => 'transactions.csv',
     );
-    $form['trades'] = array(
+    $form['announcements'] = array(
       '#type' => 'file',
-      '#title' => 'trades.csv',
-    );
-    $form['announce'] = array(
-      '#type' => 'file',
-      '#title' => 'announce.csv',
+      '#title' => 'announcements.csv',
     );
 
     return confirm_form($form, t('Do you really want to start a new import?'),
@@ -197,7 +193,7 @@ function ces_import4ces_import_form($form, &$form_state, $import_id = FALSE) {
   else {
     $import = ces_import4ces_import_load($import_id);
     $steps = _ces_import4ces_steps();
-    if ($import->step < 7) {
+    if ($import->step < 6) {
       return confirm_form($form,
         t('Step @num. Import @type.', array(
           '@num' => $import->step,
@@ -321,9 +317,18 @@ function ces_import4ces_import_load($import_id) {
  * Validates import form and saves upload csv files.
  */
 function ces_import4ces_import_form_validate($form, &$form_state) {
+
+  // $files = array('exchanges', 'users', 'offers', 'wants', 'trades',
+  //    'announce');
+  $files = array(
+    'exchanges',
+    'users',
+    'adverts',
+    'transactions',
+    'announcements'
+  );
+
   if (empty($form_state['values']['import_id'])) {
-    $files = array('settings', 'users', 'offers', 'wants', 'trades',
-      'announce');
     if (empty($form_state['values']['files'])) {
       $dir = $form_state['values']['name'];
       if (!preg_match('/[a-zA-Z0-9]+/', $dir)) {
@@ -340,8 +345,8 @@ function ces_import4ces_import_form_validate($form, &$form_state) {
           $form_state['values'][$file] = $fileobj->destination;
         }
         else {
-          form_set_error($file, t('Could not copy file to %file',
-            array('%file' => $dest)));
+          form_set_error($file, t('Could not copy file %org to %file',
+            array('%org' => $file,'%file' => $dest)));
         }
       }
       $form_state['values']['files'] = $dir;
@@ -381,7 +386,7 @@ function ces_import4ces_import_form_submit($form, &$form_state) {
   switch ($record->step) {
     case '1':
       $file = 'imports/setting.php';
-      $file_csv = 'settings.csv';
+      $file_csv = 'exchanges.csv';
       $parse_function = 'ces_import4ces_parse_setting';
       break;
 
@@ -392,30 +397,24 @@ function ces_import4ces_import_form_submit($form, &$form_state) {
       break;
 
     case '3':
-      $file = 'imports/offers.php';
-      $file_csv = 'offers.csv';
-      $parse_function = 'ces_import4ces_parse_offers';
+      $file = 'imports/adverts.php';
+      $file_csv = 'adverts.csv';
+      $parse_function = 'ces_import4ces_parse_adverts';
       break;
 
     case '4':
-      $file = 'imports/wants.php';
-      $file_csv = 'wants.csv';
-      $parse_function = 'ces_import4ces_parse_wants';
-      break;
-
-    case '5':
       $file = 'imports/trades.php';
-      $file_csv = 'trades.csv';
+      $file_csv = 'transactions.csv';
       $parse_function = 'ces_import4ces_parse_trades';
       break;
 
-    case '6':
+    case '5':
       $file = 'imports/announce.php';
       $file_csv = 'announce.csv';
       $parse_function = 'ces_import4ces_parse_announce';
       break;
 
-    case '7':
+    case '6':
       drupal_set_message(t('Import finished successfully.'));
       $form_state['redirect'] = 'ces/admin/import';
       ces_import4ces_update_step($import_id, 8);
@@ -652,11 +651,10 @@ function _ces_import4ces_steps() {
     0 => "New exchange",
     1 => "Exchange",
     2 => "Users",
-    3 => "Offers",
-    4 => "Wants",
-    5 => "Trades",
-    6 => "Announces",
-    7 => "The end",
+    3 => "Adverts",
+    4 => "Trades",
+    5 => "Announces",
+    6 => "The end",
   );
 }
 
