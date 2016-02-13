@@ -496,6 +496,16 @@ function ces_offerswants_update_7101() {
   db_create_table('ces_alerts', $schema['ces_alerts']);
 }
 /**
+ * Implements hook_update_N().
+ */
+function ces_offerswants_update_7102() {
+  // We extend DefaultMailSystem class in ces_offerswants module,
+  // for sending html emails.
+  $current = variable_get('mail_system', array('default-system' => 'DefaultMailSystem'));
+  $addition = array('ces_offerswants' => 'CesOfferswantsMailSystem');
+  variable_set('mail_system', array_merge($current, $addition));
+}
+/**
  * Implements hook_install().
  */
 function ces_offerswants_install() {
@@ -522,12 +532,24 @@ function ces_offerswants_install() {
     ),
   );
   $instance = field_create_instance($instance);
+
+  // We extend DefaultMailSystem class in ces_offerswants module,
+  // for sending html emails.
+  $current = variable_get('mail_system', array('default-system' => 'DefaultMailSystem'));
+  $addition = array('ces_offerswants' => 'CesOfferswantsMailSystem');
+  variable_set('mail_system', array_merge($current, $addition));
 }
 /**
  * Implements hook_uninstall().
  */
 function ces_offerswants_uninstall() {
   drupal_uninstall_schema(ces_offerswants_schema());
+
+  // Special class for sending html emails no more needed.
+  $mail_system = variable_get('mail_system', array('default-system' => 'DefaultMailSystem'));
+  unset($mail_system['ces_offerswants']);
+  variable_set('mail_system', $mail_system);
+
   // Delete price field.
   field_delete_field('ces_offer_rate');
   $instances = field_info_instances('ces_offerwant', 'ces_offer_rate');

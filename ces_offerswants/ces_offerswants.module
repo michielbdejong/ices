@@ -1689,17 +1689,11 @@ function ces_offerswants_mail($key, &$message, $params) {
     drupal_set_message(t('Error processing message template.'), 'error');
     return FALSE;
   }
-  $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed';
+  $message['headers']['Content-Type'] = 'text/html; charset=UTF-8;';
   $message['subject'] .= token_replace($template->subject, $params);
   $message['body'][] = token_replace($template->body, $params);
   $message['body'][] = $params['attachment'];
 }
-
-/*
-  Implements hook_form_alter().
-  function ces_offerswants_form_alter(&$form, $form_state, $form_id) {
-  }
-*/
 
 /**
  * Returns current exchange id.
