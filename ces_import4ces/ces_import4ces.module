@@ -113,11 +113,11 @@ function ces_import4ces_admin_page() {
     $row = array();
     $row[] = format_date($record->created);
     $row[] = !empty($record->name) ? $record->name : '';
-    $row[] = $step . ' / ' . count($titles_steps);
+    $row[] = $step . ' / ' . ( count($titles_steps) - 1 ) ;
     $row[] = !empty($record->row) ? $record->row : '';
 
     $actions = '';
-    if ($step < 7) {
+    if ($step < ( count(_ces_import4ces_steps()) -1 ) ) {
       $actions .= l(t('Continue'), 'ces/admin/import/' . $id . '/continue');
       $actions .= ' ';
     }
@@ -148,7 +148,7 @@ function ces_import4ces_import_form($form, &$form_state, $import_id = FALSE) {
       if (is_dir($uri)) {
         $files = file_scan_directory(CES_IMPORT4CES_FILES_URI . '/' .
         $file->name, '/.*csv/', array('recurse' => FALSE));
-        if (count($files) >= 6) {
+        if (count($files) >= 5) {
           $options[$file->name] = $file->name;
         }
       }
@@ -242,7 +242,7 @@ function ces_import4ces_row_form($form, &$form_state) {
       '#title' => check_plain($head),
       '#default_value' => $form_state['values'][$head],
       '#size' => 60,
-      '#maxlength' => 4096,
+      '#maxlength' => 1000000,
       '#required' => FALSE,
     );
   }
@@ -253,14 +253,15 @@ function ces_import4ces_row_form($form, &$form_state) {
   $form['skip'] = array(
     '#type' => 'submit',
     '#value' => t('Skip row'),
+    '#limit_validation_errors' => array(),
   );
   return $form;
 }
-
 /**
  * Import single row form submit.
  */
 function ces_import4ces_row_form_submit($form, &$form_state) {
+  echo '<pre>DEPURANDO: ' ; print_r($form) ; echo '</pre>';  exit() ; // DEV  
   $row = $form_state['values']['row'];
   if ($form_state['values']['op'] == t('Import row')) {
     $parse_function = $form_state['values']['parse_function'];
@@ -330,7 +331,9 @@ function ces_import4ces_import_form_validate($form, &$form_state) {
 
   if (empty($form_state['values']['import_id'])) {
     if (empty($form_state['values']['files'])) {
-      $dir = $form_state['values']['name'];
+      $dir = ( isset($form_state['values']['name']) ) ?
+        $form_state['values']['name'] :
+        FALSE ;
       if (!preg_match('/[a-zA-Z0-9]+/', $dir)) {
         form_set_error('name', t('Invalid folder name.'));
       }
@@ -359,7 +362,62 @@ function ces_import4ces_import_form_validate($form, &$form_state) {
  */
 function ces_import4ces_import_form_submit($form, &$form_state) {
   global $user;
-  if (empty($form_state['values']['import_id'])) {
+
+  $import_id = FALSE;
+
+  if ( isset($form['import_id']['#value']) ) {
+    $import_id = $form['import_id']['#value'];
+  }
+  if ( isset($form_state['values']['import_id']) ) {
+    $import_id = $form_state['values']['import_id'];
+  }
+
+  if ( $import_id ) {
+
+    if ($form_state['values']['op'] == t('Skip row')) {
+      $row = $form_state['row']['row'];
+      ces_save_discarded_record($import_id, $form_state['row']);
+      ces_import4ces_update_row($import_id, $row);
+      $form_state['rebuild'] = TRUE;
+      unset($form_state['manual_row']);
+      return;
+    }
+
+    if ($form_state['values']['op'] == t('Import row')) {
+      $row = $form_state['values']['row'];
+      $parse_function = $form_state['values']['parse_function'];
+      $data = $form_state['values'];
+      $context = array();
+      if (isset($form_state['values']['import_id'])) {
+        $import_id = $form_state['values']['import_id'];
+        $parse_function($import_id, $data, $row, $context, FALSE);
+        if (isset($_SESSION['ces_import4ces_row_error'])) {
+          unset($_SESSION['ces_import4ces_row_error']);
+        }
+      }
+      else {
+        $parse_function($data, $row, $context);
+      }
+      if (empty($context['results']['error'])) {
+        ces_import4ces_update_row($context['results']['import_id'], $row);
+        $form_state['rebuild'] = TRUE;
+        unset($form_state['manual_row']);
+      }
+      else {
+        drupal_set_message($context['results']['error'], 'error');
+      }
+      return;
+    }
+
+    // Continue an import.
+    $record = ces_import4ces_import_load($import_id);
+    if ($record === FALSE) {
+      drupal_set_message(t('Invalid import identifier.'), 'error');
+      $form_state['redirect'] = 'ces/bank/admin/import';
+      return;
+    }
+  }
+  else {
     $import_id = db_insert('ces_import4ces_exchange')->fields(array(
       'exchange_id' => 0,
       'created' => REQUEST_TIME,
@@ -373,16 +431,7 @@ function ces_import4ces_import_form_submit($form, &$form_state) {
       ->condition('id', $import_id)->execute()->fetch();
     $record->name = 'Exchange';
   }
-  else {
-    // Continue an import.
-    $import_id = $form_state['values']['import_id'];
-    $record = ces_import4ces_import_load($import_id);
-    if ($record === FALSE) {
-      drupal_set_message(t('Invalid import identifier.'), 'error');
-      $form_state['redirect'] = 'ces/bank/admin/import';
-      return;
-    }
-  }
+
   switch ($record->step) {
     case '1':
       $file = 'imports/setting.php';
@@ -410,14 +459,14 @@ function ces_import4ces_import_form_submit($form, &$form_state) {
 
     case '5':
       $file = 'imports/announce.php';
-      $file_csv = 'announce.csv';
+      $file_csv = 'announcements.csv';
       $parse_function = 'ces_import4ces_parse_announce';
       break;
 
     case '6':
       drupal_set_message(t('Import finished successfully.'));
       $form_state['redirect'] = 'ces/admin/import';
-      ces_import4ces_update_step($import_id, 8);
+      ces_import4ces_update_step($import_id, 6);
       return;
 
     default:
@@ -483,7 +532,7 @@ function _ces_import4ces_import_csv($file_csv, $file, $parse_function, $record) 
       $cols = array();
       foreach ($datos as $key => $val) {
         $datos[$key] = trim($datos[$key]);
-        $datos[$key] = iconv('Windows-1252', 'UTF-8', $datos[$key]);
+        // $datos[$key] = iconv('Windows-1252', 'UTF-8', $datos[$key]);
         if ($fila == 0) {
           $heads[] = $datos[$key];
         }
@@ -799,6 +848,35 @@ function ces_import4ces_update_step($import_id, $step) {
 function ces_import4ces_update_row($import_id, $row) {
   return db_update('ces_import4ces_exchange')->condition('id', $import_id)->fields(array(
       'row' => $row))->execute();
+}
+/**
+ * Save discarded record.
+ *
+ * @todo Evitar repetir cabeceras.
+ */
+function ces_save_discarded_record($import_id, $row) {
+  $import = ces_import4ces_import_load($import_id);
+  $step = $import->step;
+  $file_name = CES_IMPORT4CES_FILES_URI . '/' . $import->files . '/migration_report.csv';
+  $fp = fopen($file_name, 'a+');
+  $count=0;
+  foreach ($row as $campos) {
+    if ( $count !== 0 ) {
+      if ( $count == 1 ) {
+        // Heades
+        if ( !isset($_SESSION['step_skip_head']) || $step !== $_SESSION['step_skip_head'] ) {
+          fputcsv($fp, $campos);
+        }
+      }
+      else {
+        // Values.
+        fputcsv($fp, $campos);
+        $_SESSION['step_skip_head'] = $step;
+      }
+    }
+    $count++;
+  }
+  fclose($fp);
 }
 
 /**

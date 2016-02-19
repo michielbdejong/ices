@@ -19,7 +19,6 @@ function ces_import4ces_parse_announce($import_id, $data, $row, &$context, $widt
   if (isset($context['results']['error'])) {
     return;
   }
-  echo '<pre>data: ' ; print_r($data) ; echo '</pre>';  exit() ; // DEV  
   $tx = db_transaction();
   try {
     ob_start();
@@ -28,15 +27,11 @@ function ces_import4ces_parse_announce($import_id, $data, $row, &$context, $widt
 
     $exchange_id = $import->exchange_id;
 
-    $extra_info = array(
-      'ID' => $data['ID'],
-      'DateAdded' => $data['DateAdded'],
-      'DateEvent' => $data['DateEvent'],
-      'DateExpiry' => $data['DateExpiry'],
-      'Keep' => $data['Keep'],
-    );
+    $extra_info = $data;
+    // Prevent problems with description.
+    $extra_info['description'] = substr($extra_info['description'],0,4096); 
 
-    $query = db_query('SELECT uid FROM {users} where name=:name', array(':name' => $data['Owner']));
+    $query = db_query('SELECT uid FROM {users} where name=:name', array(':name' => $data['uid']));
     $announce_user_id = $query->fetchColumn(0);
     if (!$announce_user_id) {
       $announce_user_id = $user->uid;
@@ -44,7 +39,7 @@ function ces_import4ces_parse_announce($import_id, $data, $row, &$context, $widt
 
     // Create a blog post.
     $node = new stdClass();
-    $node->title = $data['Title'];
+    $node->title = $data['title'];
     $node->type = 'ces_blog';
     node_object_prepare($node);
     $node->language = LANGUAGE_NONE;
@@ -55,7 +50,7 @@ function ces_import4ces_parse_announce($import_id, $data, $row, &$context, $widt
     $node->ces_blog_exchange[LANGUAGE_NONE][0]['value'] = $exchange_id;
     $node->body[LANGUAGE_NONE][0] = array(
       'summary' => '',
-      'value' => $data['Description'],
+      'value' => $data['description'],
       'format' => 'filtered_html',
     );
     $node = node_submit($node);

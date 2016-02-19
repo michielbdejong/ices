@@ -10,7 +10,7 @@
  - @ref spec
    - @ref users_file
    - @ref settings_file
-   - @ref trades_file
+   - @ref transactions_file
    - @ref balances_file
    - @ref offers_file
    - @ref wants_file
@@ -207,25 +207,37 @@ Compte: La codificació dels arxius és: Windows1252/WinLatin 1.
  - BudRate: Percentatge del total de la transacció que va cap al compte
    “amic”. 
 
-@subsection trades_file Arxiu trades.csv
+@subsection transactions_file Arxiu transactions.csv
 
- - ID: Número creixent que comena per 1.
- - Seller: UID del compte que cobra.
- - Buyer: UID del compte que paga.
- - RemoteExchange: Si la transacció és entre xarxes, codi de 4 lletres 
-   de la xarxa externa.
- - RemoteBuyer: Si la transacció es entre xarxes, UID del compte de la 
-   xarxa externa. En aquest cas, Seller o Buyer és un compte virtual 
-   XXXXVIRT.
- - RecordID: Codi que identifica la transacció. Sembla el compte que 
-   ha efectuat la transacció concatenat amb la data de la transacció.
- - DateEntered: Data que s'ha entrat la transacció.
- - EnteredBy: UID del compte que ha efectuat la transacció. Normalment
+ - txid: Identificador de la transacción.
+ - txid_alt:  020102441424693149.59
+ - xid:  0000
+ - type: Tipo:
+
+   + sess: Transacción entre la misma ecoxarxa.
+   + deds: Transferencias externas.
+   + dess: Transacción entre ecoxarxas internas.
+
+ - seller: Nombre de la cuenta que cobra.
+ - buyer: Nombre de la cuenta que paga.
+ - seller_nid:  CEN0201
+ - buyer_nid:  CEN0244
+ - seller_amount:  55.88 Cantidad.
+ - buyer_amount:  55.88
+ - base_amount:  0.00
+ - seller_levy:  0.00
+ - buyer_levy:  0.00
+ - seller_levyrate:  0
+ - buyer_levyrate:  0
+ - seller_convrate:  0
+ - buyer_convrate:  0
+ - description: Descripción
+ - trader_details: Detalles (Más información sobre la transacción solo se 
+   muestra en las de tipo deds).
+ - date_entered: Fecha de la transacción.
+ - date_edited: Fecha de modificación.
+ - entered_by:  Nom del compte que ha efectuat la transacció. Normalment
    el venedor, però també pot ser un administrador.
- - Amount: Quantitat.
- - Levy: Quantitat d'impost
- - LevyRate: Percentatge de l'impost.
- - Description: Descripció de la transacció.
 
 @subsection balances_file Arxiu balances.csv
 

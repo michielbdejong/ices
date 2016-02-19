@@ -102,45 +102,78 @@ function ces_import4ces_parse_trades($import_id, $data, $row, &$context, $width_
  */
 function _ces_import4ces_trades_get_account($import_id, $name, $data) {
   $bank = new CesBank();
-  if (substr($name, 4) == 'VIRT') {
-    // This is an inter-exchange transaction. Use the corresponding virtual
-    // account.
-    if ($data['RemoteExchange'] != '0000') {
-      $name = substr($name, 0, 4) . $data['RemoteExchange'];
+
+  $import = ces_import4ces_import_load($import_id);
+  $exchange = $bank->getExchange($import->exchange_id);
+
+  $code_exchange = $exchange['code'];
+  $code_exchange_name = substr($name, 0, 4);
+  $code_exchange_buyer = substr($data['buyer'], 0, 4);
+  $code_exchange_seller = substr($data['seller'], 0, 4);
+  $code_exchange_entered = substr($data['entered_by'], 0, 4);
+
+  $account = $bank->getAccountByName($name);
+  if ($account === FALSE) {
+
+    // EL Vendedor hace la transacción, por lo tanto es el mismo que entered_by.
+
+    // Si el vendedor es externo y no existe no podemos crearlo.
+    if ( $code_exchange != $code_exchange_name ) 
+      return FALSE;
+
+    if ( $data['type'] !== 'sess' ) {
+      if ( $data['type'] == 'dess' ) {
+        // This is an inter-exchange transaction. Use the corresponding virtual
+        // account. Example: NET2NET1
+        if ( $code_exchange_name !== $code_exchange_buyer ) {
+          $name = $code_exchange_name . $code_exchange_buyer;
+        }
+        else {
+          $name = $code_exchange_name . $code_exchange_seller;
+        }
+      }
+      else {
+        echo '<pre>data: ' ; print_r($data) ; echo '</pre>'; // exit() ; // DEV  
+        echo '<pre>code_exchange_name: ' ; print_r($code_exchange_name) ; echo '</pre>'; // exit() ; // DEV  
+        // This is a remote transaction. The cen ID appears to be in the RecordID.
+        // Example: HORAcen0746
+        if ( $code_exchange_name !== $code_exchange_buyer ) {
+          $name = $code_exchange_name . 'cen' . substr($data['buyer_nid'], 3, 4);
+        }
+        else {
+          $name = $code_exchange_name . 'cen' . substr($data['seller_nid'], 3, 4);
+        }
+        echo '<pre>name: ' ; print_r($name) ; echo '</pre>';  exit() ; // DEV  
+      }
+
     }
-    else {
-      // This is a remote transaction. The cen ID appears to be in the RecordID.
-      $offset = ($name == $data['seller']) ? 0 : 4;
-      $name = substr($name, 0, 4) . 'cen' . substr($data['RecordID'], $offset, 4);
-    }
-    $account_seller = $bank->getAccountByName($name);
-    if ($account_seller === FALSE) {
-      // The virtual account does not exist yet, so let's create it.
-      $import = ces_import4ces_import_load($import_id);
-      $exchange = $bank->getExchange($import->exchange_id);
-      $account_seller = array(
-        'id' => NULL,
-        'exchange' => $exchange['id'],
-        'name' => $name,
-        'balance' => 0.0,
-        'state' => CesBankLocalAccount::STATE_HIDDEN,
-        'kind' => CesBankLocalAccount::TYPE_VIRTUAL,
-        'limitchain' => $exchange['limitchain'],
-        'users' => array(
-          array(
-            'account' => NULL,
-            'user' => 1,
-            'role' => CesBankAccountUser::ROLE_ACCOUNT_ADMINISTRATOR,
-          ),
+
+
+    // The virtual account does not exist yet, so let's create it.
+    $import = ces_import4ces_import_load($import_id);
+    $exchange = $bank->getExchange($import->exchange_id);
+    $account = array(
+      'id' => NULL,
+      'exchange' => $exchange['id'],
+      'name' => $name,
+      'balance' => 0.0,
+      'state' => CesBankLocalAccount::STATE_HIDDEN,
+      'kind' => CesBankLocalAccount::TYPE_VIRTUAL,
+      'limitchain' => $exchange['limitchain'],
+      'users' => array(
+        array(
+          'account' => NULL,
+          'user' => 1,
+          'role' => CesBankAccountUser::ROLE_ACCOUNT_ADMINISTRATOR,
         ),
-      );
-      $bank->createAccount($account_seller);
-      $bank->activateAccount($account_seller);
-    }
+      ),
+    );
+    $bank->createAccount($account);
+    $bank->activateAccount($account);
   }
   else {
-    $account_seller = $bank->getAccountByName($name);
+    $account = $bank->getAccountByName($name);
   }
-  return $account_seller;
+  return $account;
 }
 /** @} */
