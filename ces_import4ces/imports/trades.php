@@ -19,47 +19,74 @@ function ces_import4ces_parse_trades($import_id, $data, $row, &$context, $width_
   if (isset($context['results']['error'])) {
     return;
   }
+  $extra_info = $data;
   $tx = db_transaction();
   try {
     ob_start();
     $context['results']['import_id'] = $import_id;
     $bank = new CesBank();
-    $account_seller = _ces_import4ces_trades_get_account($import_id, $data['seller'], $data);
-    if ($account_seller === FALSE) {
-      throw new Exception(t('Acount @account not found.', array('@account' => $data['seller'])));
+
+    $import = ces_import4ces_import_load($import_id);
+    $exchange = $bank->getExchange($import->exchange_id);
+    $code_exchange = $exchange['code'];
+    $code_exchange_buyer = substr($data['buyer'], 0, 4);
+    $code_exchange_seller = substr($data['seller'], 0, 4);
+
+    $external_account = FALSE;
+
+    // Añadir transacciones del historico de la red.
+    // Solamente lo hacemos sobre transacciones de la misma ecoxarxa ya que
+    // una transacción sobre una cuenta de otra ecoxarxa provocará que se
+    // modifique el saldo actual de la otra cuenta.
+    if ( $code_exchange_seller != $code_exchange ) {
+      $external_account = TRUE;
+      // throw new Exception(t('With external accounts do not generate transfer [@account].', array('@account' => $data['seller'])));
     }
-    $account_buyer = _ces_import4ces_trades_get_account($import_id, $data['buyer'], $data);
-    if ($account_buyer === FALSE) {
-      throw new Exception(t('Acount @account not found.', array('@account' => $data['buyer'])));
-    }
-    // Find uid from user.
-    $query = db_query('SELECT uid FROM {users} where name=:name', array(':name' => $data['entered_by']));
-    $trade_user_id = $query->fetchColumn(0);
-    if (!$trade_user_id) {
-      $trade_user_id = $user->uid;
+    if ( $code_exchange_buyer != $code_exchange ) {
+      // throw new Exception(t('With external accounts do not generate transfer [@account].', array('@account' => $data['buyer'])));
+      $external_account = TRUE;
     }
 
-    $extra_info = $data;
+    if ( $external_account ) {
+      // Jump record automatically.
+      ces_save_discarded_record($import_id, $data);
+    }
+    else {
+      $account_seller = _ces_import4ces_trades_get_account($import_id, $data['seller'], $data);
+      if ($account_seller === FALSE) {
+        throw new Exception(t('Acount @account not found.', array('@account' => $data['seller'])));
+      }
+      $account_buyer = _ces_import4ces_trades_get_account($import_id, $data['buyer'], $data);
+      if ($account_buyer === FALSE) {
+        throw new Exception(t('Acount @account not found.', array('@account' => $data['buyer'])));
+      }
+      // Find uid from user.
+      $query = db_query('SELECT uid FROM {users} where name=:name', array(':name' => $data['entered_by']));
+      $trade_user_id = $query->fetchColumn(0);
+      if (!$trade_user_id) {
+        $trade_user_id = $user->uid;
+      }
 
-    $trans = array(
-      'fromaccountname' => $account_buyer['name'],
-      'toaccountname' => $account_seller['name'],
-      'amount' => $data['seller_amount'],
-      'concept' => $data['description'],
-      'user' => $trade_user_id,
-      'created' => strtotime($data['date_entered']),
-      'modified' => strtotime($data['date_entered']),
-    );
-    variable_set('ces_import4ces_mail', FALSE);
-    $bank->createTransaction($trans);
-    $bank->applyTransaction($trans['id']);
-    variable_set('ces_import4ces_mail', CES_IMPORT4CES_SEND_MAILS);
+      $trans = array(
+        'fromaccountname' => $account_buyer['name'],
+        'toaccountname' => $account_seller['name'],
+        'amount' => $data['seller_amount'],
+        'concept' => $data['description'],
+        'user' => $trade_user_id,
+        'created' => strtotime($data['date_entered']),
+        'modified' => strtotime($data['date_entered']),
+      );
+      variable_set('ces_import4ces_mail', FALSE);
+      $bank->createTransaction($trans);
+      $bank->applyTransaction($trans['id']);
+      variable_set('ces_import4ces_mail', CES_IMPORT4CES_SEND_MAILS);
 
+    }
     db_insert('ces_import4ces_objects')
       ->fields(array(
         'import_id' => $import_id,
         'object' => 'trades',
-        'object_id' => $trans['id'],
+        'object_id' => 0,
         'row' => $row,
         'data' => serialize($extra_info),
       ))->execute();
@@ -133,8 +160,7 @@ function _ces_import4ces_trades_get_account($import_id, $name, $data) {
         }
       }
       else {
-        echo '<pre>data: ' ; print_r($data) ; echo '</pre>'; // exit() ; // DEV  
-        echo '<pre>code_exchange_name: ' ; print_r($code_exchange_name) ; echo '</pre>'; // exit() ; // DEV  
+        // @todo Revision.
         // This is a remote transaction. The cen ID appears to be in the RecordID.
         // Example: HORAcen0746
         if ( $code_exchange_name !== $code_exchange_buyer ) {
@@ -143,7 +169,6 @@ function _ces_import4ces_trades_get_account($import_id, $name, $data) {
         else {
           $name = $code_exchange_name . 'cen' . substr($data['seller_nid'], 3, 4);
         }
-        echo '<pre>name: ' ; print_r($name) ; echo '</pre>';  exit() ; // DEV  
       }
 
     }

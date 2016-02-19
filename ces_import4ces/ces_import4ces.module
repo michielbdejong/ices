@@ -184,6 +184,10 @@ function ces_import4ces_import_form($form, &$form_state, $import_id = FALSE) {
       '#type' => 'file',
       '#title' => 'announcements.csv',
     );
+    $form['balances'] = array(
+      '#type' => 'file',
+      '#title' => 'balances.csv',
+    );
 
     return confirm_form($form, t('Do you really want to start a new import?'),
       'ces/admin/import',
@@ -193,7 +197,7 @@ function ces_import4ces_import_form($form, &$form_state, $import_id = FALSE) {
   else {
     $import = ces_import4ces_import_load($import_id);
     $steps = _ces_import4ces_steps();
-    if ($import->step < 6) {
+    if ($import->step < 7) {
       return confirm_form($form,
         t('Step @num. Import @type.', array(
           '@num' => $import->step,
@@ -259,6 +263,8 @@ function ces_import4ces_row_form($form, &$form_state) {
 }
 /**
  * Import single row form submit.
+ *
+ * @todo delete.
  */
 function ces_import4ces_row_form_submit($form, &$form_state) {
   echo '<pre>DEPURANDO: ' ; print_r($form) ; echo '</pre>';  exit() ; // DEV  
@@ -326,7 +332,8 @@ function ces_import4ces_import_form_validate($form, &$form_state) {
     'users',
     'adverts',
     'transactions',
-    'announcements'
+    'announcements',
+    'balances'
   );
 
   if (empty($form_state['values']['import_id'])) {
@@ -385,17 +392,23 @@ function ces_import4ces_import_form_submit($form, &$form_state) {
 
     if ($form_state['values']['op'] == t('Import row')) {
       $row = $form_state['values']['row'];
-      $parse_function = $form_state['values']['parse_function'];
       $data = $form_state['values'];
       $context = array();
       if (isset($form_state['values']['import_id'])) {
         $import_id = $form_state['values']['import_id'];
+        $import = ces_import4ces_import_load($import_id);
+        $step = $import->step;
+        $step_data = _ces_import4ces_steps_data($step);
+        $parse_function = $step_data['parse_function'];
+        $step_file_function = $step_data['file']; 
+        require_once drupal_get_path('module', 'ces_import4ces') . '/' . $step_file_function;
         $parse_function($import_id, $data, $row, $context, FALSE);
         if (isset($_SESSION['ces_import4ces_row_error'])) {
           unset($_SESSION['ces_import4ces_row_error']);
         }
       }
       else {
+        $parse_function = $form_state['values']['parse_function'];
         $parse_function($data, $row, $context);
       }
       if (empty($context['results']['error'])) {
@@ -464,9 +477,15 @@ function ces_import4ces_import_form_submit($form, &$form_state) {
       break;
 
     case '6':
+      $file = 'imports/balances.php';
+      $file_csv = 'balances.csv';
+      $parse_function = 'ces_import4ces_parse_balances';
+      break;
+
+    case '7':
       drupal_set_message(t('Import finished successfully.'));
       $form_state['redirect'] = 'ces/admin/import';
-      ces_import4ces_update_step($import_id, 6);
+      ces_import4ces_update_step($import_id, 7);
       return;
 
     default:
@@ -604,8 +623,14 @@ function _ces_import4ces_import_csv($file_csv, $file, $parse_function, $record) 
       'operations' => $operations,
       'file' => drupal_get_path('module', 'ces_import4ces') . '/' . $file,
       'finished' => '_ces_import4ces_batch_import_csv_finished',
-      'title' => t('Importing @exchange step @step',
-        array('@exchange' => $record->name, '@step' => $record->step)),
+      'title' => t('Importing @exchange step @step_name @step/@total ',
+        array(
+          '@exchange' => $record->name,
+          '@step_name' => _ces_import4ces_steps()[($record->step -1)],
+          '@step' => $record->step,
+          '@total' => ( count(_ces_import4ces_steps()) -1 ),
+        )
+      ),
       'init_message' => t('Import is starting.'),
       'progress_message' => t('Processed @current out of @total.'),
       'error_message' => t('Error during import.'),
@@ -703,8 +728,63 @@ function _ces_import4ces_steps() {
     3 => "Adverts",
     4 => "Trades",
     5 => "Announces",
-    6 => "The end",
+    6 => "Balances",
+    7 => "The end",
   );
+}
+
+/**
+ * Return array with steps data.
+ */
+function _ces_import4ces_steps_data($step) {
+
+  switch ($step) {
+    case '1':
+      $file = 'imports/setting.php';
+      $file_csv = 'exchanges.csv';
+      $parse_function = 'ces_import4ces_parse_setting';
+      break;
+
+    case '2':
+      $file = 'imports/users.php';
+      $file_csv = 'users.csv';
+      $parse_function = 'ces_import4ces_parse_users';
+      break;
+
+    case '3':
+      $file = 'imports/adverts.php';
+      $file_csv = 'adverts.csv';
+      $parse_function = 'ces_import4ces_parse_adverts';
+      break;
+
+    case '4':
+      $file = 'imports/trades.php';
+      $file_csv = 'transactions.csv';
+      $parse_function = 'ces_import4ces_parse_trades';
+      break;
+
+    case '5':
+      $file = 'imports/announce.php';
+      $file_csv = 'announcements.csv';
+      $parse_function = 'ces_import4ces_parse_announce';
+      break;
+
+    case '6':
+      $file = 'imports/balances.php';
+      $file_csv = 'balances.csv';
+      $parse_function = 'ces_import4ces_parse_balances';
+      break;
+
+    default:
+      return FALSE;
+
+  }
+  return array(
+    'file' => $file,
+    'file_csv' => $file_csv,
+    'parse_function' => $parse_function,
+  );
+
 }
 
 /**
@@ -851,8 +931,6 @@ function ces_import4ces_update_row($import_id, $row) {
 }
 /**
  * Save discarded record.
- *
- * @todo Evitar repetir cabeceras.
  */
 function ces_save_discarded_record($import_id, $row) {
   $import = ces_import4ces_import_load($import_id);
@@ -865,6 +943,8 @@ function ces_save_discarded_record($import_id, $row) {
       if ( $count == 1 ) {
         // Heades
         if ( !isset($_SESSION['step_skip_head']) || $step !== $_SESSION['step_skip_head'] ) {
+          $file_info = array('Step: ' . _ces_import4ces_steps()[($step -1)]);
+          fputcsv($fp, $file_info);
           fputcsv($fp, $campos);
         }
       }
