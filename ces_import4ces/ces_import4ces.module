@@ -626,7 +626,7 @@ function _ces_import4ces_import_csv($file_csv, $file, $parse_function, $record) 
       'title' => t('Importing @exchange step @step_name @step/@total ',
         array(
           '@exchange' => $record->name,
-          '@step_name' => _ces_import4ces_steps()[($record->step -1)],
+          '@step_name' => _ces_import4ces_steps()[$record->step],
           '@step' => $record->step,
           '@total' => ( count(_ces_import4ces_steps()) -1 ),
         )
