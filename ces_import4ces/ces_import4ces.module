@@ -14,6 +14,9 @@
 
 /**
  * Set to 0 in production.
+ * - 1: test.
+ * - 0: production. 
+ * @todo
  */
 define('CES_IMPORT4CES_ANONYMOUS', 1);
 /**
@@ -22,6 +25,10 @@ define('CES_IMPORT4CES_ANONYMOUS', 1);
 define('CES_IMPORT4CES_RESET_PASSWORD', 0);
 /**
  * Send welcome mails to all users.
+ *
+ * - 0: test.
+ * - 1: production. 
+ * @todo
  */
 define('CES_IMPORT4CES_SEND_MAILS', 0);
 /**
@@ -84,7 +91,7 @@ function ces_import4ces_admin_page() {
   $page = array();
 
   $result = db_query('SELECT i.id, i.exchange_id, e.code, e.name, i.created,
-  i.step, i.row, i.uid, i.observations
+  i.step, i.row, i.uid, i.observations, i.files
   FROM {ces_import4ces_exchange} i
   LEFT JOIN {ces_exchange} e ON i.exchange_id = e.id
   WHERE i.finished = 0 AND i.uid = :uid
@@ -119,6 +126,15 @@ function ces_import4ces_admin_page() {
     $actions = '';
     if ($step < (count(_ces_import4ces_steps()) - 1)) {
       $actions .= l(t('Continue'), 'ces/admin/import/' . $id . '/continue');
+      $actions .= ' ';
+    }
+    else {
+      global $base_url;
+      $report_file = CES_IMPORT4CES_FILES_URI . '/' . $record->files . '/migration_report.csv';
+      $report_url = file_create_url($report_file);
+      $report_url = parse_url($report_url);
+      $report_url = $report_url['scheme'] . '://' .  $report_url['host'] . $report_url['path'];
+      $actions .= l(t('Report'), $report_url);
       $actions .= ' ';
     }
     $actions .= l(t('Delete'), 'ces/admin/import/' . $id . '/delete');
