@@ -36,7 +36,7 @@ function ces_import4ces_parse_adverts($import_id, $data, $row, &$context, $width
 
     // If the user is not on the network is skipped and saved report.
     if (empty($offer_user_id) || !$offer_user_id) {
-      ces_save_discarded_record($import_id, $data);
+      ces_save_discarded_record($import_id, $data, 'The user is not network');
     }
     else {
 

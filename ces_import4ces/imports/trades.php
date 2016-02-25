@@ -38,20 +38,18 @@ function ces_import4ces_parse_trades($import_id, $data, $row, &$context, $width_
     // Solamente lo hacemos sobre transacciones de la misma ecoxarxa ya que
     // una transacción sobre una cuenta de otra ecoxarxa provocará que se
     // modifique el saldo actual de la otra cuenta.
-    if ( $code_exchange_seller != $code_exchange ) {
+    if ( $code_exchange_seller !== $code_exchange ) {
       $external_account = TRUE;
       // throw new Exception(t('With external accounts do not generate transfer [@account].', array('@account' => $data['seller'])));
     }
-    if ( $code_exchange_buyer != $code_exchange ) {
+    if ( $code_exchange_buyer !== $code_exchange ) {
       // throw new Exception(t('With external accounts do not generate transfer [@account].', array('@account' => $data['buyer'])));
       $external_account = TRUE;
     }
 
     if ( $external_account ) {
       // Jump record automatically.
-      // @todo revisar.
-      ces_save_discarded_record($import_id, $data);
-      echo '<pre>DEPURANDO: ' ; print_r($data) ; echo '</pre>'; // exit() ; // DEV  
+      ces_save_discarded_record($import_id, $data, 'External Account');
     }
     else {
       $account_seller = _ces_import4ces_trades_get_account($import_id, $data['seller'], $data);

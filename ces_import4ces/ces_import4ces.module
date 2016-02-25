@@ -342,7 +342,8 @@ function ces_import4ces_import_form_submit($form, &$form_state) {
 
     if ($form_state['values']['op'] == t('Skip row')) {
       $row = $form_state['row']['row'];
-      ces_save_discarded_record($import_id, $form_state['row']);
+      $merge = array_combine($form_state['row']['heads'], $form_state['row']['columns']);
+      ces_save_discarded_record($import_id, $merge);
       ces_import4ces_update_row($import_id, $row);
       $form_state['rebuild'] = TRUE;
       unset($form_state['manual_row']);
@@ -891,30 +892,24 @@ function ces_import4ces_update_row($import_id, $row) {
 /**
  * Save discarded record.
  */
-function ces_save_discarded_record($import_id, $row) {
+function ces_save_discarded_record($import_id, $row, $reason = 'Manual') {
   $import = ces_import4ces_import_load($import_id);
   $step = $import->step;
   $file_name = CES_IMPORT4CES_FILES_URI . '/' . $import->files . '/migration_report.csv';
   $fp = fopen($file_name, 'a+');
-  $count = 0;
-  foreach ($row as $campos) {
-    if ($count !== 0) {
-      if ($count == 1) {
-        // Heades.
-        if (!isset($_SESSION['step_skip_head']) || $step !== $_SESSION['step_skip_head']) {
-          $file_info = array('Step: ' . _ces_import4ces_steps()[$step]);
-          fputcsv($fp, $file_info);
-          fputcsv($fp, $campos);
-        }
-      }
-      else {
-        // Values.
-        fputcsv($fp, $campos);
-        $_SESSION['step_skip_head'] = $step;
-      }
-    }
-    $count++;
+  $heads = array_keys($row);
+  $values = array_values($row);
+  array_push($heads, 'Reason');
+  array_push($values, $reason);
+
+  if (!isset($_SESSION['step_skip_head']) || $step !== $_SESSION['step_skip_head']) {
+    $file_info = array('Step: ' . _ces_import4ces_steps()[$step]);
+    fputcsv($fp, $file_info);
+    fputcsv($fp, $heads);
+    $_SESSION['step_skip_head'] = $step;
   }
+
+  fputcsv($fp, $values);
   fclose($fp);
 }
 
