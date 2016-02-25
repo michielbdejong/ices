@@ -49,7 +49,9 @@ function ces_import4ces_parse_trades($import_id, $data, $row, &$context, $width_
 
     if ( $external_account ) {
       // Jump record automatically.
+      // @todo revisar.
       ces_save_discarded_record($import_id, $data);
+      echo '<pre>DEPURANDO: ' ; print_r($data) ; echo '</pre>'; // exit() ; // DEV  
     }
     else {
       $account_seller = _ces_import4ces_trades_get_account($import_id, $data['seller'], $data);
