@@ -16,9 +16,8 @@
  * Set to 0 in production.
  * - 1: test.
  * - 0: production. 
- * @todo
  */
-define('CES_IMPORT4CES_ANONYMOUS', 1);
+define('CES_IMPORT4CES_ANONYMOUS', 0);
 /**
  * Reset passwords or keep old CES passwords.
  */
@@ -28,9 +27,8 @@ define('CES_IMPORT4CES_RESET_PASSWORD', 0);
  *
  * - 0: test.
  * - 1: production. 
- * @todo
  */
-define('CES_IMPORT4CES_SEND_MAILS', 0);
+define('CES_IMPORT4CES_SEND_MAILS', 1);
 /**
  * Where to save import CSV files.
  */
