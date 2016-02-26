@@ -17,14 +17,14 @@
  * - 1: test.
  * - 0: production. 
  */
-define('CES_IMPORT4CES_ANONYMOUS', 1);
+define('CES_IMPORT4CES_ANONYMOUS', 0);
 /**
  * Send welcome mails to all users.
  *
  * - 0: test.
  * - 1: production. 
  */
-define('CES_IMPORT4CES_SEND_MAILS', 0);
+define('CES_IMPORT4CES_SEND_MAILS', 1);
 /**
  * Reset passwords or keep old CES passwords.
  */
