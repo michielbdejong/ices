@@ -12,7 +12,7 @@
  */
 
 /**
- * Parse balances.
+ * Checking balances.
  */
 function ces_import4ces_parse_balances($import_id, $data, $row, &$context, $width_ajax = TRUE) {
   global $user;
@@ -24,10 +24,25 @@ function ces_import4ces_parse_balances($import_id, $data, $row, &$context, $widt
     ob_start();
     $context['results']['import_id'] = $import_id;
 
-    $account_update = db_update('ces_account')
-      ->condition('name', $data['uid'])
-      ->fields(array('balance' => $data['balance'], 'state' => 1))
-      ->execute();
+    // $account_update = db_update('ces_account')
+    //   ->condition('name', $data['uid'])
+    //   ->fields(array('balance' => $data['balance'], 'state' => 1))
+    //   ->execute();
+
+    $balance = db_query('SELECT balance FROM {ces_account}
+      WHERE name = :name ',
+      array(
+        ':name' => $data['uid'],
+      )
+    )->fetchCol(0);
+    $balance = (real) $balance[0];
+    $balance_row = (real) $data['balance'];
+
+    if ( $balance !== $balance_row ) {
+      ces_save_discarded_record($import_id, $data, 
+        'Different balance: ' . $balance . ' / ' . $balance_row
+      );
+    }
 
     db_insert('ces_import4ces_objects')
       ->fields(array(

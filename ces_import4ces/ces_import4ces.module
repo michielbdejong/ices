@@ -17,18 +17,18 @@
  * - 1: test.
  * - 0: production. 
  */
-define('CES_IMPORT4CES_ANONYMOUS', 0);
-/**
- * Reset passwords or keep old CES passwords.
- */
-define('CES_IMPORT4CES_RESET_PASSWORD', 0);
+define('CES_IMPORT4CES_ANONYMOUS', 1);
 /**
  * Send welcome mails to all users.
  *
  * - 0: test.
  * - 1: production. 
  */
-define('CES_IMPORT4CES_SEND_MAILS', 1);
+define('CES_IMPORT4CES_SEND_MAILS', 0);
+/**
+ * Reset passwords or keep old CES passwords.
+ */
+define('CES_IMPORT4CES_RESET_PASSWORD', 0);
 /**
  * Where to save import CSV files.
  */
@@ -127,13 +127,14 @@ function ces_import4ces_admin_page() {
       $actions .= ' ';
     }
     else {
-      global $base_url;
       $report_file = CES_IMPORT4CES_FILES_URI . '/' . $record->files . '/migration_report.csv';
-      $report_url = file_create_url($report_file);
-      $report_url = parse_url($report_url);
-      $report_url = $report_url['scheme'] . '://' .  $report_url['host'] . $report_url['path'];
-      $actions .= l(t('Report'), $report_url);
-      $actions .= ' ';
+      if ( file_exists($report_file) ) {
+        $report_url = file_create_url($report_file);
+        $report_url = parse_url($report_url);
+        $report_url = $report_url['scheme'] . '://' .  $report_url['host'] . $report_url['path'];
+        $actions .= l(t('Report'), $report_url);
+        $actions .= ' ';
+      }
     }
     $actions .= l(t('Delete'), 'ces/admin/import/' . $id . '/delete');
     $row[] = $actions;
