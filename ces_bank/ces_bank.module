@@ -1719,6 +1719,10 @@ function ces_bank_views_pre_render(&$view) {
         2 => t('Closed'),
         3 => t('Locked'),
       );
+      $result_view = (isset($view->result[0]->ces_account_exchange)) ? $view->result[0]->ces_account_exchange : FALSE;
+      if (!$result_view) {
+      echo '<pre>reset: ' ; print_r($view->result[0]) ; echo '</pre>'; exit() ; // DEV  
+      }
       $limitchains = $bank->getAllLimitChains($view->result[0]->ces_account_exchange);
       $limits = array();
       foreach ($limitchains as $id => $limit) {
@@ -1733,21 +1737,40 @@ function ces_bank_views_pre_render(&$view) {
       if ($view->name == 'ces_bank_accounts_list_for_admins') {
         $result->ces_account_kind = substr($kinds[$result->ces_account_kind], 0, 3) . '.';
         $result->ces_account_state = substr($states[$result->ces_account_state], 0, 3) . '.';
-        $result->ces_account_limitchain = substr($limits[$result->ces_account_limitchain], 0, 10);
+        $result->ces_account_limitchain = @substr($limits[$result->ces_account_limitchain], 0, 10);
       }
 
       $result->ces_account_balance = number_format(floatval($result->ces_account_balance), 2);
 
-      $fsname = '';
-      if (isset($result->field_ces_firstname[0]['raw']['safe_value'])) {
-        $fsname = $result->field_ces_firstname[0]['raw']['safe_value'];
-        if (isset($result->field_ces_surname[0]['raw']['safe_value'])) {
-          $fsname .= ' ' . $result->field_ces_surname[0]['raw']['safe_value'];
+      $fsname = FALSE;
+      $surname = FALSE;
+      if (isset($result->field_ces_firstname)) {
+        if (isset($result->field_ces_firstname[0]['raw']['safe_value'])) {
+          $fsname = $result->field_ces_firstname[0]['raw']['safe_value'];
+          if (isset($result->field_ces_surname) && !empty($result->field_ces_surname)) {
+            if (isset($result->field_ces_surname[0]['raw']['safe_value'])) {
+              $surname .= $result->field_ces_surname[0]['raw']['safe_value'];
+              $fsname .= ' ' .  $surname;
+            }
+          }
         }
       }
-      $result->users_ces_accountuser_name = '<a href="/user/' . $result->users_ces_accountuser_uid . '" title="' . $fsname . '">' . $result->users_ces_accountuser_name . '</a>';
-      $fsname = strlen($fsname) > 18 ? substr($fsname, 0, 14) . '...' : $fsname;
-      $result->users_ces_accountuser_name .= ' <span class="ces_bank_list_accounts_name">(' . $fsname . ')</span>';
+      if ($fsname) {
+        $result->users_ces_accountuser_name = 
+          '<a href="' . base_path() . 'user/' . $result->users_ces_accountuser_uid . '"' . 'title="' . str_replace('\'','\\\'',$fsname) . '"' . '>' . 
+          $result->users_ces_accountuser_name . 
+          '</a>';
+          if (mb_strlen($fsname) > 18) {
+            $fsname = mb_substr($fsname, 0, 14) . '...';
+          }
+        $result->users_ces_accountuser_name .= ' <span class="ces_bank_list_accounts_name">(' . $fsname  . ')</span>';
+      }
+      else {
+        $result->users_ces_accountuser_name = 
+          '<a href="' . base_path() . 'user/' . $result->users_ces_accountuser_uid . '">' . 
+          $result->users_ces_accountuser_name . 
+          '</a>';
+      }
       if (strlen($result->users_ces_accountuser_mail) > 20) {
         $result->users_ces_accountuser_mail = substr($result->users_ces_accountuser_mail, 0, 16) . '...';
       }
