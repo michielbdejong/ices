@@ -1644,9 +1644,9 @@ function ces_bank_allusers_autocomplete($string) {
     ));
   foreach ($return as $row) {
     $fsname = check_plain($row->firstname) . check_plain($row->surname);
-    $fsname = strlen($fsname) > 20 ? substr($fsname, 0, 16) . '...' : $fsname;
+    $fsname = mb_strlen($fsname) > 20 ? mb_substr($fsname, 0, 16) . '...' : $fsname;
     $email = check_plain($row->mail);
-    $email = strlen($email) > 20 ? substr($email, 0, 16) . '...' : $email;
+    $email = mb_strlen($email) > 20 ? mb_substr($email, 0, 16) . '...' : $email;
     $matches[$row->username] = check_plain($row->username) . ': ' . $fsname . ' -- ' . $email;
   }
   // Return for JS.
@@ -1720,9 +1720,6 @@ function ces_bank_views_pre_render(&$view) {
         3 => t('Locked'),
       );
       $result_view = (isset($view->result[0]->ces_account_exchange)) ? $view->result[0]->ces_account_exchange : FALSE;
-      if (!$result_view) {
-      echo '<pre>reset: ' ; print_r($view->result[0]) ; echo '</pre>'; exit() ; // DEV  
-      }
       $limitchains = $bank->getAllLimitChains($view->result[0]->ces_account_exchange);
       $limits = array();
       foreach ($limitchains as $id => $limit) {
@@ -1735,9 +1732,9 @@ function ces_bank_views_pre_render(&$view) {
     foreach ($view->result as $key => $result) {
 
       if ($view->name == 'ces_bank_accounts_list_for_admins') {
-        $result->ces_account_kind = substr($kinds[$result->ces_account_kind], 0, 3) . '.';
-        $result->ces_account_state = substr($states[$result->ces_account_state], 0, 3) . '.';
-        $result->ces_account_limitchain = @substr($limits[$result->ces_account_limitchain], 0, 10);
+        $result->ces_account_kind = mb_substr($kinds[$result->ces_account_kind], 0, 3) . '.';
+        $result->ces_account_state = mb_substr($states[$result->ces_account_state], 0, 3) . '.';
+        $result->ces_account_limitchain = @mb_substr($limits[$result->ces_account_limitchain], 0, 10);
       }
 
       $result->ces_account_balance = number_format(floatval($result->ces_account_balance), 2);
@@ -1772,7 +1769,7 @@ function ces_bank_views_pre_render(&$view) {
           '</a>';
       }
       if (strlen($result->users_ces_accountuser_mail) > 20) {
-        $result->users_ces_accountuser_mail = substr($result->users_ces_accountuser_mail, 0, 16) . '...';
+        $result->users_ces_accountuser_mail = mb_substr($result->users_ces_accountuser_mail, 0, 16) . '...';
       }
       if (array_key_exists($result->id, $ids_and_keys)) {
         $duplicate_key = $ids_and_keys[$result->id];

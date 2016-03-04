@@ -143,9 +143,9 @@ function _ces_summaryblock_shorten_text($text, $size = 50) {
     return $text;
   }
   $text = drupal_substr($text, 0, $size - 3);
-  $space = strrpos($text, ' ');
-  if ($space !== FALSE && $space > (strlen($text) * 0.75)) {
-    $text = substr($text, 0, $space);
+  $space = mb_strrpos($text, ' ');
+  if ($space !== FALSE && $space > (mb_strlen($text) * 0.75)) {
+    $text = mb_substr($text, 0, $space);
   }
   return $text . '...';
 }

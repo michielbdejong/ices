@@ -2312,9 +2312,9 @@ function ces_bank_multipletransactions_confirm_form($form, &$form_state) {
       foreach ($account2data['users'] as $u) {
         $name_user_account .= ces_user_get_name(user_load($u['user'])) . ', ';
       }
-      $name_user_account = substr($name_user_account, 0, -2);
-      if (strlen($name_user_account) > 30) {
-        $name_user_account = substr($name_user_account, 0, 27) . '...';
+      $name_user_account = mb_substr($name_user_account, 0, -2);
+      if (mb_strlen($name_user_account) > 30) {
+        $name_user_account = mb_substr($name_user_account, 0, 27) . '...';
       }
       $concept = trim($values['concept-' . $i]);
       $form['transaction_fieldset']['itemfromaccountname-' . $j] = array(
