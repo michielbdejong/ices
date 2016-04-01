@@ -242,7 +242,7 @@ function ces_offerswants_menu() {
     'weight' => 230,
   );
   $menu['ces/bank/account/myoffers'] = array(
-    'title' => 'My offers',
+    'title' => 'Offers',
     'description' => 'View my current offers',
     'page callback' => 'ces_offerswants_myoffers_page',
     'access callback' => 'ces_offerwant_access',
