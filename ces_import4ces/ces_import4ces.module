@@ -978,7 +978,7 @@ function ces_import4ces_get_category($title, $import, $context = 1) {
  * Implements hook_mail_alter().
  */
 function ces_import4ces_mail_alter(&$message) {
-  if (!variable_get('ces_import4ces_mail', CES_IMPORT4CES_SEND_MAILS)) {
+  if (CES_IMPORT4CES_SEND_MAILS == 0) {
     $message['send'] = FALSE;
   }
 }

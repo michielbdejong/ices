@@ -263,6 +263,12 @@ function ces_message_update_7110() {
   ces_message_install_default_templates();
 }
 /**
+ * Fourth update 01/04/2016.
+ */
+function ces_message_update_7105() {
+  ces_message_install_default_templates();
+}
+/**
  * Implements hook_uninstall().
  *
  * At uninstall time we'll notify field.module that the entity was deleted
