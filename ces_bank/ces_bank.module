@@ -1032,6 +1032,10 @@ function ces_bank_token_info() {
           'name' => t('Identifier'),
           'description' => t('Transaction identifier'),
         ),
+        'id_buyer_transaction' => array(
+          'name' => t('Identifier Buyer Transaction'),
+          'description' => t('Buyer transaction identifier'),
+        ),
         'fromaccount' => array(
           'name' => t('Buyer account'),
           'description' => t('The buyer account object.'),
@@ -1062,6 +1066,11 @@ function ces_bank_token_info() {
 
 /**
  * Implements hook_tokens().
+ *
+ * @todo Para poder obtener el identificador de la transacción del 
+ *       comprador he sumado 1 al identificador de la transacción.
+ *       Esto es muy mejorable si hacemos que la información venga
+ *       desde CesBankBasicTransaction.
  */
 function ces_bank_tokens($type, $tokens, array $data = array(), array $options = array()) {
   $replacements = array();
@@ -1160,6 +1169,10 @@ function ces_bank_tokens($type, $tokens, array $data = array(), array $options =
 
         case 'id':
           $replacements[$original] = $transaction['id'];
+          break;
+
+        case 'id_buyer_transaction':
+          $replacements[$original] = ( $transaction['id'] + 1 );
           break;
 
       }

@@ -263,9 +263,9 @@ function ces_message_update_7110() {
   ces_message_install_default_templates();
 }
 /**
- * Fourth update 01/04/2016.
+ * Update 01/04/2016.
  */
-function ces_message_update_7105() {
+function ces_message_update_7107() {
   ces_message_install_default_templates();
 }
 /**
