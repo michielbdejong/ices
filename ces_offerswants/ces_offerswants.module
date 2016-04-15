@@ -1528,10 +1528,10 @@ function ces_offerswants_cron() {
         $attachment = '<table style="width:100%;border:0;border-spacing:1px;border-collapse:separate;"><tbody>';
         foreach ($last_offers as $lasto) {
           $attachment .= '<tr style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
-          $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt>';
+          $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
           $attachment .= '<a href="' . $base_url . '/ces/bank/account/myoffers/' . $lasto->id . '/view">' .
             $lasto->title . '</a></td>';
-          $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt>';
+          $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
           $attachment .= trim(preg_replace('/\s+/', ' ', $lasto->body)) . '</td><td>' . $lasto->ces_offer_rate_value . '</td></tr>';
         }
         $attachment .= '</tbody></table>';
