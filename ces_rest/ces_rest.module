@@ -1,0 +1,176 @@
+<?php
+/**
+ * @file
+ * Implement the Ces Rest Module
+ *
+ * @todo Pulir vista de cuentas.
+ * @todo Documentar creación de usuarios, listado, etc...
+ * @todo Ir añadiendo las acciones documentadas al script.
+ */
+
+/**
+ * @defgroup ces_rest_module Ces Rest Module
+ * @ingroup ces_rest
+ * @{
+ * Implement the Ces Rest Module.
+ */
+
+/**
+* Implementation of hook_services_resources().
+*/
+function ces_rest_services_resources() {
+  return array(
+    'cr_accounts' => array(
+      // Alias accounts.
+      'actions' => array(
+        'create' => array(
+          'help' => 'Create a account',
+          'file' => array('file' => 'inc', 'module' => 'ces_rest'),
+          'callback' => '_ces_rest_add_account',
+          'access callback' => 'ces_rest_access',
+          'access arguments' => array('admin exchange'),
+          'access arguments append' => TRUE,
+          'args' => array(
+            array(
+             'name' => 'parameters',
+             'type' => 'array',
+             'description' => '',
+             'source' => 'data',
+             'optional' => TRUE,
+             'default value' => array(),
+            ),
+          ),
+        ),
+      ),
+    ),
+    'cr_users' => array(
+      // Alias users.
+      'actions' => array(
+        'create' => array(
+          'help' => 'Create a user',
+          'file' => array('file' => 'inc', 'module' => 'ces_rest'),
+          'callback' => '_ces_rest_add_user',
+          'access callback' => 'ces_rest_access',
+          'access arguments' => array('admin exchange'),
+          'access arguments append' => TRUE,
+          'args' => array(
+            array(
+             'name' => 'parameters',
+             'type' => 'array',
+             'description' => '',
+             'source' => 'data',
+             'optional' => TRUE,
+             'default value' => array(),
+            ),
+          ),
+        ),
+      ),
+      'operations' => array(
+        'index' => array(
+          'help' => 'Retrieves a listing of user',
+          'file' => array('file' => 'inc', 'module' => 'ces_rest'),
+          'callback' => '_ces_rest_index',
+          'access callback' => 'ces_rest_access',
+          'access arguments' => array('admin exchange'),
+          'access arguments append' => TRUE,
+          'args' => array(
+            array(
+              'name' => 'code_exchange',
+              'type' => 'string',
+              'description' => 'Code of exchange',
+              // 'source' => array(
+              //   'params' => 'code_exchange',
+              // ),
+              // This parameter going with the url.
+              'source' => array('path' => '0'),
+              'optional' => FALSE,
+              'default value' => FALSE,
+            ),
+            array(
+              'name' => 'uid',
+              'type' => 'int',
+              'description' => 'Id of user',
+              // 'source' => array(
+              //   'params' => 'code_exchange',
+              // ),
+              // This parameter going with the url.
+              'source' => array('path' => '1'),
+              'optional' => TRUE,
+              'default value' => FALSE,
+            ),
+            array(
+             'name' => 'parameters',
+             'type' => 'array',
+             'description' => '',
+             'source' => 'param',
+             'optional' => TRUE,
+             'default value' => array(),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+/**
+* Access callback for the ces_rest service.
+*
+* @param string $op
+*  The operation that's going to be performed.
+* @param array $args
+*  The arguments that will be passed to the callback.
+* @return bool
+*  Whether access is given or not.
+*/
+
+function ces_rest_access($op, $args) {
+  global $user;
+
+  return TRUE; // DEV
+
+  $code_exchange = $args[0];
+  $account       = $code_exchange . '0000';
+
+  $access = FALSE;
+
+  switch ($op) {
+    case 'admin exchange':
+      $sql = "SELECT ca.id 
+        FROM ces_accountuser cau
+        LEFT JOIN ces_account ca ON ca.id = account
+        WHERE user = :uid AND ca.name = :account AND cau.privilege = 0
+        ";
+      $result = db_query($sql, array(':uid' => $user->uid, ':account' => $account));
+      if ($result->rowCount() > 0) {
+        return TRUE;
+      }
+      else {
+        return FALSE;
+      }
+      break;
+  }
+  $access = TRUE;
+  return $access;
+}
+/**
+ * Implementation of hook_ctools_plugin_api().
+ */
+//   function ces_rest_ctools_plugin_api($module, $api) {
+//     if ($module == 'services' && $api == 'services') {
+//       return array('version' => 3);
+//     }
+//   }
+/**
+ * Implements hook_views_api().
+ */
+function ces_rest_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'ces_rest') . '/views',
+  );
+}
+
+/**
+ * @}
+ */
