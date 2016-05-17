@@ -11,3 +11,5 @@ dependencies[] = oauth2_server
 dependencies[] = services
 dependencies[] = rest_server
 dependencies[] = services_views
+
+version = "7.x-0.1"

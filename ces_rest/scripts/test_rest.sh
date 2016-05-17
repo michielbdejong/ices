@@ -16,7 +16,8 @@
 ## Configurations.
 
 # Base URL of your web site.
-site_url="https://localhost/integralces"
+# site_url="https://localhost/integralces"
+site_url="http://test.integralces.net/testices"
 
 # Path to temporary file which will store your cookie data.
 cookie_path=/tmp/cookie
@@ -29,10 +30,6 @@ cookie_path=/tmp/cookie
 # Admin user.
 username="Riemann"
 password="riemann"
-
-# Admin drupal
-# username="integraledu"
-# password="eduintegral"
 
 exchange="NET1"
 
@@ -51,7 +48,7 @@ action=
 # Endpoint. URL of your custom service.
 service_url=$site_url/cesrest/
 
-# Con estos datos y la extensión RESTClient podemos optener un token.
+# Con estos datos y la extensión RESTClient podemos obtener un token.
 # Que podemos pasar al script para testear.
 
 # Register demo user.
@@ -65,8 +62,6 @@ test_firstname="firstname `date +%s`"
 if [ -e /tmp/test_rest.token ] ; then
   authorization_access_token=`cat /tmp/test_rest.token`
 fi
-# authorization_refresh_token=3e702270f69de31ec833bf11019e2aa5831e9365
-
 
 # Actions.
 declare -i actions=(accounts users/$exchange users/$exchange/3 users/create)
@@ -94,7 +89,7 @@ Options:
 Para poder testear con este script es necesario crear un cliente en el servidor
 con los datos de la configuración.
 
-admin/structure/oauth2-servers/manage/cesrest/clients/add
+${site_url}/admin/structure/oauth2-servers/manage/cesrest/clients/add
 
 Etiqueta: Test Client
 Client ID: $client_id

@@ -1,3 +1,4 @@
+<?php
 /**
 @file
 Documentación de ces_rest.
@@ -43,13 +44,13 @@ https://[site name]/oauth2/token
 Hay cuatro recursos disponibles:
 
 - https://[site name]/cesrest/users/X
-- https://[site name]/cesrest/account/X
-- https://[site name]/cesrest/transaction/X
+- https://[site name]/cesrest/accounts/X
+- https://[site name]/cesrest/transactions/X
 - https://[site name]/cesrest/exchange/X
 
 X: Es el código de la ecored, ejemplo: EXEM.
 
-#### cr_user
+#### users
 
 https://[site name]/cesrest/users/
 
@@ -116,7 +117,7 @@ Acciones posibles:
 
   En caso de error un mensaje con el error en formato JSON.
 
-#### cr_transaction
+#### transactions
 
 https://[site name]/cesrest/transactions/
 
