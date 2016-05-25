@@ -19,6 +19,11 @@ function _ces_rest_index($code_exchange, $uid, $parameters) {
 
   $output = FALSE;
 
+  // $output['code_exchange'] = $code_exchange;
+  // $output['uid'] = $uid;
+  // $output['parameters'] = $parameters;
+
+
   // @todo Validate code_exchange.
 
   // @todo Validate uid.
@@ -27,6 +32,7 @@ function _ces_rest_index($code_exchange, $uid, $parameters) {
   if ( $uid ) {
     // Comprobar que el usuario pertenece a la red.
     $user_load = user_load($uid);
+    $output['user_load'] = $user_load; // DEV
     $bank = new CesBank();
     $output[] = array(
       'user'     => $user_load,
@@ -38,8 +44,8 @@ function _ces_rest_index($code_exchange, $uid, $parameters) {
 
   // If not uid print list users.
   $bank = new CesBank();
-  $exchange = ces_bank_get_current_exchange();
-  $accounts = $bank->getAllAccounts(array('state' => 0, 'exchange' => $exchange['id']));
+  $exchange = ces_exchange_load($code_exchange);
+  $accounts = $bank->getAllAccounts(array('exchange' => $exchange['id']));
 
   foreach ($accounts as $account) {
     foreach ( $account['users'] as $user ) {

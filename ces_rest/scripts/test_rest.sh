@@ -63,8 +63,10 @@ if [ -e /tmp/test_rest.token ] ; then
   authorization_access_token=`cat /tmp/test_rest.token`
 fi
 
+config_file=
+
 # Actions.
-declare -i actions=(accounts users/$exchange users/$exchange/3 users/create)
+declare -i actions=(users/$exchange accounts users/$exchange/3 users/create)
 
 # Others.
 debug=FALSE
@@ -185,9 +187,10 @@ function test_rest_curl_oauth2() {
   local data="${2:-FALSE}"
   local tmp="/tmp/`echo ${action} | tr / -`.html"
 
-  cmd="-k -v " # Saltar certificado.
+  cmd="-k " # Saltar certificado.
 
   [[ "$debug" == "FALSE" ]] && cmd="$cmd -s "
+  [[ "$debug" == "TRUE" ]] && cmd="$cmd -v "
   [[ "$data" != "FALSE" ]]   && cmd="$cmd -d '$data'"
 
   curl \
@@ -197,18 +200,18 @@ function test_rest_curl_oauth2() {
     $cmd \
     --request GET $action > $tmp
 
-  echo
-  echo Salida: $tmp
-  echo
-
   cat $tmp | pjson
 
   echo
   echo Action: $action
+  echo Salida: $tmp
   echo Access token: $authorization_access_token
   echo Opciones Curl: $cmd --request GET
   echo
 
+  read -p '[ENTER] Para continuar: ' OPCION
+
+  #exit # DEV
 }
 function test_rest_users_create() {
 
@@ -216,8 +219,8 @@ function test_rest_users_create() {
   local cmd="-k " # Saltar certificado.
   local tmp="/tmp/create_user.html"
 
-  [[ "$debug" == "FALSE" ]] && cmd="$cmd -s " || cmd="cmd -v "
-  [[ "$data" != "FALSE" ]]   && cmd="$cmd -d '$data'"
+  [[ "$debug" == "FALSE" ]] && cmd="$cmd -s "
+  [[ "$debug" == "TRUE" ]] && cmd="$cmd -v "
 
 # curl \
 #   -H 'Content-type: application/json' \
@@ -226,7 +229,7 @@ function test_rest_users_create() {
 #   $cmd \
 #   -X POST \
 #   ${service_url}user/create \
-curl -v -k \
+curl $cmd \
   -H "Content-type: application/json" \
   -H "Authorization: Bearer $authorization_access_token" \
   --cookie $cookie_path -X POST \
@@ -256,15 +259,21 @@ cat $tmp | pjson
 
 echo
 echo Action: $action
+echo Salida: $tmp
 echo Access token: $authorization_access_token
-# echo Opciones Curl: $cmd --request GET
-echo
-
+echo Opciones Curl: $cmd --request GET
 echo
 echo USER_UID: $USER_UID
 echo
 
-test_rest_account_create $USER_UID
+if [ "$USER_UID" != "" ] ; then
+  test_rest_account_create $USER_UID
+else
+  echo
+  echo Error: No user created
+  echo
+  exit
+fi
 
 }
 
@@ -276,10 +285,9 @@ function test_rest_account_create() {
   local cmd="-k " # Saltar certificado.
   local tmp="/tmp/create_account.html"
 
-  [[ "$debug" == "FALSE" ]] && cmd="$cmd -s " || cmd="cmd -v "
-  [[ "$data" != "FALSE" ]]   && cmd="$cmd -d '$data'"
+  [[ "$debug" == "FALSE" ]] && cmd="$cmd -s "
+  [[ "$debug" == "TRUE" ]] && cmd="$cmd -v "
 
-  //name=NET10014
   name=
 
   # @todo Especificar limitchain al crear cuenta.
@@ -304,7 +312,7 @@ function test_rest_account_create() {
 
   user=$USER_UID
 
-curl -v -k \
+curl $cmd \
   -H "Content-type: application/json" \
   -H "Authorization: Bearer $authorization_access_token" \
   --cookie $cookie_path -X POST \
@@ -328,12 +336,12 @@ local ACCOUNT_ID=`cat $tmp | pjson | grep '"id": ' | cut -d: -f2 | cut -d\" -f2`
 
 cat $tmp | pjson
 
+
 echo
 echo Action: $action
+echo Salida: $tmp
 echo Access token: $authorization_access_token
-# echo Opciones Curl: $cmd --request GET
-echo
-
+echo Opciones Curl: $cmd --request GET
 echo
 echo ACCOUNT_ID: $ACCOUNT_ID
 echo
@@ -366,7 +374,8 @@ while [ -n "$1" ] ; do
            ;;
       -ar) authorization_refresh_token=$2; shift 2 ;;
       -h)  test_rest_help; exit ;;
-      *) parameters="$*" ; break ;;
+      -c)  source "$2" ; shift 2 ;;
+      *)   parameters="$*" ; break ;;
    esac
 done
 

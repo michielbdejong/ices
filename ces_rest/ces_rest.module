@@ -28,7 +28,7 @@ function ces_rest_services_resources() {
           'file' => array('file' => 'inc', 'module' => 'ces_rest'),
           'callback' => '_ces_rest_add_account',
           'access callback' => 'ces_rest_access',
-          'access arguments' => array('admin exchange'),
+          'access arguments' => array('admin', 'exchange'),
           'access arguments append' => TRUE,
           'args' => array(
             array(
@@ -51,7 +51,7 @@ function ces_rest_services_resources() {
           'file' => array('file' => 'inc', 'module' => 'ces_rest'),
           'callback' => '_ces_rest_add_user',
           'access callback' => 'ces_rest_access',
-          'access arguments' => array('admin exchange'),
+          'access arguments' => array('admin', 'exchange'),
           'access arguments append' => TRUE,
           'args' => array(
             array(
@@ -71,7 +71,7 @@ function ces_rest_services_resources() {
           'file' => array('file' => 'inc', 'module' => 'ces_rest'),
           'callback' => '_ces_rest_index',
           'access callback' => 'ces_rest_access',
-          'access arguments' => array('admin exchange'),
+          'access arguments' => array('admin', 'exchange'),
           'access arguments append' => TRUE,
           'args' => array(
             array(
@@ -124,43 +124,23 @@ function ces_rest_services_resources() {
 *  Whether access is given or not.
 */
 
-function ces_rest_access($op, $args) {
+function ces_rest_access($permission, $object, $args = FALSE) {
   global $user;
 
-  return TRUE; // DEV
-
-  $code_exchange = $args[0];
-  $account       = $code_exchange . '0000';
-
-  $access = FALSE;
-
-  switch ($op) {
-    case 'admin exchange':
-      $sql = "SELECT ca.id 
-        FROM ces_accountuser cau
-        LEFT JOIN ces_account ca ON ca.id = account
-        WHERE user = :uid AND ca.name = :account AND cau.privilege = 0
-        ";
-      $result = db_query($sql, array(':uid' => $user->uid, ':account' => $account));
-      if ($result->rowCount() > 0) {
-        return TRUE;
-      }
-      else {
-        return FALSE;
-      }
-      break;
+  if ( $args ) {
+    $code_exchange = $args[0];
+    $exchange = ces_exchange_load($code_exchange);
+    $objectid = $exchange['id'];
   }
-  $access = TRUE;
-  return $access;
+  // Debug.
+  // watchdog('cesrest', print_r(array(
+  //   'permission' => $permission,
+  //   'object'     => $object,
+  //   'args'       => $args
+  //   ),1));
+
+  return ces_bank_access($permission, $object, $objectid);
 }
-/**
- * Implementation of hook_ctools_plugin_api().
- */
-//   function ces_rest_ctools_plugin_api($module, $api) {
-//     if ($module == 'services' && $api == 'services') {
-//       return array('version' => 3);
-//     }
-//   }
 /**
  * Implements hook_views_api().
  */
