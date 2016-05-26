@@ -5,6 +5,10 @@ Documentación de ces_rest.
 
 @defgroup ces_rest Ces Rest
 @ingroup ices
+
+@todo Paginación para listado de transacciones.
+@todo Filtrar listado de transacciones por fechas, usuario, ...
+
 @{
 
 
@@ -126,9 +130,6 @@ Acciones posibles:
 - GET: [exchange_code]
 
   Devuelve objeto JSON con el listado de todas las transacciones de la red.
-
-  @todo Paginación.
-  @todo Limitar a una búsqueda concreta. (Por usuario, por fechas, ...) 
 
 - GET: [exchange_code]/[transaction_id]
 

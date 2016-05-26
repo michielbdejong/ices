@@ -66,7 +66,7 @@ fi
 config_file=
 
 # Actions.
-declare -i actions=(users/$exchange accounts users/$exchange/3 users/create)
+declare -i actions=(users/$exchange accounts/$exchange accounts/$exchange/${exchange}0001 users/$exchange/3 users/create/$exchange)
 
 # Others.
 debug=FALSE
@@ -149,30 +149,13 @@ function test_rest_save_token() {
 
 ## Execute login.
 function test_rest_login() {
-session="$(curl -k -X POST -H "Content-type: application/json" -c $cookie_path \
+curl -k -X POST -H "Content-type: application/json" -c $cookie_path \
 ${service_url}user/login \
 -d"
 {
   \"username\":\"$username\",
   \"password\":\"$password\"
-}")"
-echo
-echo Session:
-echo
-# echo $session | pjson
-echo $session
-
-# Procesamos json
-sessid=$(test_rest_json "$session" "sessid")
-token=$(test_rest_json "$session" "token")
-
-echo
-echo sessid: $sessid
-echo token: $token
-echo
-echo Sesión iniciada.
-echo
-
+}"
 }
 
 ## ... json
@@ -209,13 +192,11 @@ function test_rest_curl_oauth2() {
   echo Opciones Curl: $cmd --request GET
   echo
 
-  read -p '[ENTER] Para continuar: ' OPCION
-
   #exit # DEV
 }
 function test_rest_users_create() {
 
-  local action="${service_url}users/create"
+  local action="${service_url}users/create/$exchange"
   local cmd="-k " # Saltar certificado.
   local tmp="/tmp/create_user.html"
 
@@ -281,7 +262,7 @@ function test_rest_account_create() {
 
   local USER_UID=$1
 
-  local action="${service_url}accounts/create"
+  local action="${service_url}accounts/create/$exchange"
   local cmd="-k " # Saltar certificado.
   local tmp="/tmp/create_account.html"
 
@@ -351,7 +332,7 @@ echo
 function test_rest_exec_action() {
 
   case $1 in
-    'users/create')
+    "users/create/$exchange")
       test_rest_users_create "$2"
       ;;
     *)
@@ -396,6 +377,8 @@ fi
 if [ -z $action ] ; then
   for a in ${actions[*]} ; do
     test_rest_exec_action $a "$parameters"
+    read -p '[ENTER] Para continuar: ' OPCION
+
   done
 else
   test_rest_exec_action ${action} "$parameters"

@@ -81,6 +81,15 @@ function ces_rest_install() {
             ),
           ),
         ),
+        'update' => array(
+          'enabled' => '1',
+          'settings' => array(
+            'oauth2_server' => array(
+              'require_authentication' => '1',
+              'scope' => 'cesrest',
+            ),
+          ),
+        ),
       ),
       'operations' => array(
         'index' => array(
@@ -99,6 +108,15 @@ function ces_rest_install() {
       'alias' => 'accounts',
       'actions' => array(
         'create' => array(
+          'enabled' => '1',
+          'settings' => array(
+            'oauth2_server' => array(
+              'require_authentication' => '1',
+              'scope' => 'cesrest',
+            ),
+          ),
+        ),
+        'update' => array(
           'enabled' => '1',
           'settings' => array(
             'oauth2_server' => array(

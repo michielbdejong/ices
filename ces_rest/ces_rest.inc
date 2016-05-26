@@ -19,15 +19,6 @@ function _ces_rest_index($code_exchange, $uid, $parameters) {
 
   $output = FALSE;
 
-  // $output['code_exchange'] = $code_exchange;
-  // $output['uid'] = $uid;
-  // $output['parameters'] = $parameters;
-
-
-  // @todo Validate code_exchange.
-
-  // @todo Validate uid.
-
   // If uid print info user.
   if ( $uid ) {
     // Comprobar que el usuario pertenece a la red.
@@ -65,7 +56,7 @@ function _ces_rest_index($code_exchange, $uid, $parameters) {
  * @todo Validar datos.
  */
 
-function _ces_rest_add_user($parameters) {
+function _ces_rest_add_user($code_exchange, $parameters) {
 
   // Validate data.
 
@@ -103,7 +94,85 @@ function _ces_rest_add_user($parameters) {
 
   return $user_drupal;
 }
+/**
+ * Update user.
+ *
+ * @todo Validar datos.
+ */
 
+function _ces_rest_update_user($code_exchange, $uid, $parameters) {
+
+  // Validate data.
+
+  // The user fields.
+  $fields = array(
+    'name' => $parameters['name'],
+    'mail' => $parameters['mail'],
+    'pass' => $parameters['pass'],
+    'status' => $parameters['status'],
+    'language' => $parameters['language'],
+    // User custom fields.
+    'ces_firstname' => array(LANGUAGE_NONE => array(array('value' => $parameters['firstname']))),
+    'ces_surname' => array(LANGUAGE_NONE => array(array('value' => $parameters['surname']))),
+    'ces_address' => array(LANGUAGE_NONE => array(array('value' => $parameters['address']))) ,
+    'ces_town' => array(LANGUAGE_NONE => array(array('value' => $parameters['town']))),
+    'ces_postcode' => array(LANGUAGE_NONE => array(array('value' => $parameters['postcode']))),
+    'ces_phonemobile' => array(LANGUAGE_NONE => array(array('value' => $parameters['phonemobile']))),
+    'ces_phonework' => array(LANGUAGE_NONE => array(array('value' => $parameters['phonework']))),
+    'ces_phonehome' => array(LANGUAGE_NONE => array(array('value' => $parameters['phonehome']))),
+    'ces_website' => array(LANGUAGE_NONE => array(array('value' => $parameters['website']))),
+    'roles' => array(
+      DRUPAL_AUTHENTICATED_RID => 'authenticated user',
+    ),
+  );
+
+  $user_drupal = user_load($uid);
+  if ($user_drupal === FALSE) {
+    throw new Exception(t('Error: nonexistent user (' . $uid . ').'));
+  }
+
+  $user_drupal = user_save($user_drupal, $fields);
+  if ($user_drupal === FALSE) {
+    throw new Exception(t('Error updating user.'));
+  }
+
+  return $user_drupal;
+}
+
+/**
+ * Index ces rest.
+ */
+function _ces_rest_accounts_index($code_exchange, $account, $parameters) {
+  
+  global $user;
+
+  $output = FALSE;
+
+  $bank = new CesBank();
+  $exchange = ces_exchange_load($code_exchange);
+
+  // If uid print info user.
+  if ( $account ) {
+    // Id or Name.
+    if ( intval($account) ) {
+      $output = $bank->getAccount($account);
+    }
+    else {
+      $output = $bank->getAccountByName($account);
+    }
+    return $output;
+  }
+
+
+  // If not uid print list users.
+  $accounts = $bank->getAllAccounts(array('exchange' => $exchange['id']));
+
+  foreach ($accounts as $account) {
+    $output[] = $account;
+  }
+
+  return $output;
+}
 /**
  * Add account.
  *
@@ -123,10 +192,10 @@ function _ces_rest_add_user($parameters) {
  * CLOSED = 3
  *
  */
-function _ces_rest_add_account($parameters) {
+function _ces_rest_add_account($code_exchange, $parameters) {
 
   $bank = new CesBank();
-  $exchange = ces_bank_get_current_exchange();
+  $exchange = ces_exchange_load($code_exchange);
   $limit = $bank->getDefaultLimitChain($exchange['id']);
   $user_uid = $parameters['user'];
   $user = user_load($user_uid);
@@ -169,6 +238,42 @@ function _ces_rest_add_account($parameters) {
 
     $bank->createAccount($account, FALSE); 
     $bank->activateAccount($account);
+    $output['account'] = $account; 
+  }
+  catch (Exception $e) {
+    $output['error'] = $e->getMessage();
+  }
+
+  return $output;
+
+}
+
+/**
+ * Update account.
+ */
+function _ces_rest_update_account($code_exchange, $account, $parameters) {
+
+  $bank = new CesBank();
+  $exchange = ces_exchange_load($code_exchange);
+
+  // If uid print info user.
+  if ( $account ) {
+    // Id or Name.
+    if ( is_int($account) ) {
+      $account = $bank->getAccount($account);
+    }
+    else {
+      $account = $bank->getAccountByName($account);
+    }
+  }
+
+  try {
+
+    foreach ($parameters AS $key => $value) {
+      $account[$key] = $value;
+    }
+
+    $bank->updateAccount($account, FALSE); 
     $output['account'] = $account; 
   }
   catch (Exception $e) {

@@ -2,10 +2,6 @@
 /**
  * @file
  * Implement the Ces Rest Module
- *
- * @todo Pulir vista de cuentas.
- * @todo Documentar creación de usuarios, listado, etc...
- * @todo Ir añadiendo las acciones documentadas al script.
  */
 
 /**
@@ -16,8 +12,8 @@
  */
 
 /**
-* Implementation of hook_services_resources().
-*/
+ * Implementation of hook_services_resources().
+ */
 function ces_rest_services_resources() {
   return array(
     'cr_accounts' => array(
@@ -32,10 +28,108 @@ function ces_rest_services_resources() {
           'access arguments append' => TRUE,
           'args' => array(
             array(
+              'name' => 'code_exchange',
+              'type' => 'string',
+              'description' => 'Code of exchange',
+              // 'source' => array(
+              //   'params' => 'code_exchange',
+              // ),
+              // This parameter going with the url.
+              'source' => array('path' => '0'),
+              'optional' => FALSE,
+              'default value' => FALSE,
+            ),
+            array(
              'name' => 'parameters',
              'type' => 'array',
              'description' => '',
              'source' => 'data',
+             'optional' => TRUE,
+             'default value' => array(),
+            ),
+          ),
+        ),
+        'update' => array(
+          'help' => 'Update a account',
+          'file' => array('file' => 'inc', 'module' => 'ces_rest'),
+          'callback' => '_ces_rest_update_account',
+          'access callback' => 'ces_rest_access',
+          'access arguments' => array('admin', 'exchange'),
+          'access arguments append' => TRUE,
+          'args' => array(
+            array(
+              'name' => 'code_exchange',
+              'type' => 'string',
+              'description' => 'Code of exchange',
+              // 'source' => array(
+              //   'params' => 'code_exchange',
+              // ),
+              // This parameter going with the url.
+              'source' => array('path' => '0'),
+              'optional' => FALSE,
+              'default value' => FALSE,
+            ),
+            array(
+              'name' => 'account',
+              'type' => 'string',
+              'description' => 'Account id or name',
+              // 'source' => array(
+              //   'params' => 'code_exchange',
+              // ),
+              // This parameter going with the url.
+              'source' => array('path' => '1'),
+              'optional' => TRUE,
+              'default value' => FALSE,
+            ),
+            array(
+             'name' => 'parameters',
+             'type' => 'array',
+             'description' => '',
+             'source' => 'data',
+             'optional' => TRUE,
+             'default value' => array(),
+            ),
+          ),
+        ),
+      ),
+      'operations' => array(
+        'index' => array(
+          'help' => 'Retrieves a listing of accounts',
+          'file' => array('file' => 'inc', 'module' => 'ces_rest'),
+          'callback' => '_ces_rest_accounts_index',
+          'access callback' => 'ces_rest_access',
+          'access arguments' => array('admin', 'exchange'),
+          'access arguments append' => TRUE,
+          'args' => array(
+            array(
+              'name' => 'code_exchange',
+              'type' => 'string',
+              'description' => 'Code of exchange',
+              // 'source' => array(
+              //   'params' => 'code_exchange',
+              // ),
+              // This parameter going with the url.
+              'source' => array('path' => '0'),
+              'optional' => FALSE,
+              'default value' => FALSE,
+            ),
+            array(
+              'name' => 'account',
+              'type' => 'string',
+              'description' => 'Account. Id or name',
+              // 'source' => array(
+              //   'params' => 'code_exchange',
+              // ),
+              // This parameter going with the url.
+              'source' => array('path' => '1'),
+              'optional' => TRUE,
+              'default value' => FALSE,
+            ),
+            array(
+             'name' => 'parameters',
+             'type' => 'array',
+             'description' => '',
+             'source' => 'param',
              'optional' => TRUE,
              'default value' => array(),
             ),
@@ -54,6 +148,60 @@ function ces_rest_services_resources() {
           'access arguments' => array('admin', 'exchange'),
           'access arguments append' => TRUE,
           'args' => array(
+            array(
+              'name' => 'code_exchange',
+              'type' => 'string',
+              'description' => 'Code of exchange',
+              // 'source' => array(
+              //   'params' => 'code_exchange',
+              // ),
+              // This parameter going with the url.
+              'source' => array('path' => '0'),
+              'optional' => FALSE,
+              'default value' => FALSE,
+            ),
+            array(
+             'name' => 'parameters',
+             'type' => 'array',
+             'description' => '',
+             'source' => 'data',
+             'optional' => TRUE,
+             'default value' => array(),
+            ),
+          ),
+        ),
+        'update' => array(
+          'help' => 'Create a user',
+          'file' => array('file' => 'inc', 'module' => 'ces_rest'),
+          'callback' => '_ces_rest_update_user',
+          'access callback' => 'ces_rest_access',
+          'access arguments' => array('admin', 'exchange'),
+          'access arguments append' => TRUE,
+          'args' => array(
+            array(
+              'name' => 'code_exchange',
+              'type' => 'string',
+              'description' => 'Code of exchange',
+              // 'source' => array(
+              //   'params' => 'code_exchange',
+              // ),
+              // This parameter going with the url.
+              'source' => array('path' => '0'),
+              'optional' => FALSE,
+              'default value' => FALSE,
+            ),
+            array(
+              'name' => 'uid',
+              'type' => 'int',
+              'description' => 'Id of user',
+              // 'source' => array(
+              //   'params' => 'code_exchange',
+              // ),
+              // This parameter going with the url.
+              'source' => array('path' => '1'),
+              'optional' => TRUE,
+              'default value' => FALSE,
+            ),
             array(
              'name' => 'parameters',
              'type' => 'array',
@@ -140,15 +288,6 @@ function ces_rest_access($permission, $object, $args = FALSE) {
   //   ),1));
 
   return ces_bank_access($permission, $object, $objectid);
-}
-/**
- * Implements hook_views_api().
- */
-function ces_rest_views_api() {
-  return array(
-    'api' => 3,
-    'path' => drupal_get_path('module', 'ces_rest') . '/views',
-  );
 }
 
 /**
