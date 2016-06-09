@@ -12,6 +12,8 @@
 
 /**
  * Index ces rest.
+ *
+ * @todo Búsqueda de usuario por Cuenta, nombre, apellido, email.
  */
 function _ces_rest_index($code_exchange, $uid, $parameters) {
   
@@ -23,7 +25,6 @@ function _ces_rest_index($code_exchange, $uid, $parameters) {
   if ( $uid ) {
     // Comprobar que el usuario pertenece a la red.
     $user_load = user_load($uid);
-    $output['user_load'] = $user_load; // DEV
     $bank = new CesBank();
     $output[] = array(
       'user'     => $user_load,
@@ -102,29 +103,125 @@ function _ces_rest_add_user($code_exchange, $parameters) {
 
 function _ces_rest_update_user($code_exchange, $uid, $parameters) {
 
-  // Validate data.
-
   // The user fields.
-  $fields = array(
-    'name' => $parameters['name'],
-    'mail' => $parameters['mail'],
-    'pass' => $parameters['pass'],
-    'status' => $parameters['status'],
-    'language' => $parameters['language'],
-    // User custom fields.
-    'ces_firstname' => array(LANGUAGE_NONE => array(array('value' => $parameters['firstname']))),
-    'ces_surname' => array(LANGUAGE_NONE => array(array('value' => $parameters['surname']))),
-    'ces_address' => array(LANGUAGE_NONE => array(array('value' => $parameters['address']))) ,
-    'ces_town' => array(LANGUAGE_NONE => array(array('value' => $parameters['town']))),
-    'ces_postcode' => array(LANGUAGE_NONE => array(array('value' => $parameters['postcode']))),
-    'ces_phonemobile' => array(LANGUAGE_NONE => array(array('value' => $parameters['phonemobile']))),
-    'ces_phonework' => array(LANGUAGE_NONE => array(array('value' => $parameters['phonework']))),
-    'ces_phonehome' => array(LANGUAGE_NONE => array(array('value' => $parameters['phonehome']))),
-    'ces_website' => array(LANGUAGE_NONE => array(array('value' => $parameters['website']))),
-    'roles' => array(
-      DRUPAL_AUTHENTICATED_RID => 'authenticated user',
-    ),
-  );
+  foreach( $parameters AS $key => $value ) {
+    switch ($key) {
+      case 'name':
+        $fields['name'] = $value;
+        break;
+      
+      case 'mail':
+        $fields['mail'] = $value;
+        break;
+      
+      case 'pass':
+        $fields['pass'] = $value;
+        break;
+      
+      case 'status':
+        $fields['status'] = $value;
+        break;
+      
+      case 'language':
+        $fields['language'] = $value;
+        break;
+      
+      case 'ces_firstname':
+        $fields['ces_firstname'] = array(
+          LANGUAGE_NONE => array(
+            array(
+              'value' => $value,
+            )
+          )
+        );
+        break;
+      
+      case 'ces_surname':
+        $fields['ces_surname'] = array(
+          LANGUAGE_NONE => array(
+            array(
+              'value' => $value,
+            )
+          )
+        );
+        break;
+      
+      case 'ces_address':
+        $fields['ces_address'] = array(
+          LANGUAGE_NONE => array(
+            array(
+              'value' => $value,
+            )
+          )
+        );
+        break;
+      
+      case 'ces_town':
+        $fields['ces_town'] = array(
+          LANGUAGE_NONE => array(
+            array(
+              'value' => $value,
+            )
+          )
+        );
+        break;
+      
+      case 'ces_postcode':
+        $fields['ces_postcode'] = array(
+          LANGUAGE_NONE => array(
+            array(
+              'value' => $value,
+            )
+          )
+        );
+        break;
+      
+      case 'ces_phonemobile':
+        $fields['ces_phonemobile'] = array(
+          LANGUAGE_NONE => array(
+            array(
+              'value' => $value,
+            )
+          )
+        );
+        break;
+      
+      case 'ces_phonework':
+        $fields['ces_phonework'] = array(
+          LANGUAGE_NONE => array(
+            array(
+              'value' => $value,
+            )
+          )
+        );
+        break;
+      
+      case 'ces_phonehome':
+        $fields['ces_phonehome'] = array(
+          LANGUAGE_NONE => array(
+            array(
+              'value' => $value,
+            )
+          )
+        );
+        break;
+      
+      case 'ces_website':
+        $fields['ces_website'] = array(
+          LANGUAGE_NONE => array(
+            array(
+              'value' => $value,
+            )
+          )
+        );
+        break;
+      
+      default:
+        // @todo Error campo desconocido.
+        $output['error'][] = 'Campo ['.$key.'] desconocido ['.$value.']'; 
+        break;
+    }
+  }
 
   $user_drupal = user_load($uid);
   if ($user_drupal === FALSE) {
@@ -136,7 +233,8 @@ function _ces_rest_update_user($code_exchange, $uid, $parameters) {
     throw new Exception(t('Error updating user.'));
   }
 
-  return $user_drupal;
+  $output['user'] = $user_drupal;
+  return $output;
 }
 
 /**
@@ -251,19 +349,19 @@ function _ces_rest_add_account($code_exchange, $parameters) {
 /**
  * Update account.
  */
-function _ces_rest_update_account($code_exchange, $account, $parameters) {
+function _ces_rest_update_account($code_exchange, $account_id, $parameters) {
 
   $bank = new CesBank();
   $exchange = ces_exchange_load($code_exchange);
 
   // If uid print info user.
-  if ( $account ) {
+  if ( $account_id ) {
     // Id or Name.
-    if ( is_int($account) ) {
-      $account = $bank->getAccount($account);
+    if ( is_numeric($account_id) ) {
+      $account = $bank->getAccount($account_id);
     }
     else {
-      $account = $bank->getAccountByName($account);
+      $account = $bank->getAccountByName($account_id);
     }
   }
 

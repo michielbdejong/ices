@@ -3,6 +3,8 @@
 ## @file test_rest.sh
 ## @brief Test rest service.
 ##
+## @todo Implementar update user y account.
+##
 ## Documentation:
 ##
 ## - http://curl.haxx.se/docs/httpscripting.html
@@ -249,6 +251,7 @@ echo
 
 if [ "$USER_UID" != "" ] ; then
   test_rest_account_create $USER_UID
+  test_rest_user_update $USER_UID
 else
   echo
   echo Error: No user created
@@ -257,6 +260,52 @@ else
 fi
 
 }
+
+function test_rest_user_update() {
+
+  local USER_ID=$1
+
+  local action="${service_url}users/update/$exchange/$USER_ID"
+  local cmd="-k " # Saltar certificado.
+  local tmp="/tmp/update_user.html"
+
+  [[ "$debug" == "FALSE" ]] && cmd="$cmd -s "
+  [[ "$debug" == "TRUE" ]] && cmd="$cmd -v "
+
+  limitchain=0
+  kind=0
+  state=1
+
+  user=$USER_UID
+
+curl $cmd \
+  -H "Content-type: application/json" \
+  -H "Authorization: Bearer $authorization_access_token" \
+  --cookie $cookie_path -X POST \
+  $action \
+-d"
+{
+  \"ces_phonehome\":\"972972972\",
+  \"status\":\"0\"
+}
+" > $tmp
+
+echo 
+echo Salida: $tmp
+echo
+
+cat $tmp | pjson
+
+
+echo
+echo Action: $action
+echo Salida: $tmp
+echo Access token: $authorization_access_token
+echo Opciones Curl: $cmd --request GET
+echo
+
+}
+
 
 function test_rest_account_create() {
 
@@ -313,7 +362,7 @@ echo Salida: $tmp
 echo
 
 # Recogemos uid de usuario.
-local ACCOUNT_ID=`cat $tmp | pjson | grep '"id": ' | cut -d: -f2 | cut -d\" -f2`
+local ACCOUNT_ID=`cat $tmp | pjson | grep '"account": "' | cut -d: -f2 | cut -d\" -f2`
 
 cat $tmp | pjson
 
@@ -325,6 +374,53 @@ echo Access token: $authorization_access_token
 echo Opciones Curl: $cmd --request GET
 echo
 echo ACCOUNT_ID: $ACCOUNT_ID
+echo
+
+test_rest_account_update $ACCOUNT_ID
+
+}
+
+function test_rest_account_update() {
+
+  local ACCOUNT_ID=$1
+
+  local action="${service_url}accounts/update/$exchange/$ACCOUNT_ID"
+  local cmd="-k " # Saltar certificado.
+  local tmp="/tmp/update_account.html"
+
+  [[ "$debug" == "FALSE" ]] && cmd="$cmd -s "
+  [[ "$debug" == "TRUE" ]] && cmd="$cmd -v "
+
+  limitchain=0
+  kind=0
+  state=1
+
+  user=$USER_UID
+
+curl $cmd \
+  -H "Content-type: application/json" \
+  -H "Authorization: Bearer $authorization_access_token" \
+  --cookie $cookie_path -X POST \
+  $action \
+-d"
+{
+  \"state\":\"0\",
+  \"user\":\"1\"
+}
+" > $tmp
+
+echo 
+echo Salida: $tmp
+echo
+
+cat $tmp | pjson
+
+
+echo
+echo Action: $action
+echo Salida: $tmp
+echo Access token: $authorization_access_token
+echo Opciones Curl: $cmd --request GET
 echo
 
 }
@@ -372,6 +468,10 @@ if [ -z $authorization_access_token ] ; then
 fi
 
 [[ "$debug" == "TRUE" ]] && echo -e "\ncookie file: $cookie_path\n"
+
+
+# Probando creación de usuarios
+test_rest_users_create ; exit # DEV
 
 # Si no tenemos action las disparamos todas.
 if [ -z $action ] ; then
