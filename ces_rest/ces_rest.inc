@@ -11,6 +11,61 @@
  */
 
 /**
+ * Index ces rest exchange.
+ */
+function _ces_rest_exchange_index($code_exchange) {
+  
+  global $user;
+
+  $output = FALSE;
+
+  $bank = new CesBank();
+  $exchange = $bank->getExchangeByName($code_exchange);
+  return $exchange;
+
+  }
+/**
+ * Index ces rest transactions.
+ *
+ * @todo Acabar función.
+ * @todo Búsqueda por fecha, cuenta, ....
+ */
+function _ces_rest_transactions_index($code_exchange, $account, $parameters) {
+  
+  global $user;
+
+  $output = FALSE;
+
+  $exchange = ces_exchange_load($code_exchange);
+  $bank = new CesBank();
+  $exchange = $bank->getExchange($exchange['id']);
+
+  if ($exchange === FALSE) {
+    $output['error'] = t('Invalid exchange');
+  }
+
+  // If uid print info user.
+  if ( $account ) {
+    // Id or Name.
+    if ( intval($account) ) {
+      $account = $bank->getAccount($account);
+    }
+    else {
+      $account = $bank->getAccountByName($account);
+    }
+  }
+
+  // ces_bank.pages.inc line: 765
+  if ($account) {
+    $conditions['account'] = $account['id'];
+  }
+  else {
+    $conditions['exchange'] = $exchange['id'];
+  }
+  return $transactions = $bank->getTransactions($conditions);
+}
+
+/**
  * Index ces rest.
  *
  * @todo Búsqueda de usuario por Cuenta, nombre, apellido, email.
@@ -53,8 +108,6 @@ function _ces_rest_index($code_exchange, $uid, $parameters) {
 
 /**
  * Add user.
- *
- * @todo Validar datos.
  */
 
 function _ces_rest_add_user($code_exchange, $parameters) {
@@ -97,8 +150,6 @@ function _ces_rest_add_user($code_exchange, $parameters) {
 }
 /**
  * Update user.
- *
- * @todo Validar datos.
  */
 
 function _ces_rest_update_user($code_exchange, $uid, $parameters) {

@@ -69,6 +69,7 @@ function ces_rest_install() {
     ),
   );
   $endpoint->resources = array(
+    // Users.
     'cr_users' => array(
       'alias' => 'users',
       'actions' => array(
@@ -103,7 +104,7 @@ function ces_rest_install() {
         ),
       ),
     ),
-    // Vista de cuentas.
+    // Accounts.
     'cr_accounts' => array(
       'alias' => 'accounts',
       'actions' => array(
@@ -126,6 +127,36 @@ function ces_rest_install() {
           ),
         ),
       ),
+      'operations' => array(
+        'index' => array(
+          'enabled' => '1',
+          'settings' => array(
+            'oauth2_server' => array(
+              'require_authentication' => '1',
+              'scope' => 'cesrest',
+            ),
+          ),
+        ),
+      ),
+    ),
+    // Transactions.
+    'cr_transactions' => array(
+      'alias' => 'transactions',
+      'operations' => array(
+        'index' => array(
+          'enabled' => '1',
+          'settings' => array(
+            'oauth2_server' => array(
+              'require_authentication' => '1',
+              'scope' => 'cesrest',
+            ),
+          ),
+        ),
+      ),
+    ),
+    // Exchange.
+    'cr_exchange' => array(
+      'alias' => 'exchange',
       'operations' => array(
         'index' => array(
           'enabled' => '1',

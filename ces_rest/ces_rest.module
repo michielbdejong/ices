@@ -16,6 +16,60 @@
  */
 function ces_rest_services_resources() {
   return array(
+    'cr_exchange' => array(
+      // Alias exchange.
+      'operations' => array(
+        'index' => array(
+          'help' => 'Retrieves info of transactions',
+          'file' => array('file' => 'inc', 'module' => 'ces_rest'),
+          'callback' => '_ces_rest_exchange_index',
+          'access callback' => 'ces_rest_access',
+          'access arguments' => array('admin', 'exchange'),
+          'access arguments append' => TRUE,
+          'args' => array(
+            array(
+              'name' => 'code_exchange',
+              'type' => 'string',
+              'description' => 'Code of exchange',
+              'source' => array('path' => '0'),
+              'optional' => FALSE,
+              'default value' => FALSE,
+            ),
+          ),
+        ),
+      ),
+    ),
+    'cr_transactions' => array(
+      // Alias transactions.
+      'operations' => array(
+        'index' => array(
+          'help' => 'Retrieves a listing of transactions',
+          'file' => array('file' => 'inc', 'module' => 'ces_rest'),
+          'callback' => '_ces_rest_transactions_index',
+          'access callback' => 'ces_rest_access',
+          'access arguments' => array('admin', 'exchange'),
+          'access arguments append' => TRUE,
+          'args' => array(
+            array(
+              'name' => 'code_exchange',
+              'type' => 'string',
+              'description' => 'Code of exchange',
+              'source' => array('path' => '0'),
+              'optional' => FALSE,
+              'default value' => FALSE,
+            ),
+            array(
+              'name' => 'account',
+              'type' => 'string',
+              'description' => 'Account. Id or name',
+              'source' => array('path' => '1'),
+              'optional' => TRUE,
+              'default value' => FALSE,
+            ),
+          ),
+        ),
+      ),
+    ),
     'cr_accounts' => array(
       // Alias accounts.
       'actions' => array(

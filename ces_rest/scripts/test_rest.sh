@@ -470,8 +470,8 @@ fi
 [[ "$debug" == "TRUE" ]] && echo -e "\ncookie file: $cookie_path\n"
 
 
-# Probando creación de usuarios
-test_rest_users_create ; exit # DEV
+# Probando creación y modificación de usuarios y cuentas.
+# test_rest_users_create ; exit # DEV
 
 # Si no tenemos action las disparamos todas.
 if [ -z $action ] ; then
