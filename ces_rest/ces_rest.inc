@@ -14,16 +14,13 @@
  * Index ces rest exchange.
  */
 function _ces_rest_exchange_index($code_exchange) {
-  
-  global $user;
-
-  $output = FALSE;
 
   $bank = new CesBank();
   $exchange = $bank->getExchangeByName($code_exchange);
   return $exchange;
 
-  }
+}
+
 /**
  * Index ces rest transactions.
  *
@@ -31,8 +28,6 @@ function _ces_rest_exchange_index($code_exchange) {
  * @todo Búsqueda por fecha, cuenta, ....
  */
 function _ces_rest_transactions_index($code_exchange, $account, $parameters) {
-  
-  global $user;
 
   $output = FALSE;
 
@@ -45,9 +40,9 @@ function _ces_rest_transactions_index($code_exchange, $account, $parameters) {
   }
 
   // If uid print info user.
-  if ( $account ) {
+  if ($account) {
     // Id or Name.
-    if ( intval($account) ) {
+    if (intval($account)) {
       $account = $bank->getAccount($account);
     }
     else {
@@ -55,14 +50,15 @@ function _ces_rest_transactions_index($code_exchange, $account, $parameters) {
     }
   }
 
-  // ces_bank.pages.inc line: 765
+  // @see ces_bank.pages.inc, line 765.
   if ($account) {
     $conditions['account'] = $account['id'];
   }
   else {
     $conditions['exchange'] = $exchange['id'];
   }
-  return $transactions = $bank->getTransactions($conditions);
+  $output = $bank->getTransactions($conditions);
+  return $output;
 }
 
 /**
@@ -71,23 +67,22 @@ function _ces_rest_transactions_index($code_exchange, $account, $parameters) {
  * @todo Búsqueda de usuario por Cuenta, nombre, apellido, email.
  */
 function _ces_rest_index($code_exchange, $uid, $parameters) {
-  
+
   global $user;
 
   $output = FALSE;
 
   // If uid print info user.
-  if ( $uid ) {
+  if ($uid) {
     // Comprobar que el usuario pertenece a la red.
     $user_load = user_load($uid);
     $bank = new CesBank();
     $output[] = array(
       'user'     => $user_load,
-      'accounts' => $bank->getUserAccounts($uid)
+      'accounts' => $bank->getUserAccounts($uid),
     );
     return $output;
   }
-
 
   // If not uid print list users.
   $bank = new CesBank();
@@ -95,10 +90,10 @@ function _ces_rest_index($code_exchange, $uid, $parameters) {
   $accounts = $bank->getAllAccounts(array('exchange' => $exchange['id']));
 
   foreach ($accounts as $account) {
-    foreach ( $account['users'] as $user ) {
+    foreach ($account['users'] as $user) {
       $output[$user['user']] = array(
         'user'     => user_load($user['user']),
-        'accounts' => $bank->getUserAccounts($user['user'])
+        'accounts' => $bank->getUserAccounts($user['user']),
       );
     }
   }
@@ -109,10 +104,7 @@ function _ces_rest_index($code_exchange, $uid, $parameters) {
 /**
  * Add user.
  */
-
 function _ces_rest_add_user($code_exchange, $parameters) {
-
-  // Validate data.
 
   // The user fields.
   $fields = array(
@@ -151,132 +143,138 @@ function _ces_rest_add_user($code_exchange, $parameters) {
 /**
  * Update user.
  */
-
 function _ces_rest_update_user($code_exchange, $uid, $parameters) {
 
   // The user fields.
-  foreach( $parameters AS $key => $value ) {
+  foreach ($parameters as $key => $value) {
     switch ($key) {
       case 'name':
         $fields['name'] = $value;
         break;
-      
+
       case 'mail':
         $fields['mail'] = $value;
         break;
-      
+
       case 'pass':
         $fields['pass'] = $value;
         break;
-      
+
       case 'status':
         $fields['status'] = $value;
         break;
-      
+
       case 'language':
         $fields['language'] = $value;
         break;
-      
+
       case 'ces_firstname':
         $fields['ces_firstname'] = array(
           LANGUAGE_NONE => array(
             array(
               'value' => $value,
-            )
-          )
+            ),
+          ),
         );
         break;
-      
+
       case 'ces_surname':
         $fields['ces_surname'] = array(
           LANGUAGE_NONE => array(
             array(
               'value' => $value,
-            )
-          )
+            ),
+          ),
         );
         break;
-      
+
       case 'ces_address':
         $fields['ces_address'] = array(
           LANGUAGE_NONE => array(
             array(
               'value' => $value,
-            )
-          )
+            ),
+          ),
         );
         break;
-      
+
       case 'ces_town':
         $fields['ces_town'] = array(
           LANGUAGE_NONE => array(
             array(
               'value' => $value,
-            )
-          )
+            ),
+          ),
         );
         break;
-      
+
       case 'ces_postcode':
         $fields['ces_postcode'] = array(
           LANGUAGE_NONE => array(
             array(
               'value' => $value,
-            )
-          )
+            ),
+          ),
         );
         break;
-      
+
       case 'ces_phonemobile':
         $fields['ces_phonemobile'] = array(
           LANGUAGE_NONE => array(
             array(
               'value' => $value,
-            )
-          )
+            ),
+          ),
         );
         break;
-      
+
       case 'ces_phonework':
         $fields['ces_phonework'] = array(
           LANGUAGE_NONE => array(
             array(
               'value' => $value,
-            )
-          )
+            ),
+          ),
         );
         break;
-      
+
       case 'ces_phonehome':
         $fields['ces_phonehome'] = array(
           LANGUAGE_NONE => array(
             array(
               'value' => $value,
-            )
-          )
+            ),
+          ),
         );
         break;
-      
+
       case 'ces_website':
         $fields['ces_website'] = array(
           LANGUAGE_NONE => array(
             array(
               'value' => $value,
-            )
-          )
+            ),
+          ),
         );
         break;
-      
+
       default:
         // @todo Error campo desconocido.
-        $output['error'][] = 'Campo ['.$key.'] desconocido ['.$value.']'; 
+        $output['error'][] = 'Campo [' . $key . '] desconocido [' . $value . ']';
         break;
+
     }
   }
 
   $user_drupal = user_load($uid);
   if ($user_drupal === FALSE) {
-    throw new Exception(t('Error: nonexistent user (' . $uid . ').'));
+    throw new Exception(
+      t(
+        'Error: nonexistent user (@uid).', array(
+          '@uid' => $uid,
+        )
+      )
+    );
   }
 
   $user_drupal = user_save($user_drupal, $fields);
@@ -292,8 +290,6 @@ function _ces_rest_update_user($code_exchange, $uid, $parameters) {
  * Index ces rest.
  */
 function _ces_rest_accounts_index($code_exchange, $account, $parameters) {
-  
-  global $user;
 
   $output = FALSE;
 
@@ -301,9 +297,9 @@ function _ces_rest_accounts_index($code_exchange, $account, $parameters) {
   $exchange = ces_exchange_load($code_exchange);
 
   // If uid print info user.
-  if ( $account ) {
+  if ($account) {
     // Id or Name.
-    if ( intval($account) ) {
+    if (intval($account)) {
       $output = $bank->getAccount($account);
     }
     else {
@@ -311,7 +307,6 @@ function _ces_rest_accounts_index($code_exchange, $account, $parameters) {
     }
     return $output;
   }
-
 
   // If not uid print list users.
   $accounts = $bank->getAllAccounts(array('exchange' => $exchange['id']));
@@ -325,7 +320,7 @@ function _ces_rest_accounts_index($code_exchange, $account, $parameters) {
 /**
  * Add account.
  *
- * kind: Tipos de cuenta.
+ * Kind: Tipos de cuenta.
  *
  * INDIVIDUAL = 0 (Default)
  * SHARED = 1
@@ -339,7 +334,6 @@ function _ces_rest_accounts_index($code_exchange, $account, $parameters) {
  * ACTIVE = 1 (Default)
  * LOCKED = 2
  * CLOSED = 3
- *
  */
 function _ces_rest_add_account($code_exchange, $parameters) {
 
@@ -350,20 +344,19 @@ function _ces_rest_add_account($code_exchange, $parameters) {
   $user = user_load($user_uid);
 
   // @todo Validate parameters.
+  $name = (isset($parameters['name']) ? $parameters['name'] : FALSE);
 
-  $name = ( isset($parameters['name']) ? $parameters['name'] : FALSE ); 
-
-  if ( ! $name ) {
+  if (!$name) {
     $default_account = $bank->getDefaultAccount($exchange['id']);
     $name = $default_account['name'];
     // Es posible que no este libre.
-    $code_exchange = substr($name,0,4);
-    $number_account = substr($name,4,8);
+    $code_exchange = substr($name, 0, 4);
+    $number_account = substr($name, 4, 8);
     do {
       $number_account++;
-      $name_free = $code_exchange . sprintf('%1$04d', $number_account );
+      $name_free = $code_exchange . sprintf('%1$04d', $number_account);
       $account_free = $bank->getAccountByName($name_free);
-    } while ( $bank->getAccountByName($name_free) !== FALSE );
+    } while ($bank->getAccountByName($name_free) !== FALSE);
 
     $name = $name_free;
   }
@@ -375,7 +368,6 @@ function _ces_rest_add_account($code_exchange, $parameters) {
       'name' => $name,
       'limitchain' => $limit['id'],
       'kind' => $parameters['kind'],
-      //'state' => CesBankLocalAccount::STATE_HIDDEN,
       'state' => $parameters['state'],
       'users' => array(
         array(
@@ -385,9 +377,9 @@ function _ces_rest_add_account($code_exchange, $parameters) {
       ),
     );
 
-    $bank->createAccount($account, FALSE); 
+    $bank->createAccount($account, FALSE);
     $bank->activateAccount($account);
-    $output['account'] = $account; 
+    $output['account'] = $account;
   }
   catch (Exception $e) {
     $output['error'] = $e->getMessage();
@@ -406,9 +398,9 @@ function _ces_rest_update_account($code_exchange, $account_id, $parameters) {
   $exchange = ces_exchange_load($code_exchange);
 
   // If uid print info user.
-  if ( $account_id ) {
+  if ($account_id) {
     // Id or Name.
-    if ( is_numeric($account_id) ) {
+    if (is_numeric($account_id)) {
       $account = $bank->getAccount($account_id);
     }
     else {
@@ -418,12 +410,12 @@ function _ces_rest_update_account($code_exchange, $account_id, $parameters) {
 
   try {
 
-    foreach ($parameters AS $key => $value) {
+    foreach ($parameters as $key => $value) {
       $account[$key] = $value;
     }
 
-    $bank->updateAccount($account, FALSE); 
-    $output['account'] = $account; 
+    $bank->updateAccount($account, FALSE);
+    $output['account'] = $account;
   }
   catch (Exception $e) {
     $output['error'] = $e->getMessage();

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Implement the Ces Rest Module
+ * Implement the Ces Rest Module.
  */
 
 /**
@@ -12,7 +12,7 @@
  */
 
 /**
- * Implementation of hook_services_resources().
+ * Implementation of hook_services_resources.
  */
 function ces_rest_services_resources() {
   return array(
@@ -85,21 +85,18 @@ function ces_rest_services_resources() {
               'name' => 'code_exchange',
               'type' => 'string',
               'description' => 'Code of exchange',
-              // 'source' => array(
-              //   'params' => 'code_exchange',
-              // ),
               // This parameter going with the url.
               'source' => array('path' => '0'),
               'optional' => FALSE,
               'default value' => FALSE,
             ),
             array(
-             'name' => 'parameters',
-             'type' => 'array',
-             'description' => '',
-             'source' => 'data',
-             'optional' => TRUE,
-             'default value' => array(),
+              'name' => 'parameters',
+              'type' => 'array',
+              'description' => '',
+              'source' => 'data',
+              'optional' => TRUE,
+              'default value' => array(),
             ),
           ),
         ),
@@ -115,9 +112,6 @@ function ces_rest_services_resources() {
               'name' => 'code_exchange',
               'type' => 'string',
               'description' => 'Code of exchange',
-              // 'source' => array(
-              //   'params' => 'code_exchange',
-              // ),
               // This parameter going with the url.
               'source' => array('path' => '1'),
               'optional' => FALSE,
@@ -127,21 +121,18 @@ function ces_rest_services_resources() {
               'name' => 'account',
               'type' => 'string',
               'description' => 'Account id or name',
-              // 'source' => array(
-              //   'params' => 'code_exchange',
-              // ),
               // This parameter going with the url.
               'source' => array('path' => '2'),
               'optional' => TRUE,
               'default value' => FALSE,
             ),
             array(
-             'name' => 'parameters',
-             'type' => 'array',
-             'description' => '',
-             'source' => 'data',
-             'optional' => TRUE,
-             'default value' => array(),
+              'name' => 'parameters',
+              'type' => 'array',
+              'description' => '',
+              'source' => 'data',
+              'optional' => TRUE,
+              'default value' => array(),
             ),
           ),
         ),
@@ -159,9 +150,6 @@ function ces_rest_services_resources() {
               'name' => 'code_exchange',
               'type' => 'string',
               'description' => 'Code of exchange',
-              // 'source' => array(
-              //   'params' => 'code_exchange',
-              // ),
               // This parameter going with the url.
               'source' => array('path' => '0'),
               'optional' => FALSE,
@@ -171,21 +159,18 @@ function ces_rest_services_resources() {
               'name' => 'account',
               'type' => 'string',
               'description' => 'Account. Id or name',
-              // 'source' => array(
-              //   'params' => 'code_exchange',
-              // ),
               // This parameter going with the url.
               'source' => array('path' => '1'),
               'optional' => TRUE,
               'default value' => FALSE,
             ),
             array(
-             'name' => 'parameters',
-             'type' => 'array',
-             'description' => '',
-             'source' => 'param',
-             'optional' => TRUE,
-             'default value' => array(),
+              'name' => 'parameters',
+              'type' => 'array',
+              'description' => '',
+              'source' => 'param',
+              'optional' => TRUE,
+              'default value' => array(),
             ),
           ),
         ),
@@ -206,21 +191,18 @@ function ces_rest_services_resources() {
               'name' => 'code_exchange',
               'type' => 'string',
               'description' => 'Code of exchange',
-              // 'source' => array(
-              //   'params' => 'code_exchange',
-              // ),
               // This parameter going with the url.
               'source' => array('path' => '0'),
               'optional' => FALSE,
               'default value' => FALSE,
             ),
             array(
-             'name' => 'parameters',
-             'type' => 'array',
-             'description' => '',
-             'source' => 'data',
-             'optional' => TRUE,
-             'default value' => array(),
+              'name' => 'parameters',
+              'type' => 'array',
+              'description' => '',
+              'source' => 'data',
+              'optional' => TRUE,
+              'default value' => array(),
             ),
           ),
         ),
@@ -236,9 +218,6 @@ function ces_rest_services_resources() {
               'name' => 'code_exchange',
               'type' => 'string',
               'description' => 'Code of exchange',
-              // 'source' => array(
-              //   'params' => 'code_exchange',
-              // ),
               // This parameter going with the url.
               'source' => array('path' => '1'),
               'optional' => FALSE,
@@ -248,21 +227,18 @@ function ces_rest_services_resources() {
               'name' => 'uid',
               'type' => 'int',
               'description' => 'Id of user',
-              // 'source' => array(
-              //   'params' => 'code_exchange',
-              // ),
               // This parameter going with the url.
               'source' => array('path' => '2'),
               'optional' => TRUE,
               'default value' => FALSE,
             ),
             array(
-             'name' => 'parameters',
-             'type' => 'array',
-             'description' => '',
-             'source' => 'data',
-             'optional' => TRUE,
-             'default value' => array(),
+              'name' => 'parameters',
+              'type' => 'array',
+              'description' => '',
+              'source' => 'data',
+              'optional' => TRUE,
+              'default value' => array(),
             ),
           ),
         ),
@@ -280,9 +256,6 @@ function ces_rest_services_resources() {
               'name' => 'code_exchange',
               'type' => 'string',
               'description' => 'Code of exchange',
-              // 'source' => array(
-              //   'params' => 'code_exchange',
-              // ),
               // This parameter going with the url.
               'source' => array('path' => '0'),
               'optional' => FALSE,
@@ -292,21 +265,18 @@ function ces_rest_services_resources() {
               'name' => 'uid',
               'type' => 'int',
               'description' => 'Id of user',
-              // 'source' => array(
-              //   'params' => 'code_exchange',
-              // ),
               // This parameter going with the url.
               'source' => array('path' => '1'),
               'optional' => TRUE,
               'default value' => FALSE,
             ),
             array(
-             'name' => 'parameters',
-             'type' => 'array',
-             'description' => '',
-             'source' => 'param',
-             'optional' => TRUE,
-             'default value' => array(),
+              'name' => 'parameters',
+              'type' => 'array',
+              'description' => '',
+              'source' => 'param',
+              'optional' => TRUE,
+              'default value' => array(),
             ),
           ),
         ),
@@ -316,30 +286,23 @@ function ces_rest_services_resources() {
 }
 
 /**
-* Access callback for the ces_rest service.
-*
-* @param string $op
-*  The operation that's going to be performed.
-* @param array $args
-*  The arguments that will be passed to the callback.
-* @return bool
-*  Whether access is given or not.
-*/
-
+ * Access callback for the ces_rest service.
+ *
+ * @param string $permission
+ *   The operation that's going to be performed.
+ * @param array $object
+ *   The object that will be passed to the callback.
+ *
+ * @return args
+ *   The arguments that will be passed to the callback.
+ */
 function ces_rest_access($permission, $object, $args = FALSE) {
-  global $user;
 
-  if ( $args ) {
+  if ($args) {
     $code_exchange = $args[0];
     $exchange = ces_exchange_load($code_exchange);
     $objectid = $exchange['id'];
   }
-  // Debug.
-  // watchdog('cesrest', print_r(array(
-  //   'permission' => $permission,
-  //   'object'     => $object,
-  //   'args'       => $args
-  //   ),1));
 
   return ces_bank_access($permission, $object, $objectid);
 }

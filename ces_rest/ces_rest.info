@@ -3,13 +3,10 @@ description = Implements the rest protocol for financial transactions.
 core = 7.x
 package = ices
 
-files[] = ces_rest.test
-files[] = ces_rest.inc
-
 dependencies[] = ces_bank
 dependencies[] = oauth2_server
 dependencies[] = services
 dependencies[] = rest_server
 dependencies[] = services_views
 
-version = "7.x-0.1"
+version = "7.x-1.7"
