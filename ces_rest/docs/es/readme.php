@@ -147,6 +147,71 @@ Acciones posibles:
 
   Devuelve objeto JSON con la información de la ecored.
 
+@section example_client Cliente de ejemplo.
+
+Salida de la ayuda de test_rest.sh
+
+@code
+$ ./ces_rest/scripts/test_rest.sh -h
+
+Uso: test_rest.sh 
+
+Options:
+
+-d                     Debuger.
+-l [option]            TRUE/FALSE/LOGOUT Default FALSE.
+-at [token]            Authentication oauth2 token.
+-ar [token]            Authentication oauth2 refresh.
+-h                     This help.
+-c [file conf]         File with another configuration.     
+-a [action] [params]   Name scope and params.
+                       Acciones prefijadas: users/NET1 accounts/NET1 accounts/NET1/NET10001 users/NET1/3 users/create/NET1
+
+
+Para poder testear con este script es necesario crear un cliente en el servidor
+con los datos de la configuración.
+
+http://test.integralces.net/testices/admin/structure/oauth2-servers/manage/cesrest/clients/add
+
+Etiqueta: Test Client
+Client ID: test_client
+Client secret: test_secret
+Redirect URIs: http://localhost/headers.php (Opcional)
+
+Conceder permisos a los usuarios registrados para utilizar oauth2
+
+Use OAuth2 Server 
+
+Uso del script:
+
+Obtener un token del usuario Riemann con la extensión RESTClient
+de firefox (www.restclient.net).
+
+Para ello primero hay que logearse en integralces y pedir el token con la 
+extensión restclient.
+
+Desde restclient, vamos a Authentication / Oauth2
+
+Rellenamos formulario con los siguientes datos:
+
+- Response type: code
+- Client identifier: test_client
+- Client secret: test_secret
+- Authorization endpoint: http://test.integralces.net/testices/oauth2/authorize
+- Token endpoint: http://test.integralces.net/testices/oauth2/token
+- Access token request method: POST
+- Redirection endpoint: http://localhost/headers.php (Opcional)
+- Access token scope: cesrest
+- State: xyz
+
+Enviar token al script:
+
+./ces_rest/scripts/test_rest.sh -at [token]
+
+El token será guardado en un archivo temporal.
+
+A partir de aquí se puede hacer pruebas con las diferentes acciones posibles.
+@endcode
 
 @}
 */

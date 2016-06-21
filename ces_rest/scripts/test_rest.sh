@@ -3,14 +3,6 @@
 ## @file test_rest.sh
 ## @brief Test rest service.
 ##
-## @todo Implementar update user y account.
-##
-## Documentation:
-##
-## - http://curl.haxx.se/docs/httpscripting.html
-## - https://www.drupal.org/node/1795770
-## - http://docs.oracle.com/cd/E40329_01/dev.1112/e27134/restapioauthl.htm#AIDEV6760
-
 ## Dependencies.
 ##
 ## pjson: sudo pip install pjson
@@ -86,6 +78,7 @@ Options:
 -at [token]            Authentication oauth2 token.
 -ar [token]            Authentication oauth2 refresh.
 -h                     This help.
+-c [file conf]         File with another configuration.     
 -a [action] [params]   Name scope and params.
                        Acciones prefijadas: ${actions[*]}
 
@@ -122,7 +115,7 @@ Rellenamos formulario con los siguientes datos:
 - Authorization endpoint: $endpoint_auth
 - Token endpoint: $endpoint_token
 - Access token request method: POST
-- Redirection endpoint: $redirect_uri \*Opcional
+- Redirection endpoint: $redirect_uri (Opcional)
 - Access token scope: $scope
 - State: $state
 
