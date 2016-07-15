@@ -146,6 +146,8 @@ function ces_statistics_page($exchange = NULL) {
     DATE_FORMAT(from_unixtime(created), '%Y-%m') as usersdate
     FROM {ces_account}
     WHERE exchange = :exchange
+    AND state = 1
+    AND kind != 5
     GROUP BY DATE_FORMAT(from_unixtime(created), '%Y-%m')
     ORDER BY created ASC",
     array(
