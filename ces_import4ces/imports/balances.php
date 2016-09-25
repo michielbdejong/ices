@@ -40,7 +40,7 @@ function ces_import4ces_parse_balances($import_id, $data, $row, &$context, $widt
 
     if ( $balance !== $balance_row ) {
       ces_save_discarded_record($import_id, $data, 
-        'Different balance: ' . $balance . ' / ' . $balance_row
+        'Actual balance: ' . $balance . ' Dif: ' . round( ( $balance - $balance_row ), 2 )
       );
     }
 

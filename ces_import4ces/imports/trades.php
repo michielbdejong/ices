@@ -47,10 +47,17 @@ function ces_import4ces_parse_trades($import_id, $data, $row, &$context, $width_
       $trade_user_id = $user->uid;
     }
 
+    if ( $data['type'] == 'sess' ) {
+      $amount = ( $data['buyer_amount'] + $data['buyer_levy'] );
+    } 
+    else {
+      $amount = ( $data['buyer_amount'] - $data['buyer_levy'] );
+    }
+
     $trans = array(
       'fromaccountname' => $account_buyer['name'],
       'toaccountname' => $account_seller['name'],
-      'amount' => $data['buyer_amount'],
+      'amount' => $amount, 
       'concept' => $data['description'],
       'user' => $trade_user_id,
       'created' => strtotime($data['date_entered']),
@@ -65,7 +72,7 @@ function ces_import4ces_parse_trades($import_id, $data, $row, &$context, $width_
       ->fields(array(
         'import_id' => $import_id,
         'object' => 'trades',
-        'object_id' => 0,
+        'object_id' => $trans['id'],
         'row' => $row,
         'data' => serialize($extra_info),
       ))->execute();
