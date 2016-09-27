@@ -140,29 +140,58 @@ function ces_statistics_page($exchange = NULL) {
     drupal_set_message(filter_xss($error_message));
   }
 
-  // Extract and format users data.
+  // Extract number of users.
   $resultusers = db_query("
-    SELECT COUNT(DATE_FORMAT(from_unixtime(created), '%Y-%m')) AS usersnumber,
-    DATE_FORMAT(from_unixtime(created), '%Y-%m') as usersdate
+    SELECT DATE_FORMAT(from_unixtime(created), '%Y-%m') as usersdate, 
+    DATE_FORMAT(from_unixtime(modified), '%Y-%m') as modifieddate, 
+    state
     FROM {ces_account}
     WHERE exchange = :exchange
-    AND state = 1
+    -- AND state = 1
     AND kind != 5
-    GROUP BY DATE_FORMAT(from_unixtime(created), '%Y-%m')
     ORDER BY created ASC",
     array(
       ':exchange' => $exchange['id'],
     ));
 
   $totalusers = 0;
-  $staticsusers = array();
+  $totalaccountcanceled = 0;
+  $mouthusers = array();
+  $mouthuserscanceled = array();
   foreach ($resultusers as $record) {
-    $totalusers += $record->usersnumber;
+    $totalusers++;
+    $mouthusers[$record->usersdate] = $totalusers;
+    if ( $record->state != 1 ) {
+      $totalusers--;
+      $totalaccountcanceled++;
+      if ( isset( $mouthuserscanceled[$record->modifieddate] ) ) {
+        $mouthuserscanceled[$record->modifieddate]++;
+        }
+      else {
+        $mouthuserscanceled[$record->modifieddate] = 1;
+        }
+      }
+    };
+
+  foreach ( $mouthuserscanceled as $datecanceled => $userscanceled ) {
+    $resta = FALSE;
+    foreach ( $mouthusers as $date => &$val ) {
+      if ( $datecanceled == $date ) {
+        $resta = TRUE;
+        }
+      if ( $resta ) {
+        $val = $val - $userscanceled;
+        }
+      }
+    };
+
+  $staticsusers = array();
+  foreach ( $mouthusers as $mouth => $users ) {
     $staticsusers[] = array(
-      'usersdate' => $record->usersdate,
-      'usersnumber' => (int) $totalusers,
+      'usersdate' => $mouth,
+      'usersnumber' => (int) $users,
     );
-  };
+  }
 
   $longarray = count($staticsusers);
   $todaymonth = date("Y-m", time());
@@ -306,7 +335,7 @@ function ces_statistics_page($exchange = NULL) {
     <li>' . t('Number of accounts:') . ' ' . $totalusers . '</li>
     <li>' . t('Number of transactions:') . ' ' . $totalnumber . '</li>
     <li>' . t('Amount of transactions:') . ' ' . $totalamount . '</li>
-    <li>' . t('Average transaction:') . ' ' . $averagetrans . '</li>
+    <li>' . t('Average transaction:') . ' ' . round($averagetrans,2) . '</li>
     </ul>
     <h3 style="text-align:center;margin-bottom:0;">' . t('Number of accounts') . '</h3>
     <div id="chartdiv1"></div><br/><br/>
