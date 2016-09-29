@@ -62,7 +62,8 @@ function ces_import4ces_parse_users($import_id, $data, $row, &$context, $width_a
       'pub' => CesBankLocalAccount::TYPE_PUBLIC,
       'vir' => CesBankLocalAccount::TYPE_VIRTUAL,
     );
-    $language = _ces_import4ces_get_language($data['language_short']);
+    //$language = _ces_import4ces_get_language($data['language_short']);
+    $language = $data['language_short'];
 
     // Set up the user fields.
     $fields = array(
