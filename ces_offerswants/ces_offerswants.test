@@ -441,7 +441,7 @@ class CesOffersWantsTestCase extends DrupalWebTestCase {
     // Create an offer.
     $this->drupalGet('');
     $this->clickLink(t('My account'));
-    $this->clickLink(t('My offers'));
+    $this->clickLink(t('Offers'));
     $this->clickLink(t('Add offer'));
     $this->assertText(t('My offers'));
     $this->assertText(t('Title'));
@@ -475,7 +475,7 @@ class CesOffersWantsTestCase extends DrupalWebTestCase {
     // Edit an offer.
     $this->drupalGet('');
     $this->clickLink(t('My account'));
-    $this->clickLink(t('My offers'));
+    $this->clickLink(t('Offers'));
     $this->clickLink(t('Edit'));
     $this->assertText(t('My offers'));
     $this->assertText(t('Title'));
@@ -498,7 +498,7 @@ class CesOffersWantsTestCase extends DrupalWebTestCase {
   protected function deleteOffer() {
     $this->drupalGet('');
     $this->clickLink(t('My account'));
-    $this->clickLink(t('My offers'));
+    $this->clickLink(t('Offers'));
     $this->clickLink(t('Delete'));
     $this->assertText(t('Are you sure you want to delete the offer'));
     $this->drupalPost(NULL, array(), t('Delete'));
