@@ -128,10 +128,10 @@ function ces_import4ces_admin_page() {
     }
     else {
       $report_file = CES_IMPORT4CES_FILES_URI . '/' . $record->files . '/migration_report.csv';
-      if ( file_exists($report_file) ) {
+      if (file_exists($report_file)) {
         $report_url = file_create_url($report_file);
         $report_url = parse_url($report_url);
-        $report_url = $report_url['scheme'] . '://' .  $report_url['host'] . $report_url['path'];
+        $report_url = $report_url['scheme'] . '://' . $report_url['host'] . $report_url['path'];
         $actions .= l(t('Report'), $report_url);
         $actions .= ' ';
       }

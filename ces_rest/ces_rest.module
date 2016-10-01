@@ -12,7 +12,7 @@
  */
 
 /**
- * Implementation of hook_services_resources.
+ * Implements of hook_services_resources().
  */
 function ces_rest_services_resources() {
   return array(
