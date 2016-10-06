@@ -356,10 +356,21 @@ function ces_import4ces_import_form_submit($form, &$form_state) {
   if ($import_id) {
 
     if ($form_state['values']['op'] == t('Skip row')) {
-      $row = $form_state['row']['row'];
-      $merge = array_combine($form_state['row']['heads'], $form_state['row']['columns']);
+      $row = $form_state['row'];
+      // $merge = array_combine($form_state['row']['heads'], $form_state['row']['columns']);
+      $merge = array();
+      $count = 0;
+      foreach ( $row['heads'] as $keys ) {
+        if ( isset($row['columns'][$count]) ) {
+          $merge[$keys] = $row['columns'][$count];
+        }
+        else {
+          $merge[$keys] = '';
+        }
+        $count++;
+      }
       ces_save_discarded_record($import_id, $merge);
-      ces_import4ces_update_row($import_id, $row);
+      ces_import4ces_update_row($import_id, $row['row']);
       $form_state['rebuild'] = TRUE;
       unset($form_state['manual_row']);
       return;
@@ -838,6 +849,7 @@ function ces_import4ces_import_delete_form_submit($form, &$form_state) {
     foreach ($accounts as $account) {
       $bank->deleteAccount($account['id']);
     }
+
     $userids = ces_import4ces_get_object_ids($import->id, 'user');
     foreach ($userids as $uid) {
       if ($uid != 1) {
@@ -859,6 +871,9 @@ function ces_import4ces_import_delete_form_submit($form, &$form_state) {
   db_delete('ces_import4ces_exchange')
     ->condition('id', $import->id)
     ->execute();
+
+  // Delete SESSION.
+  unset($_SESSION['ces_import4ces_row_error']);
 
   // That's all.
   drupal_set_message(t('Import data has been deleted.'));

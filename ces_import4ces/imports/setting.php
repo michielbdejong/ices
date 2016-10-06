@@ -35,7 +35,13 @@ function ces_import4ces_parse_setting($import_id, $setting, $row, &$context, $wi
       'status' => 1,
       'roles' => array(DRUPAL_AUTHENTICATED_RID => 'authenticated user'),
     );
-    $admin_user = user_save('', $record);
+
+    $admin_user = user_load_by_name($record['name']);
+
+    if ( ! $admin_user ) {
+      $admin_user = user_save('', $record);
+    }
+
     // Compute curency value and currency scale.
     $timevalues = array(
       'h' => 1,
@@ -74,7 +80,8 @@ function ces_import4ces_parse_setting($import_id, $setting, $row, &$context, $wi
       'data' => array(
         'registration_offers' => 1,
         'registration_wants' => 0,
-        'default_lang' => _ces_import4ces_get_language($setting['language_short']),
+        //'default_lang' => _ces_import4ces_get_language($setting['language_short']),
+        'default_lang' => $setting['language_short'],
       ),
     );
 
@@ -85,8 +92,8 @@ function ces_import4ces_parse_setting($import_id, $setting, $row, &$context, $wi
     $bank->activateExchange($exchange);
     // Update default credit/debit limit.
     $default_limit = $bank->getLimitChain($exchange['limitchain']);
-    $default_credit = $setting['CredLim'];
-    $default_debit = $setting['DebLim'];
+    $default_credit = $setting['default_credit_limit'];
+    $default_debit = $setting['default_debit_limit'];
     if ($default_credit != 0) {
       $default_limit['limits'][] = array(
         'classname' => 'CesBankAbsoluteCreditLimit',
@@ -118,13 +125,13 @@ function ces_import4ces_parse_setting($import_id, $setting, $row, &$context, $wi
     $context['results']['error'] = check_plain($e->getMessage());
     $_SESSION['ces_import4ces_row_error']['row']  = $row;
     $_SESSION['ces_import4ces_row_error']['m']    = $e->getMessage();
-    $_SESSION['ces_import4ces_row_error']['data'] = $data;
+    $_SESSION['ces_import4ces_row_error']['data'] = $setting;
     if ($width_ajax) {
       $result = array('status' => FALSE, 'data' => check_plain($e->getMessage()));
-      die(json_encode($result));
+      // die(json_encode($result));
     }
     else {
-      ces_import4ces_batch_fail_row($import_id, array_keys($data), array_values($data), $row, $context);
+      ces_import4ces_batch_fail_row($import_id, array_keys($setting), array_values($setting), $row, $context);
     }
   }
 }
