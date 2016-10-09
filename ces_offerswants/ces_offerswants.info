@@ -8,4 +8,4 @@ dependencies[] = ces_message
 dependencies[] = image
 files[] = ces_offerswants.test
 files[] = includes/ces_offerswants_html_email.inc
-version = "7.x-1.10"
+version = "7.x-1.11"

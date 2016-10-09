@@ -9,4 +9,4 @@ dependencies[] = services
 dependencies[] = rest_server
 dependencies[] = services_views
 
-version = "7.x-1.10"
+version = "7.x-1.11"
