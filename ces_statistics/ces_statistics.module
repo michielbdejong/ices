@@ -266,6 +266,27 @@ function ces_statistics_page($exchange = NULL) {
     $staticsactivity[$i]['activitypercent'] = 100 * $staticsactivity[$i]['activitynumber'] / $totalusers;
   };
 
+  // Extract Total transactions amount In the last year.
+  $querytranslastyear = db_query("
+    SELECT SUM(t.amount) AS transamount
+    FROM {ces_transaction} t
+    INNER JOIN {ces_account} a
+    ON t.fromaccount = a.id
+    WHERE a.exchange = :exchange
+    AND t.created > :lastyear
+    GROUP BY a.exchange
+    ORDER BY t.created DESC
+    LIMIT 1
+    ",
+    array(
+      ':exchange' => $exchange['id'],
+      ':lastyear' => $lastyear,
+    )
+  );
+
+  
+  $resulttranslastyear = $querytranslastyear->fetchField();
+
   // Extract and format transactions data.
   $resulttrans = db_query("
     SELECT SUM(t.amount) AS transamount,
@@ -335,6 +356,7 @@ function ces_statistics_page($exchange = NULL) {
     <li>' . t('Number of accounts:') . ' ' . $totalusers . '</li>
     <li>' . t('Number of transactions:') . ' ' . $totalnumber . '</li>
     <li>' . t('Amount of transactions:') . ' ' . $totalamount . '</li>
+    <li>' . t('Amount last year:') . ' ' . round($resulttranslastyear,2) . '</li>
     <li>' . t('Average transaction:') . ' ' . round($averagetrans,2) . '</li>
     </ul>
     <h3 style="text-align:center;margin-bottom:0;">' . t('Number of accounts') . '</h3>
