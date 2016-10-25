@@ -135,8 +135,8 @@ CES. Allí cambiaremos las entradas "Incomming data URL" y "Server IP address" p
 que apunte a la nueva instalación. En el caso de integralces.net los datos son:
 
  - System: IntegralCES
- - Incomming data URL: http://www.integralces.net/ces/interop/cenip
- - Server IP address: 94.23.234.92
+ - Incomming data URL: https://www.integralces.net/ces/interop/cenip
+ - Server IP address: 46.105.161.99
 
 Seguidamente, hay que entrar con el usuario administrativo en nuestra red de 
 IntegralCES y configurar la red para aceptar transacciones externas. Se indica 
