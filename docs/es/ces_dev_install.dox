@@ -13,8 +13,8 @@ Este ejemplo utiliza ubuntu 16.04.
 
 Contenido
 
-  * Instalando las dependencias necesarias
-  * Ejecutar script de instalación.
+- Instalando las dependencias necesarias
+- Ejecutar script de instalación.
 
 ### Instalando dependencias
 
@@ -28,40 +28,40 @@ Chequear estado:
 
 Chequeamos estado:
 
-  $ drush status
-  PHP configuration     :  /etc/php/7.0/cli/php.ini 
-  Drush version         :  5.10.0                   
-  Drush configuration   :                           
+    $ drush status
+    PHP configuration     :  /etc/php/7.0/cli/php.ini 
+    Drush version         :  5.10.0                   
+    Drush configuration   :                           
 
 ### Ejecutar script de instalación
 
 Bajamos script.
 
-  wget http://cgit.drupalcode.org/ices/plain/scripts/install_ices.sh
+    wget http://cgit.drupalcode.org/ices/plain/scripts/install_ices.sh
 
 Creamos archivo de configuración.
 
-  $EDITOR ${HOME}/.puesta_punto_drupal.conf
+    $EDITOR ${HOME}/.puesta_punto_drupal.conf
 
 Añade las siguientes lineas al archivo de configuración y acaba de rellenar los datos.
 
-  NOMBRE_PROYECTO=ices
-  USUARIO_MYSQL=root
-  PASS_MYSQL=''
-  USUARIO_DRUPAL=''
-  USUARIO_PROYECTO=''
-  PASS_PROYECTO=''
-  EMAIL=""
-  DIR_SERVIDOR=''
-  USUARIO_APACHE=www-data
+    NOMBRE_PROYECTO=ices
+    USUARIO_MYSQL=root
+    PASS_MYSQL=''
+    USUARIO_DRUPAL=''
+    USUARIO_PROYECTO=''
+    PASS_PROYECTO=''
+    EMAIL=""
+    DIR_SERVIDOR=''
+    USUARIO_APACHE=www-data
   
 Damos permiso de jecución al script.
 
-  chmod +x install_ices.sh
+    chmod +x install_ices.sh
 
 Ejecutamos.
 
-  ./install_ices.sh
+    ./install_ices.sh
 
 
 
