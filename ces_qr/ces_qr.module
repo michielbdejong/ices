@@ -1,0 +1,145 @@
+<?php
+/**
+ * @file
+ * Drupal hooks for this module.
+ */
+
+/**
+ * @defgroup ces_qr Ces Qr
+ * @ingroup ices
+ * @{
+ * Qr from ICES
+ */
+
+/**
+ * Implements hook_libraries_info().
+ *
+ * For defining external libraries.
+ */
+function ces_qr_libraries_info() {
+  $libraries['phpqrcode'] = array(
+    'name' => 'phpqrcode library',
+    'vendor url' => 'https://sourceforge.net/projects/phpqrcode/',
+    'download url' => 'https://sourceforge.net/projects/phpqrcode/files/latest/download',
+    'version' => '1.1.4',
+    'files' => array(
+      'php' => array(
+        'qrlib.php',
+      ),
+    ),
+  );
+  return $libraries;
+}
+
+/**
+ * Implements hook_help().
+ */
+function ces_qr_help($path, $arg) {
+  if ($path == 'admin/help#ces_qr') {
+    // @todo Borrar.
+    // if (current_path() != 'admin/help/ces_statistics') {
+    //   // Because system_modules() executes hook_help() for each module to 'test'
+    //   // if they will return anything, but not actually display it, we want to
+    //   // return a TRUE value if this is not actually the help page.
+    //   return TRUE;
+    // }
+    $library = libraries_detect('phpqrcode');
+    $output  = '<dl>';
+    $output .= '<dt>' . t('Installation of') . ' ' . $library['name'] . '</dt>';
+    $output .= '<dd>';
+    $output .= l(t('Download the package with the necessary libraries'), $library['download url']);
+    $output .= '</dd>';
+
+    $output .= '<dd>';
+    $output .= 'Unzip the file';
+    $output .= '</dd>';
+
+    $output .= '<dd>';
+    $output .= 'And place to files in site/all/libraries/phpqrcode';
+
+    $output .= '<dd>';
+    $output .= 'If there is no directory should be created.';
+    $output .= '</dd>';
+    $output .= '<dd>';
+    $output .= "That's it.";
+    $output .= '</dd>';
+
+    $output .= '</dd>';
+    $output .= '</dl>';
+    return $output;
+  }
+}
+/**
+ * Implements hook_menu().
+ */
+function ces_qr_menu() {
+
+  $menu['ces/bank/account/qr'] = array(
+    'title' => 'QR',
+    'description' => 'Qr from transactions',
+    'page callback' => 'ces_qr_page',
+    'access callback' => 'ces_bank_access',
+    'access arguments' => array('view', 'account transactions',
+      CES_BANK_CURRENT_EXCHANGE,
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 990,
+  );
+  return $menu;
+}
+
+/**
+ * Generate Qr.
+ */
+function _generate_qr(){
+
+  $library = libraries_load('phpqrcode');
+  if (empty($library['loaded'])) {
+    $error_message = $library['error message'] . ' ' . l(t('Help'), 'admin/help/ces_qr');
+    drupal_set_message(filter_xss($error_message));
+    return FALSE;
+  }
+  $actual_account = ces_bank_get_current_account();
+  $qrdir = variable_get('file_public_path', conf_path() . '/files/qr');
+  $qrpath = $qrdir . "/" . $actual_account['name'] . '-qr.png'; 
+  if ( !file_exists($qrdir) ) {
+    mkdir($qrdir);
+  }
+  
+  // This is the  data to be added to the QR code.  
+  $text = 'https://' .$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . 'ces/bank/account/sell/' . $actual_account['id'];
+  include_once("sites/all/libraries/phpqrcode/qrlib.php");
+  // $lib =libraries_detect('phpqrcode');
+  // echo '<pre>lib: ' ; print_r($lib) ; echo '</pre>';  exit() ; // DEV  
+  QRcode::png($text, $qrpath);
+  return $qrpath;
+}
+/**
+ * Page with qr.
+ */
+function ces_qr_page($account = NULL) {
+  if ($account == FALSE) {
+    $account = ces_bank_get_current_account();
+  }
+  drupal_set_title($account['name'] . ' (QR)');
+
+  $qr = _generate_qr();
+
+  $page = array(
+    'message' => array(
+      '#markup' => '<p>' . 
+      t("This QR allows for faster transactions") . '.' .
+      '</p>' .
+      '<p>' .
+      t("Show your QR at who wants to make a transaction with you and he only have to scan it and it take you directly to the form") . '.' .
+      '</p>' .
+      '<img src="' . base_path() . $qr . '"/>'
+      ,
+    ),
+  );
+  return $page;
+}
+
+/**
+ * @}
+ */

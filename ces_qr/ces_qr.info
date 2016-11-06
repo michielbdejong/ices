@@ -1,0 +1,7 @@
+name = ICES QR Módule
+description = Gnerate QR.
+package = ices
+dependencies[] = ces_bank
+dependencies[] = libraries
+core = 7.x
+version = "7.x-1.11"

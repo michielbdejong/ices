@@ -1,0 +1,19 @@
+div.ces_qr {
+  padding: 0 !important;
+}
+
+div.ces_qr img {
+  width: 76px;
+}
+
+@media (max-width: 780px) {
+
+  div.ces_qr img {
+    width: 32px;
+  }
+  .ces_qr {
+      margin-top: 4px !important;
+      margin-right: 6px !important;
+  }
+
+}
