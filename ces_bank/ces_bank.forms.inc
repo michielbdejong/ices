@@ -1713,7 +1713,7 @@ function ces_bank_transaction_form($form, &$form_state, $op, $arg, $to_account_i
     }
     else {
       $fromaccount = $bank->getAccount($from_account_id);
-      $fromexchange = $exchanges[$fromexchangeid];
+      $fromexchange = $exchanges[$fromaccount['exchange']];
       if (empty($fromaccount)) {
         drupal_set_message(t('Account id %id does not exist, is not active yet, or does not belong to exchange %ex', array('%id' => $from_account_id, '%ex' => $fromexchange['code'])), 'error');
         return FALSE;
@@ -1726,6 +1726,33 @@ function ces_bank_transaction_form($form, &$form_state, $op, $arg, $to_account_i
       $form['fromaccountname'] = array(
         '#type' => 'value',
         '#value' => $fromaccount['name'],
+      );
+      $content_info = '<p>' . 
+          '<b>' . t('Account') . ':</b> ' . $fromaccount['name'] .
+          '</p>'.
+          '<p>'.
+          '<b>' . t('Exchange') . ':</b> ' . $fromexchange['shortname'] .
+          '</p>';
+
+      if ( count($fromaccount['users']) > 1 ) {
+          $content_info .= '<p>' .
+            '<b>' . t('Users') . ':</b> ';
+      }
+      foreach($fromaccount['users'] AS $fromuser) {
+        $user_info = user_load($fromuser['user']);
+        if ( count($fromaccount['users']) > 1 ) {
+          $content_info .= '<p>' .
+            ces_user_get_name($user_info->name) .
+            '</p>';
+        }
+        else {
+          $content_info .= '<p>' .
+            '<b>' . t('User') . ':</b> ' . ces_user_get_name($user_info) .
+            '</p>';
+        }
+      }
+      $form['message'] = array(
+        '#markup' => $content_info,
       );
     }
     $form['concept'] = array(
