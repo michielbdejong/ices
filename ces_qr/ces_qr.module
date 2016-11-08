@@ -36,13 +36,6 @@ function ces_qr_libraries_info() {
  */
 function ces_qr_help($path, $arg) {
   if ($path == 'admin/help#ces_qr') {
-    // @todo Borrar.
-    // if (current_path() != 'admin/help/ces_statistics') {
-    //   // Because system_modules() executes hook_help() for each module to 'test'
-    //   // if they will return anything, but not actually display it, we want to
-    //   // return a TRUE value if this is not actually the help page.
-    //   return TRUE;
-    // }
     $library = libraries_detect('phpqrcode');
     $output  = '<dl>';
     $output .= '<dt>' . t('Installation of') . ' ' . $library['name'] . '</dt>';
