@@ -4,4 +4,4 @@ package = ices
 dependencies[] = ces_bank
 dependencies[] = libraries
 core = 7.x
-version = "7.x-1.11"
+version = "7.x-1.12"

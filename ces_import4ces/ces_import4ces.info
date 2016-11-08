@@ -7,4 +7,4 @@ dependencies[] = ices
 dependencies[] = ces_bank
 
 stylesheets[all][] = style.css
-version = "7.x-1.11"
+version = "7.x-1.12"
