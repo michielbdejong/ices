@@ -100,7 +100,7 @@ function _generate_qr(){
   }
   
   // This is the  data to be added to the QR code.  
-  $text = 'https://' .$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . 'ces/bank/account/sell/' . $actual_account['id'];
+  $text = 'https://' .$_SERVER['HTTP_HOST'] . base_path() . 'ces/bank/account/sell/' . $actual_account['id'];
   include_once("sites/all/libraries/phpqrcode/qrlib.php");
   // $lib =libraries_detect('phpqrcode');
   // echo '<pre>lib: ' ; print_r($lib) ; echo '</pre>';  exit() ; // DEV  
