@@ -20,7 +20,7 @@ Descripción: [transaction:concept]
 Cantidad: [transaction:amount][transaction:fromaccount:exchange:currencysymbol]
 Entrada por: [transaction:orderedby:fullname] < [transaction:orderedby:mail] >
 
-Si esta transacción tendría que haber sido aceptada, contacta con el/la comprador/a [transaction:toaccount:user:fullname] < [transaction:fromaccount:user:mail] > para que acepte la transacción, o contacta el/la administrador/a en caso de cualquier problema.
+Si esta transacción tendría que haber sido aceptada, contacta con el/la comprador/a [transaction:fromaccount:user:fullname] < [transaction:fromaccount:user:mail] > para que acepte la transacción, o contacta el/la administrador/a en caso de cualquier problema.
 
 --
 Administrador/a de [exchange:shortname]:

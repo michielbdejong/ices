@@ -418,10 +418,62 @@ function ces_message_mail($key, &$message, $params) {
   $message['subject'] .= token_replace($template->subject, $params);
   $message['body'][] = token_replace($template->body, $params);
 
-  // Reply-to user offer or want.
+  // Reply-to.
+  // user offer or want.
   if ($message['key'] == 'ces_message send_offerwant_notify') {
     $replyto = token_replace('[notify:user:mail]', $params);
     if ($replyto !== '[notify:user:mail]') {
+      $message['Reply-to'] = $replyto;
+      $message['headers']['Reply-To'] = $replyto;
+    }
+  }
+  // Reply to ordered by.
+  elseif (
+    $message['key'] == 'ces_message account_credited'
+    ) {
+    $replyemail = '[transaction:orderedby:mail]';
+    $replyto = token_replace($replyemail, $params);
+    if ($replyto !== $replyemail) {
+      $message['Reply-to'] = $replyto;
+      $message['headers']['Reply-To'] = $replyto;
+    }
+  }
+  // Reply to account.
+  elseif (
+    $message['key'] == 'ces_message account_debited'
+    || $message['key'] == 'ces_message account_debit_pending'
+    ) {
+    $replyemail = '[transaction:toaccount:user:mail]';
+    $replyto = token_replace($replyemail, $params);
+    if ($replyto !== $replyemail) {
+      $message['Reply-to'] = $replyto;
+      $message['headers']['Reply-To'] = $replyto;
+    }
+  }
+  // Reply from account.
+  elseif (
+    $message['key'] == 'ces_message account_credit_rejected'
+    || $message['key'] == 'ces_message account_pending'
+    ) {
+    $replyemail = '[transaction:fromaccount:user:mail]';
+    $replyto = token_replace($replyemail, $params);
+    if ($replyto !== $replyemail) {
+      $message['Reply-to'] = $replyto;
+      $message['headers']['Reply-To'] = $replyto;
+    }
+  }
+  // Reply to admin exchange.
+  elseif (
+    $message['key'] == 'ces_message account_activated'
+    || $message['key'] == 'ces_message alert_offerwant_expired'
+    || $message['key'] == 'ces_message alert_offerwant_newoffer'
+    || $message['key'] == 'ces_message alert_offerwant_newwant'
+    || $message['key'] == 'ces_message alert_offerwant_offersperiodical'
+    || $message['key'] == 'ces_message alert_offerwant_wantsperiodical'
+    ) {
+    $replyemail = '[exchange:admin:mail]';
+    $replyto = token_replace($replyemail, $params);
+    if ($replyto !== $replyemail) {
       $message['Reply-to'] = $replyto;
       $message['headers']['Reply-To'] = $replyto;
     }
