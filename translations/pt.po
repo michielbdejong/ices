@@ -1,0 +1,4415 @@
+# $Id$
+# 
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  common.db.logic.inc: n/a
+#  ices.module: n/a
+#  ces_user/ces_user.module: n/a
+#  ices.info: n/a
+#  ces_bank/ces_bank.info: n/a
+#  ces_blog/ces_blog.info: n/a
+#  ces_develop/ces_develop.info: n/a
+#  ces_import4ces/ces_import4ces.info: n/a
+#  ces_interop/ces_interop.info: n/a
+#  ces_message/ces_message.info: n/a
+#  ces_offerswants/ces_offerswants.info: n/a
+#  ces_statistics/ces_statistics.info: n/a
+#  ces_summaryblock/ces_summaryblock.info: n/a
+#  ces_user/ces_user.info: n/a
+#  ces_bank/ces_bank.forms.account_users.inc: n/a
+#  ces_bank/ces_bank.forms.inc: n/a
+#  ces_bank/ces_bank.pages.inc: n/a
+#  ces_bank/ces_bank.module: n/a
+#  ces_bank/views/ces_bank.views_default.inc: n/a
+#  ces_message/ces_message.module: n/a
+#  ces_bank/ces_bank.theme.inc: n/a
+#  ces_bank/ces_bank.pages.account_users.inc: n/a
+#  ces_message/includes/ces_message.templates.inc: n/a
+#  ces_offerswants/ces_offerswants.module: n/a
+#  ces_interop/ces_interop.module: n/a
+#  ces_user/ces_user.install: n/a
+#  ces_message/views/ces_message.views_default.inc: n/a
+#  ces_import4ces/ces_import4ces.module: n/a
+#  ces_message/views/ces_message.views.inc: n/a
+#  ces_statistics/ces_statistics.module: n/a
+#  ces_offerswants/includes/ces_offerswants_send_notify.inc: n/a
+#  ces_bank/ces_bank.logic.inc: n/a
+#  ces_summaryblock/ces_summaryblock.module: n/a
+#  ces_bank/ces_bank.install: n/a
+#  ces_bank/views/ces_bank.views.inc: n/a
+#  ces_blog/ces_blog.module: n/a
+#  ces_blog/ces_blog.install: n/a
+#  ces_develop/ces_develop.module: n/a
+#  ces_import4ces/imports/offers.php: n/a
+#  ces_import4ces/imports/trades.php: n/a
+#  ces_import4ces/imports/users.php: n/a
+#  ces_import4ces/imports/wants.php: n/a
+#  ces_interop/ces_interop.cenip.logic.inc: n/a
+#  ces_message/includes/ces_message.message.inc: n/a
+#  ces_message/ces_message.install: n/a
+#  ces_offerswants/ces_offerwant.tpl.php: n/a
+# 
+# Translators:
+# Henrique de Sousa Casalderrey <lilocasalderrey@gmail.com>, 2017
+# lirca <lirca@riseup.net>, 2017
+# Marcelo Voos <marcelocvoos@gmail.com>, 2017
+# saritamoreira <saritamoreira@gmail.com>, 2014
+# Saulo M <jacques@autistici.org>, 2017
+msgid ""
+msgstr ""
+"Project-Id-Version: IntegralCES\n"
+"POT-Creation-Date: 2016-01-21 18:37+0100\n"
+"PO-Revision-Date: 2017-03-06 17:21+0000\n"
+"Last-Translator: Saulo M <jacques@autistici.org>\n"
+"Language-Team: Portuguese (http://www.transifex.com/integralces/integralces/language/pt/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: common.db.logic.inc:193
+msgid ""
+"WARNING: CES table @table is missing. You probably need to reinstall CES."
+msgstr "AVISO: a tabela @table está faltando. Você provavelmente precisa reinstalar o CES."
+
+#: common.db.logic.inc:357
+msgid "Impossible to get the database lock %lock"
+msgstr "Impossível obter a base de dados %lock"
+
+#: ices.module:22 ces_user/ces_user.module:383
+msgid "About"
+msgstr "Sobre"
+
+#: ices.module:23
+msgid ""
+"Integral CES is a suite of Drupal modules featuring social currencies "
+"management for communities. See <a href=\"@integralces\">integralces.net</a>"
+" for more documentation and <a href=\"@demo\">demo.integralces.net</a> for a"
+" demonstration site."
+msgstr "Integral CES é uma suite de módulos Drupal que disponibiliza um sistema de gestão de moedas sociais para comunidades. Visite <a href=\"@integralces\">integralces.net</a> para mais documentação e <a href=\"@demo\">demo.integralces.net</a> - um site de demonstração."
+
+#: ices.module:24
+msgid "Initializing an exchange group"
+msgstr "Iniciar um grupo de trocas."
+
+#: ices.module:26
+msgid "Enable the sub-modules you need"
+msgstr "Activa os sub-módulos que precisas."
+
+#: ices.module:27
+msgid ""
+"<em>CES Bank</em> is needed to run Integral CES, is about management of "
+"exchange groups, users accounts, transactions between accounts, etc... "
+"<em>CES Notifications</em> is the messaging system of Integral CES. <em>CES "
+"Offers and Wants</em> allows users to publish their offers and wants in the "
+"exchange group. <em>CES user profile</em> extends Drupal user profile with "
+"fields about Integral CES. <em>CES Summary Block</em> enables a block with "
+"information about the user's account, and a switcher between accounts, if "
+"the user owns several. <em>CES exchange blog</em> enables a blog for every "
+"exchange group and the exchange administrator can publish entries. <em>CES "
+"Statistics</em> produces some statistics of the exchange groups."
+msgstr "O <em>Banco iCES</em> é necessário para o Integral CES funcionar; trata da gestão de grupos de troca, contas de utilizador, transações entre contas, etc... <em>Mensagens iCES</em> é o sistema de mensagens do Integral CES. O <em>iCES Ofertas e Demandas</em> permite que utilizadores publiquem as suas ofertas e demandas no grupo de trocas. <em>Perfil de utilizador iCES</em> acrescenta ao perfil de utilizador Drupal outros campos sobre o Integral CES. O <em>Bloco de resumo iCES</em> disponibiliza um bloco de informação sobre a conta de utilizador, e a possibilidade de alternar entre contas, caso o utilizador tenha várias. O <em>blog de trocas iCES</em> disponibiliza um blog para cada grupo de trocas e o administrador do grupo pode publicar novas entradas. As <em>Estatísticas iCES</em> produzem algumas estatísticas sobre os grupos de trocas. "
+
+#: ices.module:28
+msgid "Create new exchange group"
+msgstr "Criar novo grupo de trocas"
+
+#: ices.module:29
+msgid ""
+"Visit <a href=\"@newexchange\">new exchange form</a> and initialize the "
+"first exchange group. You must fill in the Administrator section with the "
+"user that will be the exchange administrator (It cannot be the current "
+"drupal admin)."
+msgstr "Visite <a href=\"@newexchange\">formulário da nova troca</a> e inicie o primeiro grupo de troca. Você deve preencher a seção de administrador com a pessoa que administrará o grupo (este não pode ser o administrador drupal atual)."
+
+#: ices.module:30
+msgid ""
+"Visit <a href=\"@activateexchange\">admin exchanges page</a>, click on the "
+"new exchange and activate it."
+msgstr "Visite <a href=\"@activateexchange\">página de administrador de troca</a>, clique em nova troca e ative"
+
+#: ices.module:31
+msgid "Login as exchange administrator and write some welcome blog posts."
+msgstr "Entre como administrador de uma rede de trocas e escreva alguns posts de boas vindas."
+
+#: ices.module:33
+msgid "Invite the users to create an account"
+msgstr "Convida os utilizadores a criarem uma conta."
+
+#: ices.module:34
+msgid ""
+"Users can sing up and create a new account visiting "
+"<em>user/register/exchange_name</em>, where exchange_name is the short name "
+"of the new exchange group (Four numbers or uppercase letters)"
+msgstr "Os usuários podem criar uma conta em <em>usuário/registro/nome_rede</em>, em que nome_rede é uma abreviação do nome do novo grupo de trocas (quatro números ou letras maiúsculas)."
+
+#: ices.module:36
+msgid "Publish some offers and wants, blog entries... And have fun!"
+msgstr "Publica algumas ofertas e demandas, posts no blog... E diverte-te!"
+
+#: ices.module:47
+msgid "Module CES Bank required"
+msgstr "O módulo Banco iCES é necessário"
+
+#: ices.module:56 ices.info:0
+msgid "Integral Community Exchange System"
+msgstr "Integral Community Exchange System (Sistema Integral de Trocas Comunitárias)"
+
+#: ices.info:0
+msgid "A social currency exchange system including banking and shopping."
+msgstr "Um sistema de trocas de moeda social que inclui banca e compras."
+
+#: ices.info:0 ces_bank/ces_bank.info:0 ces_blog/ces_blog.info:0
+#: ces_develop/ces_develop.info:0 ces_import4ces/ces_import4ces.info:0
+#: ces_interop/ces_interop.info:0 ces_message/ces_message.info:0
+#: ces_offerswants/ces_offerswants.info:0 ces_statistics/ces_statistics.info:0
+#: ces_summaryblock/ces_summaryblock.info:0 ces_user/ces_user.info:0
+msgid "ices"
+msgstr "ices"
+
+#: ces_bank/ces_bank.forms.account_users.inc:48
+#: ces_bank/ces_bank.forms.inc2158;2299;2540;2563
+#: ces_bank/ces_bank.pages.inc273;287;859 ces_bank/ces_bank.module:947
+#: ces_bank/views/ces_bank.views_default.inc230;469
+#: ces_message/ces_message.module:450
+msgid "Account"
+msgstr "Conta"
+
+#: ces_bank/ces_bank.forms.account_users.inc:54
+msgid "Operation not permitted"
+msgstr "Operação não permitida"
+
+#: ces_bank/ces_bank.forms.account_users.inc:67
+msgid "Edit user in account"
+msgstr "Editar usuário na conta"
+
+#: ces_bank/ces_bank.forms.account_users.inc:74
+#: ces_bank/ces_bank.module415;745
+msgid "Add user in account"
+msgstr "Adicionar usuário na conta"
+
+#: ces_bank/ces_bank.forms.account_users.inc:103
+#: ces_bank/ces_bank.forms.inc:1043 ces_bank/ces_bank.theme.inc:49
+msgid "Username"
+msgstr "Nome de usuário"
+
+#: ces_bank/ces_bank.forms.account_users.inc:104
+msgid "The name of the user."
+msgstr "O nome do usuário"
+
+#: ces_bank/ces_bank.forms.account_users.inc:115
+#: ces_bank/ces_bank.pages.account_users.inc:42
+msgid "Privilege"
+msgstr "Privilégio"
+
+#: ces_bank/ces_bank.forms.account_users.inc:116
+msgid "Add administrator privileges."
+msgstr "Adicionar privilégios de administrador"
+
+#: ces_bank/ces_bank.forms.account_users.inc:122
+#: ces_bank/ces_bank.forms.inc:1109
+#: ces_message/includes/ces_message.templates.inc:373
+#: ces_offerswants/ces_offerswants.module682;1040;1220
+msgid "Save"
+msgstr "Salvar"
+
+#: ces_bank/ces_bank.forms.account_users.inc126;272
+#: ces_bank/ces_bank.forms.inc611;1445;1810 ces_interop/ces_interop.module:757
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: ces_bank/ces_bank.forms.account_users.inc:138
+msgid "The user not exist"
+msgstr "O usuário não existe"
+
+#: ces_bank/ces_bank.forms.account_users.inc:141
+msgid "The user is required"
+msgstr "O usuário é requerido"
+
+#: ces_bank/ces_bank.forms.account_users.inc:184
+msgid "Users account successfully update."
+msgstr "Conta de usuário atualizada com sucesso"
+
+#: ces_bank/ces_bank.forms.account_users.inc:194
+msgid "Duplicate entry"
+msgstr "Dados duplicados"
+
+#: ces_bank/ces_bank.forms.account_users.inc197;304
+msgid "An error occurred while saving the user account record. Details: %msg"
+msgstr "Ocorreu um erro durante a gravação de registro de conta de usuário. Detalhes: %msg"
+
+#: ces_bank/ces_bank.forms.account_users.inc:217
+#: ces_bank/ces_bank.module426;427;756;757;768;769
+msgid "Delete account user"
+msgstr "Apagar conta de usuário"
+
+#: ces_bank/ces_bank.forms.account_users.inc:240
+#: ces_bank/ces_bank.pages.account_users.inc:75
+#: ces_bank/ces_bank.pages.inc:565
+msgid "Nonexistent user"
+msgstr "Usuário inexistente"
+
+#: ces_bank/ces_bank.forms.account_users.inc:259
+msgid "Delete user"
+msgstr "Excluir usuário"
+
+#: ces_bank/ces_bank.forms.account_users.inc:260
+msgid "account"
+msgstr "conta"
+
+#: ces_bank/ces_bank.forms.account_users.inc:261
+msgid "of"
+msgstr "de"
+
+#: ces_bank/ces_bank.forms.account_users.inc:265
+msgid "Confirm delete user of account."
+msgstr "Confirmar exclusão de usuário da conta"
+
+#: ces_bank/ces_bank.forms.account_users.inc:269
+#: ces_bank/ces_bank.forms.inc605;818;827;1441
+msgid "Confirm"
+msgstr "Confirmar"
+
+#: ces_bank/ces_bank.forms.account_users.inc:295
+msgid "Users account successfully delete."
+msgstr "Usuário excluído com sucesso"
+
+#: ces_bank/ces_bank.forms.inc43;409;419;1602
+msgid "Invalid exchange id."
+msgstr "Id de trocas inválido."
+
+#: ces_bank/ces_bank.forms.inc:56
+msgid "Settings for an individual exchange in Community Exchange System."
+msgstr "Definições de uma troca individual no \"Community Exchange System\"."
+
+#: ces_bank/ces_bank.forms.inc:78
+msgid "General"
+msgstr "Geral"
+
+#: ces_bank/ces_bank.forms.inc:79
+msgid "General settings for this exchange."
+msgstr "Definições gerais desta troca."
+
+#: ces_bank/ces_bank.forms.inc:84
+msgid "Four numbers or uppercase letters identifying this exchange."
+msgstr "Quatro números ou letras maiúsculas que identificam esta troca."
+
+#: ces_bank/ces_bank.forms.inc85;1017 ces_bank/ces_bank.pages.inc:95
+#: ces_bank/ces_bank.theme.inc:21
+msgid "Code"
+msgstr "Código"
+
+#: ces_bank/ces_bank.forms.inc:94
+msgid "Acronym or short title. To be used in small-sized places like menus."
+msgstr "Acrônimo ou título curto. A ser usado em elementos pequenos como menus."
+
+#: ces_bank/ces_bank.forms.inc:95
+msgid "Short name"
+msgstr "Nome curto"
+
+#: ces_bank/ces_bank.forms.inc:104
+msgid "It can be the same as the short name. To be used as title."
+msgstr "Pode ser o mesmo que o nome curto. Para ser usado como título."
+
+#: ces_bank/ces_bank.forms.inc:105
+msgid "Full name"
+msgstr "Nome completo"
+
+#: ces_bank/ces_bank.forms.inc:112
+msgid "Website or blog of this exchange. Include http:// or https://"
+msgstr "Website ou blog deste grupo de trocas. Inclui http:// ou https://"
+
+#: ces_bank/ces_bank.forms.inc:113 ces_bank/ces_bank.theme.inc:23
+#: ces_user/ces_user.install:162
+msgid "Website"
+msgstr "Website"
+
+#: ces_bank/ces_bank.forms.inc:123
+msgid "Administrator"
+msgstr "Administrador"
+
+#: ces_bank/ces_bank.forms.inc:124
+msgid ""
+"Administrator settings for this exchange. One Drupal user is the "
+"administrator. It is recommended not to use a real person name here."
+msgstr "Definições de administrador para esta rede de trocas. Um utilizador Drupal é o administrador. É recomendado que não se use o nome de uma pessoa real aqui."
+
+#: ces_bank/ces_bank.forms.inc:133
+msgid ""
+"Administrator settings for this exchange. One Drupal user is the "
+"administrator."
+msgstr "Definições de administrador para este grupo de trocas. Um utilizador Drupal é o administrador."
+
+#: ces_bank/ces_bank.forms.inc:139
+msgid "Location"
+msgstr "Localização"
+
+#: ces_bank/ces_bank.forms.inc:140
+msgid "Location settings for this exchange."
+msgstr "Definições de localização para este grupo de trocas."
+
+#: ces_bank/ces_bank.forms.inc:148
+msgid "The legal country of this exchange."
+msgstr "País legal deste grupo de trocas."
+
+#: ces_bank/ces_bank.forms.inc:149 ces_bank/ces_bank.theme.inc:25
+msgid "Country"
+msgstr "País"
+
+#: ces_bank/ces_bank.forms.inc:157
+msgid "Region within the country."
+msgstr "Região do país."
+
+#: ces_bank/ces_bank.forms.inc:158 ces_bank/ces_bank.pages.inc:105
+msgid "Region"
+msgstr "Região"
+
+#: ces_bank/ces_bank.forms.inc:165
+msgid "Main city or town."
+msgstr "Cidade ou vila principal."
+
+#: ces_bank/ces_bank.forms.inc:166 ces_bank/ces_bank.pages.inc:110
+#: ces_bank/ces_bank.theme.inc:27 ces_user/ces_user.install:154
+msgid "Town"
+msgstr "Cidade"
+
+#: ces_bank/ces_bank.forms.inc:173
+msgid ""
+"Paste here a Google Map URL pointing to your location. Something like "
+"http://maps.google.com/maps?..."
+msgstr "Copia aqui um URL do Google Maps que aponte para a tua localização. Algo tipo http://maps.google.com/maps?..."
+
+#: ces_bank/ces_bank.forms.inc:174
+msgid "Map"
+msgstr "Mapa"
+
+#: ces_bank/ces_bank.forms.inc:191
+msgid ""
+"Choose the language that will have the new users registered to this "
+"exchange. They will be able to change their preferred language once logged "
+"in."
+msgstr "Escolhe a língua em que os novos utilizadores vão registar-se neste grupo de trocas. Eles e elas vão conseguir alterar a língua preferida depois de fazerem login."
+
+#: ces_bank/ces_bank.forms.inc:192
+msgid "Default language"
+msgstr "Língua padrão"
+
+#: ces_bank/ces_bank.forms.inc:198 ces_bank/ces_bank.pages.inc120;188
+#: ces_bank/ces_bank.theme.inc:29
+msgid "Currency"
+msgstr "Moeda"
+
+#: ces_bank/ces_bank.forms.inc:199
+msgid "Currency settings for this exchange."
+msgstr "Definições da moeda para este grupo de trocas."
+
+#: ces_bank/ces_bank.forms.inc:203
+msgid ""
+"Symbol for the currency of this exchange. It can be any 3 unicode "
+"characters."
+msgstr "Símbolo da moeda deste sistema de trocas. Podem ser quaisquer 3 caracteres unicode. "
+
+#: ces_bank/ces_bank.forms.inc:204
+msgid "Symbol"
+msgstr "Símbolo"
+
+#: ces_bank/ces_bank.forms.inc:213
+msgid "Name for a single unit of this currency."
+msgstr "Nome para unidade desta moeda."
+
+#: ces_bank/ces_bank.forms.inc:214
+#: ces_bank/ces_bank.pages.account_users.inc:34
+#: ces_bank/ces_bank.pages.inc100;463
+#: ces_message/views/ces_message.views_default.inc406;444
+msgid "Name"
+msgstr "Nome"
+
+#: ces_bank/ces_bank.forms.inc:223
+msgid "Plural currency name."
+msgstr "Nome plural da moeda."
+
+#: ces_bank/ces_bank.forms.inc:224
+msgid "Plural name"
+msgstr "Nome plural"
+
+#: ces_bank/ces_bank.forms.inc:233
+msgid ""
+"Value of this currency against the value of an average hour of labor. This "
+"is used to convert amounts between two currencies. If your currency is worth"
+" 10u/hour then put \"0.1\". If you want to use your national currency as "
+"standard of value, look for the average cost of an hour of labor or choose "
+"an approximation based on your community reality."
+msgstr "Atribui um valor a esta moeda tendo em conta o valor médio de uma hora de trabalho. Isto é usado para converter quantias entre duas moedas. Se a tua moeda vale 10 unidades / hora então põe \"0.1\". Se queres usar a tua moeda nacional como standard de valor, procura o custo médio de uma hora de trabalho ou escolhe uma aproximação de acordo com a realidade da tua comunidade."
+
+#: ces_bank/ces_bank.forms.inc:234 ces_bank/ces_bank.theme.inc:146
+msgid "Value"
+msgstr "Valor"
+
+#: ces_bank/ces_bank.forms.inc:243
+msgid "Number of decimal digits to be shown."
+msgstr "Número de dígitos decimais a serem mostrados."
+
+#: ces_bank/ces_bank.forms.inc:244
+msgid "Scale"
+msgstr "Escala"
+
+#: ces_bank/ces_bank.forms.inc:248
+#: ces_offerswants/ces_offerswants.module2424;2438
+msgid "1"
+msgstr "1"
+
+#: ces_bank/ces_bank.forms.inc:249
+#: ces_offerswants/ces_offerswants.module2425;2439
+msgid "2"
+msgstr "2"
+
+#: ces_bank/ces_bank.forms.inc:250
+#: ces_offerswants/ces_offerswants.module2426;2440
+msgid "3"
+msgstr "3"
+
+#: ces_bank/ces_bank.forms.inc:251
+#: ces_offerswants/ces_offerswants.module2427;2441
+msgid "4"
+msgstr "4"
+
+#: ces_bank/ces_bank.forms.inc:256
+msgid "Members"
+msgstr "Membros"
+
+#: ces_bank/ces_bank.forms.inc:257
+msgid ""
+"Settings for users registering with exchange. Sub-modules add settings here."
+msgstr "Definições para utilizadores que queiram registar-se no grupo de trocas. Definições para adicionar sub-módulos estão aqui."
+
+#: ces_bank/ces_bank.forms.inc:264
+msgid "Hide balance"
+msgstr "Esconder saldo"
+
+#: ces_bank/ces_bank.forms.inc:265
+msgid ""
+"If checked the balance is shown only to account owners. Otherwise it is "
+"public to any exchange user."
+msgstr "Se marcado, o saldo só é mostrado ao dono da conta. Caso contrário será público para qualquer usuário."
+
+#: ces_bank/ces_bank.forms.inc:273
+msgid "Hide sales and purchases"
+msgstr "Esconder vendas e compras"
+
+#: ces_bank/ces_bank.forms.inc:274
+msgid ""
+"If checked, the total amount purchased and sold is shown only to to account "
+"owners. Otherwise it is public to any exchange user."
+msgstr "Se marcado, a quantidade total comprada e vendida só é mostrada aos donos da conta. Caso contrário será pública para qualquer usuário."
+
+#: ces_bank/ces_bank.forms.inc:286
+msgid "Default limit chain"
+msgstr "Cadeia limite padrão"
+
+#: ces_bank/ces_bank.forms.inc:287
+msgid "The limit chain for new accounts."
+msgstr "O limite de cadeia para novas contas."
+
+#: ces_bank/ces_bank.forms.inc:294 ces_bank/ces_bank.module643;644
+msgid "Activate exchange"
+msgstr "Ativar moeda"
+
+#: ces_bank/ces_bank.forms.inc:298
+msgid "Create exchange"
+msgstr "Criar moeda"
+
+#: ces_bank/ces_bank.forms.inc:302
+msgid "Update exchange"
+msgstr "Atualizar moeda"
+
+#: ces_bank/ces_bank.forms.inc:319
+msgid "Code %code is invalid. Code must have exactly 4 letters."
+msgstr "O código %code é inválido. Deve conter exatamente 4 letras."
+
+#: ces_bank/ces_bank.forms.inc:324
+msgid ""
+"Code %code is invalid. Code characters must be uppercase ASCII letters and "
+"numbers. No accents, no spaces, no special characters."
+msgstr "O código %code é inválido. Os caracteres do código devem ser letras maiúsculas ASCII e números. Sem acentos, sem espaços, sem caracteres especiais."
+
+#: ces_bank/ces_bank.forms.inc:330
+msgid ""
+"The url %url is invalid. Please enter a fully qualified URL like "
+"http://www.example.org/something or leave the field blank."
+msgstr "O url %url é inválido. Por favor introduz um URL completamente qualificado como http://www.example.org/something ou deixa o campo em branco."
+
+#: ces_bank/ces_bank.forms.inc:335
+msgid ""
+"The map url %url is invalid. Please enter a fully qualified URL like "
+"http://maps.google.com/...."
+msgstr "O url de mapa %url é inválido. Por favor introduza um URL completamente qualificado como http://maps.google.com/...."
+
+#: ces_bank/ces_bank.forms.inc:340
+msgid ""
+"Currency value %value is invalid. Enter a numeric value like 0.1, "
+"0.0666666667 or 1"
+msgstr "O valor da moeda %value é inválido. Introduz um valor numérico como 0.1, 0.0666666667 ou 1"
+
+#: ces_bank/ces_bank.forms.inc:369
+msgid ""
+"Exchange %code successfully created. You must wait for the system "
+"administrator to set up the exchange before it is operative. You will "
+"receive an e-mail notification within the next few days."
+msgstr "Rede %code criada com sucesso. Você precisa esperar o administrador do sistema configurar a rede antes que ela fique ativa. Você vai receber um email de notificação nos próximos dias."
+
+#: ces_bank/ces_bank.forms.inc:373
+msgid "Exchange %code successfully updated."
+msgstr "Rede %code atualizada com sucesso."
+
+#: ces_bank/ces_bank.forms.inc:384
+msgid ""
+"Exchange %code successfully activated. There has been sent an email to the "
+"new exchange administrator."
+msgstr "Rede %code ativada com sucesso. Foi enviado um e-mail para o administrador da nova rede"
+
+#: ces_bank/ces_bank.forms.inc:388
+msgid "An error occurred while saving the exchange record. Details: %msg"
+msgstr "Ocorreu um erro durante o salvamento dos registros da rede. Detalhes: %msg"
+
+#: ces_bank/ces_bank.forms.inc425;1007;2290;2537;2564
+#: ces_bank/ces_bank.pages.inc183;282;349 ces_bank/ces_bank.theme.inc45;73
+#: ces_bank/ces_bank.module943;450
+#: ces_bank/views/ces_bank.views_default.inc237;479
+#: ces_import4ces/ces_import4ces.module:102
+#: ces_message/includes/ces_message.templates.inc:123
+#: ces_message/views/ces_message.views.inc:148
+#: ces_message/views/ces_message.views_default.inc116;168;202;345;360;440
+#: ces_offerswants/ces_offerswants.module:2040
+msgid "Exchange"
+msgstr "Rede"
+
+#: ces_bank/ces_bank.forms.inc:504
+msgid "Total number of accounts:"
+msgstr "Número total de contas:"
+
+#: ces_bank/ces_bank.forms.inc:505
+msgid "Accounts to be deleted:"
+msgstr "Contas que serão apagadas:"
+
+#: ces_bank/ces_bank.forms.inc:507
+msgid "These accounts"
+msgstr "Estas contas"
+
+#: ces_bank/ces_bank.forms.inc:508
+msgid ""
+"depend on other exchange/s in the system, so they CANNOT be deleted:<br "
+"/><i>"
+msgstr "depende de outra/s rede/s no sistema, então não pode ser apagado:<br /><i>"
+
+#: ces_bank/ces_bank.forms.inc:514
+msgid ""
+"No accounts depend on other exchanges in the system, so all of them can be "
+"deleted."
+msgstr "Nenhuma conta depende de outras redes no sistema, então todas podem ser apagadas."
+
+#: ces_bank/ces_bank.forms.inc:518 ces_bank/ces_bank.pages.inc115;367;471
+#: ces_bank/ces_bank.module207;464;477;519
+msgid "Accounts"
+msgstr "Contas"
+
+#: ces_bank/ces_bank.forms.inc:525
+msgid "Total number of users:"
+msgstr "Número total de usuários:"
+
+#: ces_bank/ces_bank.forms.inc:526
+msgid "Users to be deleted:"
+msgstr "Usuários que serão apagados:"
+
+#: ces_bank/ces_bank.forms.inc:528
+msgid "These users"
+msgstr "Estes usuários"
+
+#: ces_bank/ces_bank.forms.inc:529
+msgid ""
+"have accounts that depen on other exchanges in the system, so they CANNOT be"
+" deleted:"
+msgstr "possuem contas que dependem de outras redes no sistema, portanto não podem ser apagados:"
+
+#: ces_bank/ces_bank.forms.inc:533
+msgid ""
+"All users have accounts that belongs only to this exchange, so they can be "
+"deleted."
+msgstr "Todos os usuários possuem contas que pertencem só a esta rede, portanto podem ser apagados."
+
+#: ces_bank/ces_bank.forms.inc537;1305
+msgid "Users"
+msgstr "Usuários"
+
+#: ces_bank/ces_bank.forms.inc:547 ces_statistics/ces_statistics.module:305
+msgid "Number of transactions:"
+msgstr "Número de transações:"
+
+#: ces_bank/ces_bank.forms.inc550;1265 ces_bank/ces_bank.pages.inc:368
+#: ces_bank/ces_bank.module285;297
+msgid "Transactions"
+msgstr "Transações"
+
+#: ces_bank/ces_bank.forms.inc:561
+msgid "Sorry, it is not possible to delete the exchange."
+msgstr "Desculpe, não é possível apagar a rede."
+
+#: ces_bank/ces_bank.forms.inc:568
+msgid "Proceed to delete the exchange"
+msgstr "Continue para apagar a rede"
+
+#: ces_bank/ces_bank.forms.inc:586
+msgid "Delete accounts:"
+msgstr "Apagar contas:"
+
+#: ces_bank/ces_bank.forms.inc:588
+msgid "Delete users:"
+msgstr "Apagar usuários:"
+
+#: ces_bank/ces_bank.forms.inc:590
+msgid "Delete transactions:"
+msgstr "Apagar transações:"
+
+#: ces_bank/ces_bank.forms.inc:595
+msgid "Confirm actions for exchange"
+msgstr "Confirmar ações para a rede"
+
+#: ces_bank/ces_bank.forms.inc:606
+msgid "Do you really want to delete the exchange?"
+msgstr "Você realmente quer apagar a rede?"
+
+#: ces_bank/ces_bank.forms.inc607;1437;2417
+#: ces_offerswants/ces_offerswants.module773;1085
+msgid "This action cannot be undone."
+msgstr "Esta ação não pode ser desfeita."
+
+#: ces_bank/ces_bank.forms.inc:626
+msgid "%trans transactions have been deleted."
+msgstr "%trans as transações foram apagadas."
+
+#: ces_bank/ces_bank.forms.inc634;1460
+msgid "The account %account has been deleted."
+msgstr "A conta %account foi apagada."
+
+#: ces_bank/ces_bank.forms.inc:639
+msgid "An error occurred while deleting the account %account. Details: %msg"
+msgstr "Ocorreu um erro ao apagar a conta %account. Detalhes: %msg"
+
+#: ces_bank/ces_bank.forms.inc:659
+msgid "The exchange %exchg has been deleted."
+msgstr "A rede %exchg foi apagada."
+
+#: ces_bank/ces_bank.forms.inc:663
+msgid "An error occurred while deleting the exchange %exchg. Details: %msg"
+msgstr "Ocorreu um erro ao apagar a rede %exch. Detalhes: %msg"
+
+#: ces_bank/ces_bank.forms.inc691;986 ces_bank/ces_bank.pages.inc63;449
+msgid "Invalid current exchange"
+msgstr "Rede atual invalida"
+
+#: ces_bank/ces_bank.forms.inc706;1085
+msgid "Limit chain"
+msgstr "Corrente limíte"
+
+#: ces_bank/ces_bank.forms.inc:730
+msgid "Name for this account limit"
+msgstr "Nome para o limite desta conta"
+
+#: ces_bank/ces_bank.forms.inc:731
+msgid "name"
+msgstr "nome"
+
+#: ces_bank/ces_bank.forms.inc:738
+msgid "Account limits"
+msgstr "Limites da conta"
+
+#: ces_bank/ces_bank.forms.inc:739
+msgid "List of account limits currently belonging to this chain."
+msgstr "Lista de limites de conta atualmente pertencente a esta corrente"
+
+#: ces_bank/ces_bank.forms.inc:750
+msgid "Add account limit"
+msgstr "Adicionar limite de conta"
+
+#: ces_bank/ces_bank.forms.inc:751
+msgid "Add a new account limit to this limit chain."
+msgstr "Adicionar novo limite de conta para esta conta limite."
+
+#: ces_bank/ces_bank.forms.inc:755
+msgid "Limit class"
+msgstr "Tipo de limite "
+
+#: ces_bank/ces_bank.forms.inc:757
+msgid ""
+"The type of limit to add. Each class limits a different aspect of the "
+"account balance or in a different way. Once added, you will be able to "
+"configure its parameters."
+msgstr "O tipo de limite para adicionar. Cada tipo limita um aspecto diferente do saldo da conta ou de uma maneira diferente. Uma vez adicionado você poderá configurar seus parâmetros."
+
+#: ces_bank/ces_bank.forms.inc:774
+msgid "Add limit"
+msgstr "Adicionar limite"
+
+#: ces_bank/ces_bank.forms.inc:780
+msgid "Create limit chain"
+msgstr "Criar corrente de limite"
+
+#: ces_bank/ces_bank.forms.inc:780
+msgid "Update limit chain"
+msgstr "Atualizar corrente de limite"
+
+#: ces_bank/ces_bank.forms.inc:799
+msgid "Delete Limit Chain"
+msgstr "Apagar corrente de limite"
+
+#: ces_bank/ces_bank.forms.inc:811 ces_bank/ces_bank.pages.inc:468
+#: ces_bank/ces_bank.theme.inc:136 ces_bank/ces_bank.module:564
+msgid "Limits"
+msgstr "Limites"
+
+#: ces_bank/ces_bank.forms.inc:835
+msgid "An error occurred while delete the limitchain record. Details: %msg"
+msgstr "Ocorreu um erro ao apagar o registro de corrente de limite. Detalhes: %msg"
+
+#: ces_bank/ces_bank.forms.inc:869 ces_bank/ces_bank.theme.inc:178
+msgid "Block"
+msgstr "Bloquear"
+
+#: ces_bank/ces_bank.forms.inc:870
+msgid "Block transactions when account reaches the limit vaule."
+msgstr "Bloquear transações quando a conta atingir o valor limite."
+
+#: ces_bank/ces_bank.forms.inc:875
+msgid "Limit value"
+msgstr "Valor limite"
+
+#: ces_bank/ces_bank.forms.inc:876
+msgid "Value for this limit class"
+msgstr "Valor para este tipo de limite"
+
+#: ces_bank/ces_bank.forms.inc882;2418
+#: ces_bank/ces_bank.pages.account_users.inc70;78
+#: ces_bank/ces_bank.pages.inc366;434;496 ces_bank/ces_bank.module273;619;719
+#: ces_import4ces/ces_import4ces.module124;67
+#: ces_message/includes/ces_message.templates.inc:378
+#: ces_offerswants/ces_offerswants.module776;899;1087;1844
+msgid "Delete"
+msgstr "Apagar"
+
+#: ces_bank/ces_bank.forms.inc:930
+msgid "The limit amount must be numeric."
+msgstr "A quantidade limite precisa ser numèrica."
+
+#: ces_bank/ces_bank.forms.inc:934
+msgid "The credit limit must not be negative."
+msgstr "O limite de crédito não pode ser negativo"
+
+#: ces_bank/ces_bank.forms.inc:939
+msgid "The debit limit must not be positive."
+msgstr "O limite de débito não pode ser positivo."
+
+#: ces_bank/ces_bank.forms.inc:954
+msgid "Limit chain %name successfully created."
+msgstr "Corrente de limite %name criada com sucesso."
+
+#: ces_bank/ces_bank.forms.inc:959
+msgid "Limit chain %name successfully updated."
+msgstr "Corrente de limite %name atualizada com sucesso."
+
+#: ces_bank/ces_bank.forms.inc963;2643
+msgid "An error occurred while saving the record. Details: %msg"
+msgstr "Ocorreu um erro ao salvar o registro. Detalhes: %msg"
+
+#: ces_bank/ces_bank.forms.inc:1016
+msgid "Four digits code."
+msgstr "Código de quatro dígitos."
+
+#: ces_bank/ces_bank.forms.inc:1044
+msgid "The username of the owner of this account."
+msgstr "O nome de usuário do dono desta conta."
+
+#: ces_bank/ces_bank.forms.inc:1058 ces_bank/ces_bank.pages.inc:570
+#: ces_bank/ces_bank.module:1706
+msgid "Individual"
+msgstr "Individual"
+
+#: ces_bank/ces_bank.forms.inc:1059 ces_bank/ces_bank.pages.inc:571
+#: ces_bank/ces_bank.module:1707
+msgid "Shared"
+msgstr "Compartilhado"
+
+#: ces_bank/ces_bank.forms.inc:1060 ces_bank/ces_bank.pages.inc:572
+#: ces_bank/ces_bank.module:1708
+msgid "Organization"
+msgstr "Organização"
+
+#: ces_bank/ces_bank.forms.inc:1061 ces_bank/ces_bank.pages.inc:573
+#: ces_bank/ces_bank.module:1709
+msgid "Company"
+msgstr "Companhia"
+
+#: ces_bank/ces_bank.forms.inc:1062 ces_bank/ces_bank.pages.inc:574
+#: ces_bank/ces_bank.module:1710
+msgid "Public"
+msgstr "Público"
+
+#: ces_bank/ces_bank.forms.inc:1065 ces_bank/ces_bank.pages.inc:575
+#: ces_bank/ces_bank.module:1711
+msgid "Virtual"
+msgstr "Virtual"
+
+#: ces_bank/ces_bank.forms.inc:1069 ces_bank/ces_bank.theme.inc51;146
+#: ces_bank/ces_bank.module:1013 ces_bank/views/ces_bank.views_default.inc:474
+#: ces_message/views/ces_message.views.inc:78
+#: ces_message/views/ces_message.views_default.inc333;390;439;443
+#: ces_offerswants/ces_offerswants.module:2910
+msgid "Type"
+msgstr "Tipo"
+
+#: ces_bank/ces_bank.forms.inc:1070
+msgid ""
+"Select \"Individual\" for personal use, \"Shared\" if several people share "
+"this account, \"Organization\" for a non-profit organization, \"Company\" "
+"for a profit-pursuing company and \"Public\" for a public account."
+msgstr "Selecione \"Individual\" para uso pessoal, \"Compartilhado\" se várias pessoas compartilham esta conta, \"Organização\" para organização sem fins lucrativos, \"Companhia\" para uma companhia com fins lucrativos e \"Pública\" para uma conta pública."
+
+#: ces_bank/ces_bank.forms.inc:1086
+msgid "The limit chain to apply to this account"
+msgstr "A corrente limite para aplicar a esta conta"
+
+#: ces_bank/ces_bank.forms.inc:1094 ces_bank/ces_bank.pages.inc734;855
+#: ces_bank/ces_bank.theme.inc55;107
+#: ces_bank/views/ces_bank.views_default.inc:475
+#: ces_message/views/ces_message.views.inc:100
+msgid "State"
+msgstr "Estado"
+
+#: ces_bank/ces_bank.forms.inc:1095
+msgid "Active is the common state."
+msgstr "O estado comum é ativo."
+
+#: ces_bank/ces_bank.forms.inc:1097 ces_bank/ces_bank.pages.inc:578
+#: ces_bank/ces_bank.module:1714 ces_offerswants/ces_offerswants.module:880
+msgid "Hidden"
+msgstr "Oculto"
+
+#: ces_bank/ces_bank.forms.inc:1098 ces_bank/ces_bank.pages.inc:579
+#: ces_bank/ces_bank.module:1715
+msgid "Active"
+msgstr "Ativo"
+
+#: ces_bank/ces_bank.forms.inc:1099 ces_bank/ces_bank.pages.inc:580
+#: ces_bank/ces_bank.module:1716
+msgid "Closed"
+msgstr "Fechado"
+
+#: ces_bank/ces_bank.forms.inc:1100 ces_bank/ces_bank.pages.inc:581
+#: ces_bank/ces_bank.module:1717
+msgid "Locked"
+msgstr "Travado"
+
+#: ces_bank/ces_bank.forms.inc:1124
+msgid "Username %name does not exist."
+msgstr "Nome de usuário %name não existe."
+
+#: ces_bank/ces_bank.forms.inc:1142
+msgid "The name of the administrator account can not be changed"
+msgstr "O nome do administrador da conta não pode ser mudado"
+
+#: ces_bank/ces_bank.forms.inc:1150
+msgid "Account number %name already exists."
+msgstr "Número de conta %name já existe."
+
+#: ces_bank/ces_bank.forms.inc:1157
+msgid "The first four carecteres should be the network (%code)."
+msgstr "Os primeiros quatro caracteres precisam ser a rede (%code)"
+
+#: ces_bank/ces_bank.forms.inc:1163
+msgid "The last four digits must be a number. (%number)."
+msgstr "Os últimos quatro dígitos precisam ser números. (%number)."
+
+#: ces_bank/ces_bank.forms.inc:1183
+msgid "Account successfully created."
+msgstr "Conta criada com sucesso."
+
+#: ces_bank/ces_bank.forms.inc:1185
+msgid ""
+"The account will not be available until it is being activated by this "
+"exchange's administrator. You will receive an email when this is done."
+msgstr "A conta não estará disponível enquanto não for ativada pelo administrador da rede. Você receberá um email quando isto ocorrer."
+
+#: ces_bank/ces_bank.forms.inc:1209
+msgid "Account successfully activated."
+msgstr "Conta ativada com sucesso."
+
+#: ces_bank/ces_bank.forms.inc:1213
+msgid "An error occurred while saving the account record. Details: %msg"
+msgstr "Ocorreu um erro ao salvar o registro da conta. Detalhes: %msg"
+
+#: ces_bank/ces_bank.forms.inc:1215
+msgid "Account successfully update."
+msgstr "Conta atualizada com sucesso."
+
+#: ces_bank/ces_bank.forms.inc:1232
+msgid "Invalid account."
+msgstr "Conta inválida."
+
+#: ces_bank/ces_bank.forms.inc:1240
+msgid ""
+"This account depends on other exchanges in the system, so the account will "
+"not be deleted, nor closed"
+msgstr "Esta conta depende de outras redes no sistema, então ela não será apagada nem fechada."
+
+#: ces_bank/ces_bank.forms.inc1244;1337;1398 ces_bank/ces_bank.module:274
+msgid "Delete account"
+msgstr "Apagar conta"
+
+#: ces_bank/ces_bank.forms.inc:1257
+msgid "These transactions"
+msgstr "Estas transações"
+
+#: ces_bank/ces_bank.forms.inc:1258
+msgid "refer to this account, so the account can only be closed, not deleted."
+msgstr "são referentes a esta conta, então a conta só pode ser fechada, não apagada."
+
+#: ces_bank/ces_bank.forms.inc:1261
+msgid "No transaction refers to this account."
+msgstr "Nenhuma transação referente a esta conta."
+
+#: ces_bank/ces_bank.forms.inc1285;2562
+#: ces_bank/views/ces_bank.views_default.inc231;470
+#: ces_message/views/ces_message.views.inc:125
+#: ces_message/views/ces_message.views_default.inc351;441
+#: ces_offerswants/ces_offerswants.module:2069
+msgid "User"
+msgstr "Usuário"
+
+#: ces_bank/ces_bank.forms.inc:1286
+msgid "has other accounts and cannot be deleted nor canceled:"
+msgstr "tem outras contas e não pode ser apagado ou cancelado:"
+
+#: ces_bank/ces_bank.forms.inc:1297
+msgid "This user doesn't have more accounts."
+msgstr "Este usuário não tem mais contas."
+
+#: ces_bank/ces_bank.forms.inc:1298
+msgid "These users doesn't have more accounts."
+msgstr "Estes usuários não tem mais contas."
+
+#: ces_bank/ces_bank.forms.inc:1300
+msgid "The account belongs to a single user"
+msgstr "Esta conta pertence a um único usuário"
+
+#: ces_bank/ces_bank.forms.inc:1301
+msgid "The account belongs to"
+msgstr "Esta conta pertence a"
+
+#: ces_bank/ces_bank.forms.inc:1301
+msgid "users"
+msgstr "usuários"
+
+#: ces_bank/ces_bank.forms.inc:1315
+msgid "Delete user (The user will no longer exist in the system)"
+msgstr "Apagar usuário (O usuário deixará de existir no sistema)"
+
+#: ces_bank/ces_bank.forms.inc1316;1318
+msgid "Cancel user (The user will not be able to login in the system)"
+msgstr "Cancelar usuário (O usuário não poderá mais fazer login no sistema)"
+
+#: ces_bank/ces_bank.forms.inc1317;1319
+msgid "Do nothing"
+msgstr "Não faça nada"
+
+#: ces_bank/ces_bank.forms.inc:1323
+msgid "Action with user"
+msgstr "Ação com usuário"
+
+#: ces_bank/ces_bank.forms.inc:1326
+msgid "Select the action you want to do with this user."
+msgstr "Selecione a ação que deseja fazer com este usuário."
+
+#: ces_bank/ces_bank.forms.inc1341;1402
+msgid "Close account"
+msgstr "Fechar conta"
+
+#: ces_bank/ces_bank.forms.inc:1345
+msgid "It is NOT possible to delete nor to close the account."
+msgstr "NÃO é possível apagar nem fechar esta conta."
+
+#: ces_bank/ces_bank.forms.inc:1376
+msgid "Hey! That's not a valid option!"
+msgstr "Opa! Esta não é uma opção válida!"
+
+#: ces_bank/ces_bank.forms.inc:1406
+msgid "Do nothing with account"
+msgstr "Não faça nada com a conta"
+
+#: ces_bank/ces_bank.forms.inc:1414
+msgid "Delete user (and all content: offers, wants, comments...)"
+msgstr "Apagar usuário (todo o conteúdo: ofertas, demandas, comentários...)"
+
+#: ces_bank/ces_bank.forms.inc:1418
+msgid "Cancel user"
+msgstr "Cancelar usuário"
+
+#: ces_bank/ces_bank.forms.inc:1422
+msgid "Do nothing with user"
+msgstr "Não faça nada com o usuário"
+
+#: ces_bank/ces_bank.forms.inc:1430
+msgid "Confirm actions for account"
+msgstr "Confirmar ações para a conta"
+
+#: ces_bank/ces_bank.forms.inc:1465
+msgid "An error occurred while deleting the account. Details: %msg"
+msgstr "Ocorreu um erro ao deletar a conta. Detalhes: %msg"
+
+#: ces_bank/ces_bank.forms.inc:1475
+msgid "The account %account has been closed."
+msgstr "A conta %account foi fechada."
+
+#: ces_bank/ces_bank.forms.inc:1479
+msgid "An error occurred while closing the account. Details: %msg"
+msgstr "Ocorreu um erro ao fechar a conta. Detalhes: %msg"
+
+#: ces_bank/ces_bank.forms.inc:1485
+msgid ""
+"The account %account remains as before. No action has done to this account."
+msgstr "A conta %account continua como antes. Nenhuma ação foi executada nesta conta."
+
+#: ces_bank/ces_bank.forms.inc:1499
+msgid "The user %user remains as before. No action has done to this user."
+msgstr "O usuário %user continua como antes. Nenhuma ação foi executada neste usuário."
+
+#: ces_bank/ces_bank.forms.inc:1589
+msgid "There are no exchanges yet."
+msgstr "Não existem redes ainda."
+
+#: ces_bank/ces_bank.forms.inc:1646
+msgid "Seller exchange"
+msgstr "Rede de vendedor"
+
+#: ces_bank/ces_bank.forms.inc:1647
+msgid "The seller's account exchange."
+msgstr "The seller's account exchange."
+
+#: ces_bank/ces_bank.forms.inc:1657 ces_bank/ces_bank.module:1038
+#: ces_interop/ces_interop.module181;891
+msgid "Seller account"
+msgstr "Conta do vendedor"
+
+#: ces_bank/ces_bank.forms.inc:1658
+msgid ""
+"The recipient of the transaction. You can search by account or user name."
+msgstr "Recebedor da transação. Você pode procurar por conta ou nome de usuário."
+
+#: ces_bank/ces_bank.forms.inc1673;1718;2127
+msgid ""
+"Account id %id does not exist, is not active yet, or does not belong to "
+"exchange %ex"
+msgstr "Id da conta %id não existe, ainda não está ativa ou não pertence à rede %ex"
+
+#: ces_bank/ces_bank.forms.inc:1689
+msgid "Buyer exchange"
+msgstr "Rede do comprador"
+
+#: ces_bank/ces_bank.forms.inc:1690
+msgid "The buyer's account exchange."
+msgstr "The buyer's account exchange."
+
+#: ces_bank/ces_bank.forms.inc:1701 ces_bank/ces_bank.module:1033
+#: ces_interop/ces_interop.module168;901
+msgid "Buyer account"
+msgstr "Conta do comprador"
+
+#: ces_bank/ces_bank.forms.inc:1702
+msgid "The payer of the transaction. You can search by account or user name."
+msgstr "O pagador da transação. Você pode procurar por conta ou nome de usuário."
+
+#: ces_bank/ces_bank.forms.inc:1733 ces_bank/ces_bank.pages.inc746;863
+#: ces_bank/ces_bank.theme.inc:102 ces_bank/ces_bank.module:1047
+#: ces_interop/ces_interop.module196;906
+#: ces_offerswants/ces_offerswants.module643;999;1791
+#: ces_offerswants/includes/ces_offerswants_send_notify.inc:25
+msgid "Description"
+msgstr "Descrição"
+
+#: ces_bank/ces_bank.forms.inc:1734
+msgid "Enter the concept of the transference."
+msgstr "Coloque o conceito da transferência."
+
+#: ces_bank/ces_bank.forms.inc:1742
+msgid "Amount in @currenciesname"
+msgstr "Quantidade em @currenciesname"
+
+#: ces_bank/ces_bank.forms.inc:1743
+msgid "The amount to be transferred."
+msgstr "Quantidade a ser transferida."
+
+#: ces_bank/ces_bank.forms.inc:1757
+msgid "Create transaction"
+msgstr "Criar transação"
+
+#: ces_bank/ces_bank.forms.inc1757;1951
+msgid "Update transaction"
+msgstr "Atualizar transação"
+
+#: ces_bank/ces_bank.forms.inc:1777
+msgid "Authorize transaction"
+msgstr "Autorizar transação"
+
+#: ces_bank/ces_bank.forms.inc:1788
+msgid "Do you accept the following transaction from your account?"
+msgstr "Você aceita a seguinte transação a partir da sua conta?"
+
+#: ces_bank/ces_bank.forms.inc:1800
+msgid "Accept"
+msgstr "Aceitar"
+
+#: ces_bank/ces_bank.forms.inc:1805
+msgid "Reject"
+msgstr "Rejeitar"
+
+#: ces_bank/ces_bank.forms.inc:1894
+msgid "No transaction provided."
+msgstr "Nenhuma transação fornecida."
+
+#: ces_bank/ces_bank.forms.inc1898;2047 ces_interop/ces_interop.module:971
+msgid "Operation not permitted or not implemented yet."
+msgstr "Operação não permitida ou ainda não implementada."
+
+#: ces_bank/ces_bank.forms.inc1916;2412
+msgid "Are you sure you want to delete the transaction?"
+msgstr "Tem certeza que quer apagar a transação?"
+
+#: ces_bank/ces_bank.forms.inc1917;2413
+msgid "Transaction details:"
+msgstr "Detalhes da transação:"
+
+#: ces_bank/ces_bank.forms.inc1932;2343 ces_interop/ces_interop.module:917
+msgid "Back"
+msgstr "Voltar"
+
+#: ces_bank/ces_bank.forms.inc:1942
+msgid "Confirm transaction"
+msgstr "Confirmar transação"
+
+#: ces_bank/ces_bank.forms.inc:1943
+msgid "Confirm the transaction to end the process"
+msgstr "Confirmar a transação no fim do processo"
+
+#: ces_bank/ces_bank.forms.inc:1947
+msgid "Trigger transaction"
+msgstr "Lançar transação"
+
+#: ces_bank/ces_bank.forms.inc1983;2223
+msgid "Seller account %acc is incorrect."
+msgstr "Conta do vendedor %acc está incorreta."
+
+#: ces_bank/ces_bank.forms.inc1988;2239
+msgid "Buyer account %acc is incorrect."
+msgstr "Conta do vendedor %acc está incorreta."
+
+#: ces_bank/ces_bank.forms.inc1992;2242
+msgid "Buyer account cannot be the same as seller account."
+msgstr "A conta do comprador não pode ser a mesma que a do vendedor."
+
+#: ces_bank/ces_bank.forms.inc1997;2232
+msgid ""
+"The amount entered is not a numeric value. Use the dot \".\" character for "
+"the decimal point and do not use any thousands separator."
+msgstr "A quantidade especificada não é um valor numérico. Use ponto \".\" para separação decimal e não use separador de milhar."
+
+#: ces_bank/ces_bank.forms.inc2001;2234
+msgid "The amount must be positive."
+msgstr "A quantidade precisa ser positiva."
+
+#: ces_bank/ces_bank.forms.inc2014;2255
+msgid "You don't have permission to apply this transaction."
+msgstr "Você não tem permissão para realizar esta transação."
+
+#: ces_bank/ces_bank.forms.inc:2066
+msgid "Transaction successfully applied."
+msgstr "Transação aplicada satisfatoriamente."
+
+#: ces_bank/ces_bank.forms.inc:2070
+msgid "Transaction successfully updated."
+msgstr "Transação atualizada satisfatoriamente."
+
+#: ces_bank/ces_bank.forms.inc:2074
+msgid "Transaction has been rejected and will NOT be applied."
+msgstr "A transação foi rejeitada e NÃO será aplicada"
+
+#: ces_bank/ces_bank.forms.inc:2090
+msgid "The transaction has NOT been applied."
+msgstr "Esta transação NÃO foi aplicada"
+
+#: ces_bank/ces_bank.forms.inc:2092
+msgid "Details:"
+msgstr "Detalhes:"
+
+#: ces_bank/ces_bank.forms.inc:2119
+msgid "Invalid exchange or account."
+msgstr "Rede ou conta inválida."
+
+#: ces_bank/ces_bank.forms.inc2158;2299
+msgid "Concept"
+msgstr "Conceito"
+
+#: ces_bank/ces_bank.forms.inc:2201
+msgid "Create transactions"
+msgstr "Criar transações"
+
+#: ces_bank/ces_bank.forms.inc:2245
+msgid "You must specify the concept of this transaction."
+msgstr "Você deve especificar o conceito dessa transação"
+
+#: ces_bank/ces_bank.forms.inc:2295
+msgid "Seller account and user"
+msgstr "Conta e usuário do/a vendedor/a"
+
+#: ces_bank/ces_bank.forms.inc:2351
+msgid "Confirm all transactions"
+msgstr "Confirmar todas as transações"
+
+#: ces_bank/ces_bank.forms.inc:2401
+msgid ""
+"All transactions have been properly registered. For more information, see"
+msgstr "Todas as transações foram registradas corretamente. Para mais informações, veja"
+
+#: ces_bank/ces_bank.forms.inc:2402
+msgid "your account statement"
+msgstr "o extrato da sua conta"
+
+#: ces_bank/ces_bank.forms.inc:2427
+msgid "Transaction %concept has been deleted."
+msgstr "O %concept da transação foi eliminado."
+
+#: ces_bank/ces_bank.forms.inc:2469
+msgid "From"
+msgstr "De"
+
+#: ces_bank/ces_bank.forms.inc:2474
+msgid "To"
+msgstr "Para"
+
+#: ces_bank/ces_bank.forms.inc:2478
+#: ces_offerswants/ces_offerswants.module1988;2033;2113
+msgid "Filter"
+msgstr "Filtro"
+
+#: ces_bank/ces_bank.forms.inc:2517 ces_bank/ces_bank.pages.inc:393
+msgid "Permission type"
+msgstr "Tipo de permissão"
+
+#: ces_bank/ces_bank.forms.inc:2520 ces_bank/ces_bank.pages.inc:490
+#: ces_bank/ces_bank.module249;593;684
+msgid "View"
+msgstr "Ver"
+
+#: ces_bank/ces_bank.forms.inc:2521
+msgid "Use"
+msgstr "Usar"
+
+#: ces_bank/ces_bank.forms.inc:2522
+#: ces_bank/ces_bank.pages.account_users.inc:70
+#: ces_bank/ces_bank.pages.inc301;365;433;493
+#: ces_bank/ces_bank.module261;607;707 ces_message/ces_message.module:249
+#: ces_offerswants/ces_offerswants.module898;1843
+msgid "Edit"
+msgstr "Editar"
+
+#: ces_bank/ces_bank.forms.inc:2523
+msgid "Admin"
+msgstr "Administrador/a"
+
+#: ces_bank/ces_bank.forms.inc:2530 ces_bank/ces_bank.pages.inc:398
+msgid "Object type"
+msgstr "Tipo de objeto"
+
+#: ces_bank/ces_bank.forms.inc:2531
+msgid "The type of the piece of data on which the permission is set."
+msgstr "Tipo do conjunto de dados onde a permissão está."
+
+#: ces_bank/ces_bank.forms.inc2534;2565
+msgid "Global"
+msgstr "Global"
+
+#: ces_bank/ces_bank.forms.inc:2535
+msgid "Global statistics"
+msgstr "Estatísticas globais"
+
+#: ces_bank/ces_bank.forms.inc:2536
+msgid "Global exchange creation"
+msgstr "Criação de rede global"
+
+#: ces_bank/ces_bank.forms.inc:2538
+msgid "Exchange configuration details"
+msgstr "Detalhes de configuração da rede"
+
+#: ces_bank/ces_bank.forms.inc:2539
+msgid "Exchange account creation"
+msgstr "Criação de conta na rede"
+
+#: ces_bank/ces_bank.forms.inc:2541 ces_bank/ces_bank.theme.inc:43
+msgid "Account details"
+msgstr "Detalhes da conta"
+
+#: ces_bank/ces_bank.forms.inc:2542
+msgid "Account transactions"
+msgstr "Transações da conta"
+
+#: ces_bank/ces_bank.forms.inc:2543
+msgid "Account seller"
+msgstr "Conta do vendedor/a"
+
+#: ces_bank/ces_bank.forms.inc:2544
+msgid "Account buyer"
+msgstr "Conta do comprador/a"
+
+#: ces_bank/ces_bank.forms.inc:2553 ces_bank/ces_bank.pages.inc:403
+msgid "Object identifier"
+msgstr "Identificador de objeto"
+
+#: ces_bank/ces_bank.forms.inc:2559 ces_bank/ces_bank.pages.inc:407
+msgid "Scope type"
+msgstr "Tipo de escopo"
+
+#: ces_bank/ces_bank.forms.inc:2560
+msgid "The group of users who have this permission."
+msgstr "O grupo de usuários/as que têm esta permissão"
+
+#: ces_bank/ces_bank.forms.inc:2574 ces_bank/ces_bank.pages.inc:412
+msgid "Scope identifier"
+msgstr "Identificador de escopo"
+
+#: ces_bank/ces_bank.forms.inc:2580
+msgid "Create permission"
+msgstr "Criar permissão"
+
+#: ces_bank/ces_bank.forms.inc:2580
+msgid "Update permission"
+msgstr "Atualizar permissão"
+
+#: ces_bank/ces_bank.forms.inc:2617
+msgid "You are not authorized to modify permissions on this object."
+msgstr "Não está autorizado/a a modificar permissões para esse objeto."
+
+#: ces_bank/ces_bank.forms.inc:2620
+msgid "Object with given id does not exist."
+msgstr "Não existe nenhum objeto com esse id."
+
+#: ces_bank/ces_bank.forms.inc:2623
+msgid "Scope with given id does not exist."
+msgstr "Não existe nenhum escopo com esse id."
+
+#: ces_bank/ces_bank.forms.inc:2635
+msgid "Permission successfully created."
+msgstr "Permissão criada satisfatoriamente."
+
+#: ces_bank/ces_bank.forms.inc:2639
+msgid "Permission successfully updated."
+msgstr "Permissão atualizada satisfatoriamente."
+
+#: ces_bank/ces_bank.logic.inc:556
+msgid "Transaction id %id is invalid"
+msgstr "O Id %id da transação é inválido"
+
+#: ces_bank/ces_bank.logic.inc:899
+msgid "%offrs offers and wants of user %usr have been deleted."
+msgstr "%offrs ofertas e demandas do/a usuário/a %usr foram eliminadas."
+
+#: ces_bank/ces_bank.logic.inc:909
+msgid "%offrs offers and wants of user %usr have been hidden."
+msgstr "%offrs ofertas e demandas do/a usuário/a %usr foram ocultadas."
+
+#: ces_bank/ces_bank.logic.inc:918
+msgid "%offrcomm offer comments and ratings of user %usr have been deleted."
+msgstr "%offrcomm comentários e avaliações do/a usuário/a %usr foram eliminadas."
+
+#: ces_bank/ces_bank.logic.inc:1012
+msgid "CES Debug: getDefaultAccount: No exchangeId."
+msgstr "Depuração CES: getDefaultAccount: No exchangeId."
+
+#: ces_bank/ces_bank.logic.inc:1016
+msgid "CES Debug: getDefaultAccount: exchange is false."
+msgstr "Depuração CES: getDefaultAccount: a rede é falsa."
+
+#: ces_bank/ces_bank.logic.inc:1085
+msgid "There has been an error applying the transaction."
+msgstr "Houve um erro ao aplicar a transação."
+
+#: ces_bank/ces_bank.logic.inc:1308
+msgid "Object of type %classname with id %id does not exist."
+msgstr "O objeto do tipo %classname com id %id não existe."
+
+#: ces_bank/ces_bank.logic.inc1339;1348
+msgid "Seller account not set."
+msgstr "Conta do vendedor não estabelecida."
+
+#: ces_bank/ces_bank.logic.inc:1351
+msgid "Error loading seller account."
+msgstr "Erro ao carregar a conta do/a vendedor/a."
+
+#: ces_bank/ces_bank.logic.inc:1354
+msgid "Error loading buyer account."
+msgstr "Erro ao carregar a conta do/a comprador/a."
+
+#: ces_bank/ces_bank.logic.inc:1956
+msgid "User %user cannot accept transactions because it is not active."
+msgstr "O usuário/a %user não pode aceitar transações porque não está ativo/a"
+
+#: ces_bank/ces_bank.logic.inc:2008
+msgid "The transaction must be manually authorized."
+msgstr "A transação deve ser autorizada manualmente."
+
+#: ces_bank/ces_bank.logic.inc:2306
+msgid "Account %account exceeds the debit limit of %limit."
+msgstr "A conta %account supera o límite de endividamento de %limit."
+
+#: ces_bank/ces_bank.logic.inc:2336
+msgid "Account %account exceeds the credit limit of %limit."
+msgstr "A conta %account supera o limite de crédito de %limit."
+
+#: ces_bank/ces_bank.logic.inc:2672
+msgid "Invalid state transition for transaction %trans."
+msgstr "Estado de transição inválido para a transacção %trans."
+
+#: ces_bank/ces_bank.pages.account_users.inc:21
+msgid "List users account"
+msgstr "Lista de contas de usuários/as"
+
+#: ces_bank/ces_bank.pages.account_users.inc:38
+msgid "Mail"
+msgstr "Mail"
+
+#: ces_bank/ces_bank.pages.account_users.inc:46
+#: ces_bank/ces_bank.pages.inc354;416;474
+#: ces_import4ces/ces_import4ces.module:105
+#: ces_offerswants/ces_offerswants.module:1803
+msgid "Actions"
+msgstr "Ações"
+
+#: ces_bank/ces_bank.pages.account_users.inc:69
+msgid "yes"
+msgstr "Sim"
+
+#: ces_bank/ces_bank.pages.account_users.inc:69
+msgid "No"
+msgstr "Não"
+
+#: ces_bank/ces_bank.pages.inc:26
+msgid "New accounts"
+msgstr "Novas contas"
+
+#: ces_bank/ces_bank.pages.inc:27
+msgid ""
+"List of new account requests for this exchange. Activate or delete all them."
+msgstr "Lista de novos pedidos de contas para esta rede. Ativar ou eliminar todas elas."
+
+#: ces_bank/ces_bank.pages.inc:41
+msgid "No requests for new accounts."
+msgstr "Sem novos pedidos de criação de contas."
+
+#: ces_bank/ces_bank.pages.inc:45
+msgid "Administer limit chains"
+msgstr "Administrar correntes limite"
+
+#: ces_bank/ces_bank.pages.inc:84
+msgid "There are no active exchanges in %country."
+msgstr "Não tem transações ativas em %country."
+
+#: ces_bank/ces_bank.pages.inc:129
+msgid "Click to open an account in this exchange"
+msgstr "Clique aqui para abrir uma conta nesta rede"
+
+#: ces_bank/ces_bank.pages.inc:132
+msgid "Info about this exchange"
+msgstr "Info sobre esta rede"
+
+#: ces_bank/ces_bank.pages.inc:191
+msgid "Imports"
+msgstr "Importações"
+
+#: ces_bank/ces_bank.pages.inc:196
+msgid "Exports"
+msgstr "Exportações"
+
+#: ces_bank/ces_bank.pages.inc201;292;871 ces_bank/ces_bank.module:1327
+#: ces_bank/views/ces_bank.views_default.inc235;477
+#: ces_summaryblock/ces_summaryblock.module:129
+msgid "Balance"
+msgstr "Saldo"
+
+#: ces_bank/ces_bank.pages.inc:235
+msgid "Remote"
+msgstr "Remoto"
+
+#: ces_bank/ces_bank.pages.inc:256
+msgid "TOTAL"
+msgstr "TOTAL"
+
+#: ces_bank/ces_bank.pages.inc:297
+msgid "Statement"
+msgstr "Extrato"
+
+#: ces_bank/ces_bank.pages.inc:305
+msgid "Charge a sale"
+msgstr "Cobrar uma venda"
+
+#: ces_bank/ces_bank.pages.inc:319
+msgid "Exchange requests"
+msgstr "Pedidos de transações"
+
+#: ces_bank/ces_bank.pages.inc:335
+msgid "No requests for new exchanges."
+msgstr "Sem pedidos para novas transações."
+
+#: ces_bank/ces_bank.pages.inc:340
+msgid "Active exchanges"
+msgstr "Transações ativas"
+
+#: ces_bank/ces_bank.pages.inc:376
+msgid "No exchanges activated yet."
+msgstr "Sem transações ativas por enquanto."
+
+#: ces_bank/ces_bank.pages.inc:485
+msgid "block"
+msgstr "bloco"
+
+#: ces_bank/ces_bank.pages.inc:536
+msgid "You don't belong to any exchange yet."
+msgstr "Ainda não pertences a nenhuma rede."
+
+#: ces_bank/ces_bank.pages.inc:701
+msgid "Invalid exchange"
+msgstr "Rede inválida"
+
+#: ces_bank/ces_bank.pages.inc:706
+msgid "Transactions of account"
+msgstr "Transações da conta"
+
+#: ces_bank/ces_bank.pages.inc729;850 ces_bank/ces_bank.theme.inc:109
+#: ces_import4ces/ces_import4ces.module:101
+#: ces_message/views/ces_message.views_default.inc102;150;204
+msgid "Date"
+msgstr "Data"
+
+#: ces_bank/ces_bank.pages.inc:738 ces_bank/ces_bank.theme.inc:80
+msgid "Buyer"
+msgstr "Comprador/a"
+
+#: ces_bank/ces_bank.pages.inc:742 ces_bank/ces_bank.theme.inc:93
+msgid "Seller"
+msgstr "Vendedor/a"
+
+#: ces_bank/ces_bank.pages.inc750;867 ces_bank/ces_bank.theme.inc:105
+#: ces_bank/ces_bank.module:1043 ces_interop/ces_interop.module190;912
+msgid "Amount"
+msgstr "Quantidade"
+
+#: ces_bank/ces_bank.pages.inc:820
+msgid "You don't have any exchange account yet."
+msgstr "Você ainda não tem uma conta."
+
+#: ces_bank/ces_bank.pages.inc:883
+msgid "No Transaction"
+msgstr "Sem transações"
+
+#: ces_bank/ces_bank.pages.inc:950
+msgid "Not performed"
+msgstr "Não efetuada"
+
+#: ces_bank/ces_bank.pages.inc:951
+msgid "Awaiting acceptance"
+msgstr "Aguardando aceitação"
+
+#: ces_bank/ces_bank.pages.inc:952
+msgid "Accepted"
+msgstr "Aceita"
+
+#: ces_bank/ces_bank.pages.inc:953
+msgid "Committed"
+msgstr "Comprometida"
+
+#: ces_bank/ces_bank.pages.inc:954
+msgid "Archived"
+msgstr "Arquivada"
+
+#: ces_bank/ces_bank.pages.inc:955
+msgid "Rejected"
+msgstr "Rejeitada"
+
+#: ces_bank/ces_bank.pages.inc:956
+msgid "Discarded"
+msgstr "Descartada"
+
+#: ces_bank/ces_bank.pages.inc:957
+msgid "Revoke triggered"
+msgstr "Renúncia lançada"
+
+#: ces_bank/ces_bank.pages.inc:958
+msgid "Revoke accepted"
+msgstr "Renúncia aceita"
+
+#: ces_bank/ces_bank.pages.inc:959
+msgid "Revoke rejected"
+msgstr "Renúncia rejeitada"
+
+#: ces_bank/ces_bank.pages.inc:960
+msgid "Revoked"
+msgstr "Renunciada"
+
+#: ces_bank/ces_bank.pages.inc:961
+msgid "Error"
+msgstr "Error"
+
+#: ces_bank/ces_bank.theme.inc:31 ces_bank/ces_bank.module:998
+msgid "Currency value"
+msgstr "Valor da moeda"
+
+#: ces_bank/ces_bank.theme.inc:33
+msgid "Since"
+msgstr "Desde"
+
+#: ces_bank/ces_bank.theme.inc:47
+msgid "Account number"
+msgstr "Número de conta"
+
+#: ces_bank/ces_bank.theme.inc:53 ces_bank/ces_bank.module:1350
+#: ces_bank/views/ces_bank.views_default.inc:476
+msgid "Limit"
+msgstr "Limite"
+
+#: ces_bank/ces_bank.theme.inc:77
+msgid "Buyer's exchange"
+msgstr "Rede do/a comprador/a"
+
+#: ces_bank/ces_bank.theme.inc:90
+msgid "Seller's exchange"
+msgstr "Rede do vendedor/a"
+
+#: ces_bank/ces_bank.theme.inc:112
+msgid "Modified"
+msgstr "Modificado"
+
+#: ces_bank/ces_bank.theme.inc:115
+msgid "Entered by"
+msgstr "Inserido por"
+
+#: ces_bank/ces_bank.theme.inc:138
+msgid "No limits."
+msgstr "Sem limites."
+
+#: ces_bank/ces_bank.theme.inc:146 ces_message/ces_message.module127;142;449
+#: ces_message/includes/ces_message.templates.inc120;182;228;229;253;254;338
+msgid "Action"
+msgstr "Ação"
+
+#: ces_bank/ces_bank.theme.inc:146
+msgid "Weight"
+msgstr "Peso"
+
+#: ces_bank/ces_bank.theme.inc:178
+msgid "Warn"
+msgstr "Advertir"
+
+#: ces_bank/ces_bank.module:24
+msgid ""
+"Charge a sale. Select the payer account, enter a short decription and the "
+"amount of the transaction. This amount will be trasferred to your account."
+msgstr "Cobrar uma venda: selecione a conta do/a comprador/a, insira uma pequena descrição e o valor da transação. Esta quantidade será transferida a sua conta."
+
+#: ces_bank/ces_bank.module:30
+msgid "All users and banking accounts of your exchange."
+msgstr "Todas as contas bancárias e usuários/as da sua rede."
+
+#: ces_bank/ces_bank.module:36
+msgid "Balance of trade and currency value of other exchanges."
+msgstr "Saldo de transações e valor da moeda de outras redes."
+
+#: ces_bank/ces_bank.module:42
+msgid ""
+"Showing your transactions. Set the \"From\" and \"To\" dates to see a "
+"specific time range."
+msgstr "Como mostrar suas transações: escolha as datas de ínicio (\"Desde\") e final (\"Até\") para visualizar um período de tempo específico."
+
+#: ces_bank/ces_bank.module:46
+msgid "Click on the exchange you want to join."
+msgstr "Clique na rede que você quer fazer parte."
+
+#: ces_bank/ces_bank.module:50
+msgid "You can add users to this account."
+msgstr "Você pode adicionar usuários nesta conta,"
+
+#: ces_bank/ces_bank.module:52
+msgid ""
+"If you give them privileges, they can manage the account in addition to "
+"making transactions."
+msgstr "Se você lhes der privilégios, eles poderão gerenciar a conta além de fazer transações."
+
+#: ces_bank/ces_bank.module:902
+msgid "Absolute credit limit"
+msgstr "Limite de crédito absoluto "
+
+#: ces_bank/ces_bank.module:903
+msgid "Absolute debit limit"
+msgstr "Limite de débito absoluto "
+
+#: ces_bank/ces_bank.module:944
+msgid "Tokens for bank exchanges."
+msgstr "Tokens para trocas com o banco."
+
+#: ces_bank/ces_bank.module:948
+msgid "Tokens for bank accounts."
+msgstr "Tokens para contas de banco."
+
+#: ces_bank/ces_bank.module:951
+msgid "Transaction"
+msgstr "Transação"
+
+#: ces_bank/ces_bank.module:952
+msgid "Tokens for bank transactions."
+msgstr "Tokens para transações com o banco."
+
+#: ces_bank/ces_bank.module:958
+msgid "Exchange code"
+msgstr "Código da rede"
+
+#: ces_bank/ces_bank.module:959
+msgid "The 4 letter exchange code."
+msgstr "O código da rede com 4 letras."
+
+#: ces_bank/ces_bank.module:962
+msgid "Exchange short name"
+msgstr "Nome curto da rede"
+
+#: ces_bank/ces_bank.module:963
+msgid "Exchange short name."
+msgstr "Nome curto da rede."
+
+#: ces_bank/ces_bank.module:966
+msgid "Exchange full name"
+msgstr "Nome completo da rede"
+
+#: ces_bank/ces_bank.module:967
+msgid "Exchange full name."
+msgstr "Nome completo da rede."
+
+#: ces_bank/ces_bank.module:970
+msgid "Exchange country"
+msgstr "País da rede"
+
+#: ces_bank/ces_bank.module:971
+msgid "Exchange country."
+msgstr "País da rede."
+
+#: ces_bank/ces_bank.module:974
+msgid "Exchange town"
+msgstr "Cidade da rede"
+
+#: ces_bank/ces_bank.module:975
+msgid "Exchange town."
+msgstr "Cidade da rede."
+
+#: ces_bank/ces_bank.module:978
+msgid "Exchange region"
+msgstr "Região da rede"
+
+#: ces_bank/ces_bank.module:979
+msgid "Exchange region within the country."
+msgstr "Região da rede, dentro do país."
+
+#: ces_bank/ces_bank.module:982
+msgid "Exchange website"
+msgstr "Website da rede"
+
+#: ces_bank/ces_bank.module:983
+msgid "Exchange website."
+msgstr "Website da rede."
+
+#: ces_bank/ces_bank.module:986
+msgid "Currency symbol"
+msgstr "Símbolo da moeda"
+
+#: ces_bank/ces_bank.module:987
+msgid "Exchange currency symbol."
+msgstr "Símbolo da moeda da rede."
+
+#: ces_bank/ces_bank.module:990
+msgid "Currency name"
+msgstr "Nome da moeda"
+
+#: ces_bank/ces_bank.module:991
+msgid "Exchange currency name."
+msgstr "Nome da moeda da rede."
+
+#: ces_bank/ces_bank.module:994
+msgid "Currency name plural"
+msgstr "Nome da moeda no plural"
+
+#: ces_bank/ces_bank.module:995
+msgid "Exchange currency name in plural."
+msgstr "Nome da moeda da rede no plural."
+
+#: ces_bank/ces_bank.module:999
+msgid "Exchange currency value in hours of work."
+msgstr "Valor da moeda da rede em horas de trabalho."
+
+#: ces_bank/ces_bank.module:1002
+msgid "Exchange administrator"
+msgstr "Administrador da rede"
+
+#: ces_bank/ces_bank.module:1003
+msgid "Exchange administrator user."
+msgstr "Usuário administrador da rede."
+
+#: ces_bank/ces_bank.module:1009
+msgid "Account identifier"
+msgstr "Identificador da conta"
+
+#: ces_bank/ces_bank.module:1010
+msgid "4 letter exchange identifier plus 4 number account code."
+msgstr "4 letras do identificador da rede mais 4 números do código da conta. "
+
+#: ces_bank/ces_bank.module:1014
+msgid "Account type."
+msgstr "Tipo de conta."
+
+#: ces_bank/ces_bank.module:1017 ces_offerswants/ces_offerswants.module:2924
+msgid "Account user"
+msgstr "Usuário da conta"
+
+#: ces_bank/ces_bank.module:1018 ces_offerswants/ces_offerswants.module:2925
+msgid "Account user."
+msgstr "Usuário da conta."
+
+#: ces_bank/ces_bank.module1022;1023
+msgid "Exchange Account"
+msgstr "Conta na Rede"
+
+#: ces_bank/ces_bank.module:1029
+msgid "Identifier"
+msgstr "Identificador"
+
+#: ces_bank/ces_bank.module:1030
+msgid "Transaction identifier"
+msgstr "Identificador de transação"
+
+#: ces_bank/ces_bank.module:1034
+msgid "The buyer account object."
+msgstr "O objeto da conta do comprador."
+
+#: ces_bank/ces_bank.module:1039
+msgid "The seller account object."
+msgstr "O objeto da conta do vendedor."
+
+#: ces_bank/ces_bank.module:1044
+msgid "The transaction amount."
+msgstr "A quantia da transação."
+
+#: ces_bank/ces_bank.module:1048
+msgid "The concept of the transaction."
+msgstr "O conceito da transação."
+
+#: ces_bank/ces_bank.module:1051
+msgid "Ordered by"
+msgstr "Encomendado por"
+
+#: ces_bank/ces_bank.module:1052
+msgid "The user who created the transaction."
+msgstr "O usuário que criou a transação."
+
+#: ces_bank/ces_bank.module:1295
+msgid "Not yet implemented. Sorry!"
+msgstr "Ainda não implementado. Desculpe!"
+
+#: ces_bank/ces_bank.module:1336 ces_summaryblock/ces_summaryblock.module:105
+msgid "Sales"
+msgstr "Vendas"
+
+#: ces_bank/ces_bank.module:1343 ces_summaryblock/ces_summaryblock.module:111
+msgid "Purchases"
+msgstr "Compras"
+
+#: ces_bank/ces_bank.module:1394
+msgid "Account @name"
+msgstr "Conta @name"
+
+#: ces_bank/ces_bank.module:1398
+msgid "Accept payments manually"
+msgstr "Aceitar pagamentos manualmente"
+
+#: ces_bank/ces_bank.module:1399
+msgid ""
+"If cheked, all payments from all accounts but those in the whitelist will "
+"not be effective until you manually accept them. Otherwise all payments will"
+" automatically be done. If you check this item you must regularly check your"
+" messages to quickly accept your pending payments."
+msgstr "Se marcado, todos os pagamentos de todas as contas, exceto aqueles na \"lista branca\", não serão efetivados até que você os aceite manualmente. Se não, todos os pagamentos serão feitos automaticamente. Se você marcar este item, você deve verificar regularmente suas mensagens para aceitar rapidamente seus pagamentos pendentes."
+
+#: ces_bank/ces_bank.module:1404
+msgid "Accept payments whitelist"
+msgstr "\"Lista branca\" de pagamentos aceitos"
+
+#: ces_bank/ces_bank.module:1405
+msgid ""
+"Write one account per line. The payments from these accounts will be "
+"automatically accepted."
+msgstr "Escreva uma conta por linha. Os pagamentos cobrados por estas contas serão automaticamente aceitos. "
+
+#: ces_bank/ces_bank.module:1411
+msgid "Manage account users"
+msgstr "Gerenciar contas de usuários"
+
+#: ces_bank/ces_bank.module:1435
+msgid "Could not find account @account."
+msgstr "Não foi possível localizar a conta @account."
+
+#: ces_bank/ces_bank.module:1490
+msgid "Next >>"
+msgstr "Próximo >>"
+
+#: ces_bank/ces_bank.module:1512 ces_offerswants/ces_offerswants.module:2363
+msgid "<< Previous"
+msgstr "<< Anterior"
+
+#: ces_bank/ces_bank.module126;632
+msgid "Administer CES bank"
+msgstr "Administrar o banco CES"
+
+#: ces_bank/ces_bank.module127;633
+msgid "Top administer interface for CES Bank"
+msgstr "Interface de administração top para o Banco CES"
+
+#: ces_bank/ces_bank.module137;549;550
+msgid "Edit exchange"
+msgstr "Editar rede"
+
+#: ces_bank/ces_bank.module:138
+msgid "Top administer interface for CES Bank - Edit exchange"
+msgstr "Interface de administração top para o Banco CES - Editar rede"
+
+#: ces_bank/ces_bank.module:148
+msgid "Delete exchange"
+msgstr "Excluir rede"
+
+#: ces_bank/ces_bank.module:149
+msgid "Top administer interface for CES Bank - Delete exchange"
+msgstr "Interface de administração top para o Banco CES - Excluir rede"
+
+#: ces_bank/ces_bank.module:159
+msgid "Edit accounts"
+msgstr "Editar contas"
+
+#: ces_bank/ces_bank.module:160
+msgid "Top administer interface for CES Bank - Edit accounts"
+msgstr "Interface de administração top para o Banco CES - Editar contas"
+
+#: ces_bank/ces_bank.module:170
+msgid "Edit transactions"
+msgstr "Editar transações"
+
+#: ces_bank/ces_bank.module:171
+msgid "Top administer interface for CES Bank - Edit transactions"
+msgstr "Interface de administração top para o Banco CES - Editar transações"
+
+#: ces_bank/ces_bank.module182;655 ces_user/ces_user.module:378
+msgid "New exchange"
+msgstr "Nova rede"
+
+#: ces_bank/ces_bank.module183;656
+msgid "Create a new exchange"
+msgstr "Criar uma nova rede"
+
+#: ces_bank/ces_bank.module:194
+msgid "Administration"
+msgstr "Administração"
+
+#: ces_bank/ces_bank.module:208
+msgid "Administer accounts"
+msgstr "Contas de administrador"
+
+#: ces_bank/ces_bank.module220;310;409;576
+#: ces_import4ces/ces_import4ces.module:44
+#: ces_message/ces_message.module186;221
+msgid "List"
+msgstr "Listar"
+
+#: ces_bank/ces_bank.module225;226
+msgid "New account"
+msgstr "Nova conta"
+
+#: ces_bank/ces_bank.module237;238
+msgid "New user"
+msgstr "Novo usuário"
+
+#: ces_bank/ces_bank.module:250
+msgid "View account"
+msgstr "Visualizar conta"
+
+#: ces_bank/ces_bank.module:262
+msgid "Edit account"
+msgstr "Editar conta"
+
+#: ces_bank/ces_bank.module:286
+msgid "Show account transactions"
+msgstr "Mostrar transações da conta"
+
+#: ces_bank/ces_bank.module:298
+msgid "Administer transactions"
+msgstr "Transações do administrador"
+
+#: ces_bank/ces_bank.module315;581 ces_import4ces/ces_import4ces.module:49
+msgid "New"
+msgstr "Novo"
+
+#: ces_bank/ces_bank.module:318
+msgid "Do a transaction between two accounts."
+msgstr "Fazer uma transação entre duas contas."
+
+#: ces_bank/ces_bank.module:335
+msgid "Enter transaction"
+msgstr "Inserir transação"
+
+#: ces_bank/ces_bank.module:336
+msgid "Charge a sale to an account."
+msgstr "Cobrar uma venda a uma conta"
+
+#: ces_bank/ces_bank.module:350
+msgid "One transaction"
+msgstr "Uma transação"
+
+#: ces_bank/ces_bank.module:355
+msgid "Multiple transactions"
+msgstr "Múltiplas transações"
+
+#: ces_bank/ces_bank.module:356
+msgid "Charge many sales to many accounts."
+msgstr "Cobrar várias vendas a uma conta"
+
+#: ces_bank/ces_bank.module:369
+msgid "Autocomplete for accounts in a exchange"
+msgstr "Autocompletar para contas em uma rede"
+
+#: ces_bank/ces_bank.module:370
+msgid "Autocomplete for accounts in a exchange."
+msgstr "Autocompletar para contas em uma rede."
+
+#: ces_bank/ces_bank.module:380 ces_summaryblock/ces_summaryblock.module:91
+msgid "My account"
+msgstr "Minha conta"
+
+#: ces_bank/ces_bank.module:381
+msgid "View account details."
+msgstr "Ver detalhes da conta"
+
+#: ces_bank/ces_bank.module:397
+msgid "Account users"
+msgstr "Usuários da conta"
+
+#: ces_bank/ces_bank.module:398
+msgid "Admin account users"
+msgstr "Usuários da conta administradores"
+
+#: ces_bank/ces_bank.module414;744
+msgid "Add account users"
+msgstr "Adicionar usuários da conta"
+
+#: ces_bank/ces_bank.module438;439;780;781
+msgid "Edit account user"
+msgstr "Editar usuários da conta"
+
+#: ces_bank/ces_bank.module:451
+msgid "View exchange details"
+msgstr "Ver detalhes da rede"
+
+#: ces_bank/ces_bank.module:465
+msgid "View exchange accounts list"
+msgstr "Ver lista de contas da rede"
+
+#: ces_bank/ces_bank.module482;506
+msgid "Other exchanges"
+msgstr "Outras redes de trocas"
+
+#: ces_bank/ces_bank.module:483
+msgid "View trade balances with other exchanges"
+msgstr "Ver saldo de transações com outras redes"
+
+#: ces_bank/ces_bank.module:495
+msgid "Exchanges in your country"
+msgstr "Redes no seu país"
+
+#: ces_bank/ces_bank.module:496
+msgid "List of exchanges in your country"
+msgstr "Lista de redes no seu país"
+
+#: ces_bank/ces_bank.module:507
+msgid "List of exchanges in this site"
+msgstr "Lista de redes neste site"
+
+#: ces_bank/ces_bank.module:520
+msgid "List of accounts of other exchange"
+msgstr "Lista de contas de outra rede"
+
+#: ces_bank/ces_bank.module:565
+msgid "Types of debit and credit limits for accounts."
+msgstr "Tipos de limites de crédito e débito para contas."
+
+#: ces_bank/ces_bank.module:582
+msgid "Create a new account limit."
+msgstr "Criar um novo limite de conta."
+
+#: ces_bank/ces_bank.module:594
+msgid "View account limit details."
+msgstr "Ver detalhes do limite de conta."
+
+#: ces_bank/ces_bank.module:608
+msgid "Edit account limit"
+msgstr "Editar limite de conta"
+
+#: ces_bank/ces_bank.module:620
+msgid "Delete account limit"
+msgstr "Apagar limite de conta"
+
+#: ces_bank/ces_bank.module666;679
+msgid "Account statement"
+msgstr "Extrato da conta"
+
+#: ces_bank/ces_bank.module:667
+msgid "Last transactions with this account"
+msgstr "Últimas transações com esta conta"
+
+#: ces_bank/ces_bank.module:695
+msgid "Accept/Reject"
+msgstr "Aceitar/Rejeitar"
+
+#: ces_bank/ces_bank.module:696
+msgid "Accept or reject transaction."
+msgstr "Aceitar ou rejeitar transação."
+
+#: ces_bank/ces_bank.module:708
+msgid "Edit transaction."
+msgstr "Editar transação."
+
+#: ces_bank/ces_bank.module:720
+msgid "Delete transaction."
+msgstr "Apagar transação."
+
+#: ces_bank/ces_bank.module:732
+msgid "List users"
+msgstr "Listar usuários"
+
+#: ces_bank/ces_bank.module:733
+msgid "List account users"
+msgstr "Listar usuários da conta"
+
+#: (duplicate) ces_bank/ces_bank.install:21
+msgid "Error creating default permissions."
+msgstr "Erro ao criar permissões padrão."
+
+#: (duplicate) ces_bank/ces_bank.install:24
+msgid "Initial records created."
+msgstr "Registros iniciais criados."
+
+#: ces_bank/ces_bank.info:0
+msgid "ICES Bank"
+msgstr "Banco ICES"
+
+#: ces_bank/ces_bank.info:0
+msgid "Integral Community Exchange System Banking"
+msgstr "Integral Community Exchange System Banking"
+
+#: ces_bank/views/ces_bank.views.inc:16
+msgid "Ces Exchange"
+msgstr "Rede Ces"
+
+#: ces_bank/views/ces_bank.views.inc:19
+msgid "Ces Exchange table"
+msgstr "Tabela da rede Ces"
+
+#: ces_bank/views/ces_bank.views.inc:20
+msgid "Ces Exchange view."
+msgstr "Visualização da rede Ces."
+
+#: ces_bank/views/ces_bank.views.inc:30
+msgid "Ces exchange Id"
+msgstr "Id da rede Ces"
+
+#: ces_bank/views/ces_bank.views.inc:31
+msgid "Ces exchange id."
+msgstr "id da rede Ces"
+
+#: ces_bank/views/ces_bank.views.inc43;44
+msgid "Ces exchange message relationship"
+msgstr "Relacionamento de mensagens da rede Ces"
+
+#: ces_bank/views/ces_bank.views.inc45;89;183;202
+#: ces_message/views/ces_message.views.inc144;167
+msgid "More information on this relationship"
+msgstr "Mais informações deste relacionamento"
+
+#: ces_bank/views/ces_bank.views.inc:50
+msgid "Exchange Shortname"
+msgstr "Nome curto da rede"
+
+#: ces_bank/views/ces_bank.views.inc:51
+msgid "Exchange Shortname."
+msgstr "Nome curto da rede."
+
+#: ces_bank/views/ces_bank.views.inc:64
+msgid "Ces Account"
+msgstr "Conta Ces"
+
+#: ces_bank/views/ces_bank.views.inc:67
+msgid "Ces Account table"
+msgstr "Tabela da conta Ces"
+
+#: ces_bank/views/ces_bank.views.inc:68
+msgid "Ces Account view."
+msgstr "Visualização da conta Ces."
+
+#: ces_bank/views/ces_bank.views.inc:78
+#: ces_bank/views/ces_bank.views_default.inc227;467
+msgid "Ces account Id"
+msgstr "Id da conta Ces"
+
+#: ces_bank/views/ces_bank.views.inc:79
+msgid "Ces account id."
+msgstr "Id da conta Ces."
+
+#: ces_bank/views/ces_bank.views.inc87;88
+#: ces_bank/views/ces_bank.views_default.inc225;465
+msgid "Ces accountuser relationship"
+msgstr "Relacionamento do usuário da conta Ces"
+
+#: ces_bank/views/ces_bank.views.inc:93
+msgid "Account name"
+msgstr "Nome da conta"
+
+#: ces_bank/views/ces_bank.views.inc:94
+msgid "Account name."
+msgstr "Nome da conta."
+
+#: ces_bank/views/ces_bank.views.inc:101
+msgid "Account balance"
+msgstr "Saldo da conta"
+
+#: ces_bank/views/ces_bank.views.inc:102
+msgid "Account balance."
+msgstr "Saldo da conta."
+
+#: ces_bank/views/ces_bank.views.inc:109
+msgid "Account state"
+msgstr "Estado da conta"
+
+#: ces_bank/views/ces_bank.views.inc:110
+msgid "Account state."
+msgstr "Estado da conta."
+
+#: ces_bank/views/ces_bank.views.inc:119
+msgid "Account kind"
+msgstr "Tipo da conta"
+
+#: ces_bank/views/ces_bank.views.inc:120
+msgid "Account kind."
+msgstr "Tipo da conta."
+
+#: ces_bank/views/ces_bank.views.inc:129
+msgid "Account limit"
+msgstr "Limite da conta"
+
+#: ces_bank/views/ces_bank.views.inc:130
+msgid "Account limit."
+msgstr "Limite da conta."
+
+#: ces_bank/views/ces_bank.views.inc:136
+msgid "Account exchange"
+msgstr "Rede da conta"
+
+#: ces_bank/views/ces_bank.views.inc:137
+msgid "Account exchange."
+msgstr "Rede da conta."
+
+#: ces_bank/views/ces_bank.views.inc:148
+msgid "Ces Account-Users"
+msgstr "Usuários da conta Ces"
+
+#: ces_bank/views/ces_bank.views.inc:151
+msgid "Ces Account-User table"
+msgstr "Tabela de usuários da conta Ces"
+
+#: ces_bank/views/ces_bank.views.inc:152
+msgid "Ces Account-User view."
+msgstr "Visualização de usuário da conta Ces."
+
+#: ces_bank/views/ces_bank.views.inc:168
+msgid "Ces account user Id"
+msgstr "Id do usuário da conta Ces"
+
+#: ces_bank/views/ces_bank.views.inc:169
+msgid "Ces account user Id."
+msgstr "Id do usuário da conta Ces."
+
+#: ces_bank/views/ces_bank.views.inc181;182
+#: ces_bank/views/ces_bank.views_default.inc226;466
+msgid "Ces user relationship"
+msgstr "Relacionamento do usuário Ces"
+
+#: ces_bank/views/ces_bank.views.inc:187
+msgid "Ces account(user) Id"
+msgstr "Id da conta(usuário) Ces"
+
+#: ces_bank/views/ces_bank.views.inc:188
+msgid "Ces account(user) Id."
+msgstr "Id da conta(usuário) Ces."
+
+#: ces_bank/views/ces_bank.views.inc200;201
+msgid "Ces transaction relationship"
+msgstr "Relacionamento da transação Ces"
+
+#: ces_bank/views/ces_bank.views_default.inc211;451
+#: ces_message/views/ces_message.views_default.inc181;419
+msgid "Master"
+msgstr "Master"
+
+#: ces_bank/views/ces_bank.views_default.inc212;452
+#: ces_message/views/ces_message.views_default.inc183;421
+msgid "more"
+msgstr "mais"
+
+#: ces_bank/views/ces_bank.views_default.inc213;453
+#: ces_message/views/ces_message.views_default.inc184;422
+msgid "Apply"
+msgstr "Aplicar"
+
+#: ces_bank/views/ces_bank.views_default.inc214;454
+#: ces_message/views/ces_message.views_default.inc36;185;229;423
+msgid "Reset"
+msgstr "Reset"
+
+#: ces_bank/views/ces_bank.views_default.inc215;455
+#: ces_message/views/ces_message.views_default.inc186;424
+msgid "Sort by"
+msgstr "Selecionar por"
+
+#: ces_bank/views/ces_bank.views_default.inc216;456
+#: ces_message/views/ces_message.views_default.inc187;425
+msgid "Asc"
+msgstr "Asc"
+
+#: ces_bank/views/ces_bank.views_default.inc217;457
+#: ces_message/views/ces_message.views_default.inc188;426
+msgid "Desc"
+msgstr "Desc"
+
+#: ces_bank/views/ces_bank.views_default.inc218;458
+#: ces_message/views/ces_message.views_default.inc189;427
+msgid "Items per page"
+msgstr "Itens por página"
+
+#: ces_bank/views/ces_bank.views_default.inc219;459
+#: ces_message/views/ces_message.views_default.inc190;428
+msgid "- All -"
+msgstr "- Tudo -"
+
+#: ces_bank/views/ces_bank.views_default.inc220;460
+#: ces_message/views/ces_message.views_default.inc191;429
+msgid "Offset"
+msgstr "Offset"
+
+#: ces_bank/views/ces_bank.views_default.inc221;461
+msgid "« first"
+msgstr "primeiro"
+
+#: ces_bank/views/ces_bank.views_default.inc222;462
+msgid "‹ previous"
+msgstr "anterior"
+
+#: ces_bank/views/ces_bank.views_default.inc223;463
+msgid "next ›"
+msgstr "próximo"
+
+#: ces_bank/views/ces_bank.views_default.inc224;464
+msgid "last »"
+msgstr "último"
+
+#: ces_bank/views/ces_bank.views_default.inc228;468
+#: ces_message/views/ces_message.views_default.inc199;436
+msgid "."
+msgstr " ."
+
+#: ces_bank/views/ces_bank.views_default.inc229;480
+msgid ","
+msgstr " ,"
+
+#: ces_bank/views/ces_bank.views_default.inc232;471
+#: ces_user/ces_user.install:149
+msgid "First Name"
+msgstr "Nome"
+
+#: ces_bank/views/ces_bank.views_default.inc233;472
+#: ces_user/ces_user.install:151
+msgid "Surname"
+msgstr "Sobrenome"
+
+#: ces_bank/views/ces_bank.views_default.inc:234
+msgid "E-mail"
+msgstr "E-mail"
+
+#: ces_bank/views/ces_bank.views_default.inc236;478
+#: ces_offerswants/ces_offerswants.module:2048
+#: ces_summaryblock/ces_summaryblock.module:249
+msgid "All"
+msgstr "Tudo"
+
+#: ces_bank/views/ces_bank.views_default.inc238;481
+msgid "Search for account, user or email"
+msgstr "Procurar conta, usuário ou email"
+
+#: ces_bank/views/ces_bank.views_default.inc:239
+msgid "Accounts "
+msgstr "Contas"
+
+#: ces_bank/views/ces_bank.views_default.inc:240
+msgid "Accounts list, display for auth-users."
+msgstr "Lista de contas, exibição para usuários autorizados."
+
+#: ces_bank/views/ces_bank.views_default.inc:473 ces_user/ces_user.module:341
+msgid "Email"
+msgstr "Email"
+
+#: ces_bank/views/ces_bank.views_default.inc:482
+msgid "Accounts admin"
+msgstr "Administrador de contas"
+
+#: ces_bank/views/ces_bank.views_default.inc:483
+msgid "Accounts list, display for_for_admins admins."
+msgstr "Lista de contas, exibição para usuários administradores."
+
+#: ces_blog/ces_blog.module:72
+msgid "Exchange blog entry"
+msgstr "Postagem do blog de troca"
+
+#: ces_blog/ces_blog.module:74
+msgid "Blog post for members of your exchange"
+msgstr "Postagem do Blog para membros da sua troca"
+
+#: ces_blog/ces_blog.module:108
+msgid "There are no blog posts yet."
+msgstr "Ainda não há postagem no blog"
+
+#: ces_blog/ces_blog.module:114
+msgid "Add new post"
+msgstr "Adicionar nova postagem"
+
+#: ces_blog/ces_blog.module:127
+msgid "CES blog exchange"
+msgstr "Blog CES da rede"
+
+#: ces_blog/ces_blog.module139;140
+#: ces_offerswants/ces_offerswants.module633;990;1788;2068;2906
+msgid "Title"
+msgstr "Título"
+
+#: ces_blog/ces_blog.module:169
+msgid "Hidden formatter"
+msgstr "Formatador oculto"
+
+#: (duplicate) ces_blog/ces_blog.module26;48 ces_blog/ces_blog.install:25
+msgid "Blog"
+msgstr "Blog"
+
+#: ces_blog/ces_blog.module:27
+msgid "View exchange posts"
+msgstr "Visualizar postagens da rede"
+
+#: ces_blog/ces_blog.module:37
+msgid "Post"
+msgstr "Postagem"
+
+#: ces_blog/ces_blog.module:38
+msgid "Add new blog post"
+msgstr "Adicionar nova postagem no blog"
+
+#: ces_blog/ces_blog.module:49
+msgid "View other exchange blog."
+msgstr "Visualizar blog de outra rede"
+
+#: (duplicate) ces_blog/ces_blog.install:32
+msgid "CES Exchange blog post."
+msgstr "Postagem do blog da rede CES"
+
+#: (duplicate) ces_blog/ces_blog.install:33
+msgid "Content"
+msgstr "Conteúdo"
+
+#: (duplicate) ces_blog/ces_blog.install:34
+msgid "Title Ces Blog"
+msgstr "Título do blog CES"
+
+#: ces_blog/ces_blog.info:0
+msgid "ICES exchange blog"
+msgstr "blog da rede ICES"
+
+#: ces_blog/ces_blog.info:0
+msgid "Individual blog for each exchange."
+msgstr "Blog individual para cada rede"
+
+#: ces_develop/ces_develop.module:111 ces_user/ces_user.module:192
+msgid "Create new account"
+msgstr "Criar nova conta"
+
+#: ces_develop/ces_develop.module15;16
+msgid "Run script"
+msgstr "Rodar script"
+
+#: ces_develop/ces_develop.info:0
+msgid "ICES develop"
+msgstr "Desenvolver ICES"
+
+#: ces_develop/ces_develop.info:0
+msgid "CES develop helper module. Do not install in a production site."
+msgstr "Módulo de ajuda de desenvolvimento CES. Não instale em um site de produção."
+
+#: ces_import4ces/ces_import4ces.module:103
+msgid "Step"
+msgstr "Passo"
+
+#: ces_import4ces/ces_import4ces.module:104
+msgid "Row"
+msgstr "Linha"
+
+#: ces_import4ces/ces_import4ces.module121;58
+msgid "Continue"
+msgstr "Continuar"
+
+#: ces_import4ces/ces_import4ces.module:146
+msgid "Upload new files"
+msgstr "Carregar novos arquivos"
+
+#: ces_import4ces/ces_import4ces.module:160
+msgid "Select a previously uploaded import file set or let \"Upload new files\"."
+msgstr "Selecione um set de importação de arquivos previamente carregado ou permita \"Carregar novos arquivos\"."
+
+#: ces_import4ces/ces_import4ces.module:165
+msgid "A good name is the four letter code of the exchange to be imported."
+msgstr "Um bom nome é o código de quatro letras da rede a ser importada."
+
+#: ces_import4ces/ces_import4ces.module:192
+msgid "Do you really want to start a new import?"
+msgstr "Realmente quer iniciar uma nova importação?"
+
+#: ces_import4ces/ces_import4ces.module:194
+msgid "Either select an import set or upload a new set of files."
+msgstr "Selecione um set de importação ou carregue um novo set de arquivos. "
+
+#: ces_import4ces/ces_import4ces.module:195
+msgid "New import"
+msgstr "Nova importação"
+
+#: ces_import4ces/ces_import4ces.module:202
+msgid "Step @num. Import @type."
+msgstr "Passo@num. Importar @type."
+
+#: ces_import4ces/ces_import4ces.module:206
+msgid "Importing step @step of exchange @exchange from row @row."
+msgstr "Importando passo @step da rede @exchange a partir da linha @row."
+
+#: ces_import4ces/ces_import4ces.module:210
+msgid "Import @type"
+msgstr "Importar @type"
+
+#: ces_import4ces/ces_import4ces.module:213
+msgid "All data has been imported"
+msgstr "Todos os dados foram importados"
+
+#: ces_import4ces/ces_import4ces.module:214
+msgid "Click Finish to end the import process."
+msgstr "Clique Finalizar para acabar o processo de importação."
+
+#: ces_import4ces/ces_import4ces.module:215
+msgid "Finish"
+msgstr "Finalizar"
+
+#: ces_import4ces/ces_import4ces.module255;269
+msgid "Import row"
+msgstr "Linha de importação"
+
+#: ces_import4ces/ces_import4ces.module259;292
+msgid "Skip row"
+msgstr "Saltar linha"
+
+#: ces_import4ces/ces_import4ces.module:330
+msgid "Invalid folder name."
+msgstr "Nome da pasta inválido."
+
+#: ces_import4ces/ces_import4ces.module:343
+msgid "Could not copy file to %file"
+msgstr "Não foi possível copiar o arquivo para %file"
+
+#: ces_import4ces/ces_import4ces.module:376
+msgid "Invalid import identifier."
+msgstr "Identificador de importação inválido."
+
+#: ces_import4ces/ces_import4ces.module:419
+msgid "Import finished successfully."
+msgstr "Importação finalizada satisfatoriamente."
+
+#: ces_import4ces/ces_import4ces.module:425
+msgid "Invalid import step."
+msgstr "Passo de importação não válido."
+
+#: ces_import4ces/ces_import4ces.module:462
+msgid "Import file @path not found."
+msgstr "Arquivo @path não encontrado."
+
+#: ces_import4ces/ces_import4ces.module:544
+msgid "Could not open import file @path."
+msgstr "Não foi possível abrir arquivo @path."
+
+#: ces_import4ces/ces_import4ces.module:552
+msgid "There is no data to import in this step."
+msgstr "Não há dados para importar nesse passo."
+
+#: ces_import4ces/ces_import4ces.module:559
+msgid "Importing @exchange step @step"
+msgstr "Importando @exchange passo @step"
+
+#: ces_import4ces/ces_import4ces.module:561
+msgid "Import is starting."
+msgstr "A importação está iniciando."
+
+#: ces_import4ces/ces_import4ces.module:562
+msgid "Processed @current out of @total."
+msgstr "Processado @current de @total."
+
+#: ces_import4ces/ces_import4ces.module:563
+msgid "Error during import."
+msgstr "Erro durante a importação."
+
+#: ces_import4ces/ces_import4ces.module:588
+msgid "The row @row could not be parsed."
+msgstr "A linha @row não pôde ser analisada."
+
+#: ces_import4ces/ces_import4ces.module:605
+msgid "Step finished successfully."
+msgstr "Passo finalizado com sucesso."
+
+#: ces_import4ces/ces_import4ces.module:643
+msgid "Unknown error."
+msgstr "Erro desconhecido."
+
+#: ces_import4ces/ces_import4ces.module:672
+msgid "Are you sure you want to delete the exchange @name and all its data?"
+msgstr "Tem certeza que quer apagar o @nome da rede e todos os seus dados?"
+
+#: ces_import4ces/ces_import4ces.module:676
+msgid "Invaid import id."
+msgstr "ID de importação inválido."
+
+#: ces_import4ces/ces_import4ces.module:762
+msgid "Import data has been deleted."
+msgstr "Dado de importação foi excluído."
+
+#: ces_import4ces/ces_import4ces.module:36
+msgid "Import exchange"
+msgstr "Importar rede"
+
+#: ces_import4ces/ces_import4ces.module:50
+msgid "Start a new exchange import from CES"
+msgstr "Iniciar uma nova importação de rede a partir de CES"
+
+#: ces_import4ces/ces_import4ces.module:59
+msgid "Continue the import from CES"
+msgstr "Continuar a importação a partir de CES"
+
+#: ces_import4ces/ces_import4ces.module:68
+msgid "Delete the import from CES"
+msgstr "Excluir a importação a partir de CES"
+
+#: ces_import4ces/ces_import4ces.info:0
+msgid "ICES import"
+msgstr "Importação de ICES"
+
+#: ces_import4ces/ces_import4ces.info:0
+msgid "Import data from CES"
+msgstr "Importar dados a partir de CES"
+
+#: ces_import4ces/imports/offers.php:59
+msgid ""
+"The user @user was not found in offer import row @row. It may be a\n"
+"      user from another exchange not yet imported."
+msgstr "O usuário @user não foi encontrado na importação de ofertas, linha @row. Pode ser um usuário de outra rede ainda não importada."
+
+#: ces_import4ces/imports/offers.php:95
+msgid "Image @file could not be downloaded."
+msgstr "Imagem @file não pôde ser baixada."
+
+#: ces_import4ces/imports/trades.php29;33
+msgid "Acount @account not found."
+msgstr "Conta @account não encontrada."
+
+#: ces_import4ces/imports/users.php:144
+msgid "Error creating Drupal user."
+msgstr "Erro na criação de usuário Drupal."
+
+#: ces_import4ces/imports/wants.php:58
+msgid ""
+"The user @user was not found in want import row @row. It may be a\n"
+"      user from another exchange not yet imported."
+msgstr "O usuário @user não foi encontrado na fila @row de importação de demanda.\nEsse pode ser um usuário de outra troca ainda não importada."
+
+#: ces_interop/ces_interop.cenip.logic.inc:343
+msgid "Network error in remote transaction."
+msgstr "Erro de rede em transação remota."
+
+#: ces_interop/ces_interop.cenip.logic.inc:376
+msgid ""
+"Network error connecting with Clearing Central. Try again later or contact "
+"your exchange administrator."
+msgstr "Erro de rede ao conectar com Clearing Central. Tente novamente mais tarde ou contate o administrador da sua rede."
+
+#: ces_interop/ces_interop.cenip.logic.inc:383
+msgid "Buyer account does not exist."
+msgstr "Conta do comprador não existe."
+
+#: ces_interop/ces_interop.cenip.logic.inc:386
+msgid "Network ID does not exist."
+msgstr "ID da rede não existe."
+
+#: ces_interop/ces_interop.cenip.logic.inc:389
+msgid "Transaction denied by remote exchange."
+msgstr "Transação rejeitada pela rede remota."
+
+#: ces_interop/ces_interop.cenip.logic.inc:392
+msgid "Faulty data."
+msgstr "Dado defeituoso."
+
+#: ces_interop/ces_interop.cenip.logic.inc:395
+msgid "The transaction has repeated ID."
+msgstr "Atransação tem ID repetido."
+
+#: ces_interop/ces_interop.cenip.logic.inc:398
+msgid "URL error."
+msgstr "Erro de URL."
+
+#: ces_interop/ces_interop.cenip.logic.inc:401
+msgid "Remote conversion rate not set."
+msgstr "Taxa de conversão remota não definida."
+
+#: ces_interop/ces_interop.cenip.logic.inc:404
+msgid "Remote server error."
+msgstr "Erro de servidor remoto."
+
+#: ces_interop/ces_interop.cenip.logic.inc:407
+msgid "Password incorrect."
+msgstr "Senha incorreta."
+
+#: ces_interop/ces_interop.cenip.logic.inc:410
+msgid "Invalid IP of incoming server."
+msgstr "IP inválido do servidor de entrada."
+
+#: ces_interop/ces_interop.cenip.logic.inc:413
+msgid "No Transaction ID provided."
+msgstr "ID de transação não fornecido."
+
+#: ces_interop/ces_interop.cenip.logic.inc:416
+msgid "Transaction ID does not exist."
+msgstr "ID de transação não existe."
+
+#: ces_interop/ces_interop.cenip.logic.inc:419
+msgid "Unable to connect to remote server."
+msgstr "Impossível conectar ao servidor remoto."
+
+#: ces_interop/ces_interop.cenip.logic.inc:422
+msgid "Unknown error in remote transaction."
+msgstr "Erro desconhecido em transação remota."
+
+#: ces_interop/ces_interop.module:148
+msgid "Do you authorize the following transaction?"
+msgstr "Você autoriza a transação seguinte?"
+
+#: ces_interop/ces_interop.module:193
+msgid "No details provided."
+msgstr "Nenhum detalhe fornecido."
+
+#: ces_interop/ces_interop.module469;513
+msgid "There is no user with ID @id."
+msgstr "Não há usuário com o ID @id."
+
+#: ces_interop/ces_interop.module482;533
+msgid "There is no account with ID @id."
+msgstr "Não há conta com o ID @id."
+
+#: ces_interop/ces_interop.module495;550
+msgid "There is no transaction with ID @id."
+msgstr "Não há transação com o ID @id."
+
+#: ces_interop/ces_interop.module:572
+msgid "CEN Clearing Central URL"
+msgstr "URL da Clearing Central CEN "
+
+#: ces_interop/ces_interop.module:574
+msgid "The URL of the Community Exchange Network Clearing Central server."
+msgstr "A URL do servidor da Community Exchange Network Clearing Central. "
+
+#: ces_interop/ces_interop.module:578
+msgid "CEN Clearing Central IP"
+msgstr "IP da Clearing Central IP"
+
+#: ces_interop/ces_interop.module:580
+msgid "Only requests from this IP will be allowed."
+msgstr "Apenas solicitações deste IP serão permitidas."
+
+#: ces_interop/ces_interop.module:584
+msgid "Debug mode"
+msgstr "Modo de debug"
+
+#: ces_interop/ces_interop.module:586
+msgid ""
+"Do not check on production sites. Accept CEN messages from any address."
+msgstr "Não marque em sites de produção. Aceitar mensagens CEN de qualquer endereço. "
+
+#: ces_interop/ces_interop.module:599
+msgid "Allow remote transactions"
+msgstr "Permitir transações remotas"
+
+#: ces_interop/ces_interop.module:600
+msgid ""
+"Allow transactions with remote servers from the Community Exchange Network."
+msgstr "Permitir transações com servidores remotos da Community Exchange Network."
+
+#: ces_interop/ces_interop.module:616
+msgid "NID"
+msgstr "NID"
+
+#: ces_interop/ces_interop.module:617
+msgid ""
+"Network Identifier in the Community Exchange Network. For example: cen0123. "
+"You can check your account at !link."
+msgstr "Identificador de rede na Community Exchange Network. Por exemplo: cen0123. Você pode marcar sua conta em @link."
+
+#: ces_interop/ces_interop.module:619
+msgid "Clearing Central"
+msgstr "Clearing Central"
+
+#: ces_interop/ces_interop.module:626
+msgid "Password"
+msgstr "Senha"
+
+#: ces_interop/ces_interop.module:628
+msgid ""
+"Password of the Community Exchange Network account for this exchange. Leave "
+"blank to keep the stored password."
+msgstr "Senha da conta Community Exchange Network para esta rede. Deixe em branco para manter a senha armazenada."
+
+#: ces_interop/ces_interop.module:648
+msgid ""
+"Specify the NID (Network Identifier) to be able to trade with remote "
+"echanges within the Community Echange Network."
+msgstr "Especifique o NID (Network Identifier) para poder transacionar com redes remotas dentro da Community Echange Network."
+
+#: ces_interop/ces_interop.module:667
+msgid "Specify the password for this Community Exchange Network."
+msgstr "Especificar a senha para essa Community Exchange Network."
+
+#: ces_interop/ces_interop.module:690
+msgid "The pair NID/password is incorrect."
+msgstr "O par NID/senha está incorreto."
+
+#: ces_interop/ces_interop.module:731
+msgid "Extern network..."
+msgstr "Rede externa..."
+
+#: ces_interop/ces_interop.module:751
+msgid "Remote transactions can only be edited by the seller account."
+msgstr "Transações remotas só podem ser editadas pela conta do vendedor."
+
+#: ces_interop/ces_interop.module:768
+msgid "Netork ID"
+msgstr "ID de Rede"
+
+#: ces_interop/ces_interop.module:769
+msgid ""
+"Enter the identifier of the remote network, for example \"cen1234\". Click "
+"\"Search\" to find the network identifier you are looking for."
+msgstr "Digite o identificador da rede remota, por exemplo \"cen1234\". Clique \"Buscar\" para encontrar o identificador da rede que você está procurando."
+
+#: ces_interop/ces_interop.module:773
+#: ces_offerswants/ces_offerswants.module2083;2089
+msgid "Search"
+msgstr "Buscar"
+
+#: ces_interop/ces_interop.module:835
+msgid "The Network Id must be the three leters \"cen\" plus four numbers."
+msgstr "O ID da Rede deve ter as 3 letras \"cen\" mais 4 números. "
+
+#: ces_interop/ces_interop.module:884
+msgid ""
+"Check that all this data is correct before submit the extern transaction."
+msgstr "Cheque se todos estes dados estão corretos antes de submeter a transação externa."
+
+#: ces_interop/ces_interop.module:896
+msgid "Buyer Network ID"
+msgstr "ID da rede do comprador"
+
+#: ces_interop/ces_interop.module:995
+msgid ""
+"Warning: This is a remote transaction using the Community Exchage Network "
+"protocol and can not be revoked. This will delete the transaction only from "
+"the local system and therefore you may cause inconsistency in balances."
+msgstr "Aviso: Essa é uma transação remota usando o protocolo da Community Exchage Network e não pode ser revogada. Isso irá excluir a transação apenas do sistema local e assim você poderá causar inconsistência nos balanços."
+
+#: ces_interop/ces_interop.module:999
+msgid "Remote transactions can not be deleted."
+msgstr "Transações remotas não podem ser excluídas."
+
+#: ces_interop/ces_interop.module:53
+msgid "ICES interop settings"
+msgstr "Configurações de interoperabilidade ICES"
+
+#: ces_interop/ces_interop.module:54
+msgid "Change global settings related to IntegralCES interoperability."
+msgstr "Modificar configurações globais relacionadas à interoperabilidade IntegralCES."
+
+#: ces_interop/ces_interop.info:0
+msgid "ICES interoperability services"
+msgstr "Serviços de interoperabilidade ICES"
+
+#: ces_interop/ces_interop.info:0
+msgid "Implements the opentransact protocol for financial transactions."
+msgstr "Implementa o protocolo opentransact para transações financeiras."
+
+#: ces_message/ces_message.module:28
+#: ces_message/includes/ces_message.message.inc:56
+#: ces_message/views/ces_message.views.inc:16
+msgid "Message"
+msgstr "Mensagem"
+
+#: ces_message/ces_message.module:47
+#: ces_message/includes/ces_message.templates.inc:107
+msgid "Default"
+msgstr "Padrão"
+
+#: ces_message/ces_message.module58;120
+msgid "Tweaky"
+msgstr "Tweaky"
+
+#: ces_message/ces_message.module:62
+msgid "In a message list"
+msgstr "Em uma lista de mensagens"
+
+#: ces_message/ces_message.module:70
+msgid "Message template"
+msgstr "Templates de mensagens"
+
+#: ces_message/ces_message.module:147
+msgid "Full action"
+msgstr "Ação completada"
+
+#: ces_message/ces_message.module:317
+msgid "Internal error"
+msgstr "Erro interno"
+
+#: ces_message/ces_message.module:318
+msgid "No template was found"
+msgstr "Não foram encontrados templates"
+
+#: ces_message/ces_message.module:319
+msgid "for action"
+msgstr "para a ação"
+
+#: ces_message/ces_message.module:320
+msgid "with language"
+msgstr "nesse idioma"
+
+#: ces_message/ces_message.module:363
+msgid "Undefined exchange."
+msgstr "Transação não definida"
+
+#: ces_message/ces_message.module:375
+msgid "No template from action"
+msgstr "Sem templates dessa ação"
+
+#: ces_message/ces_message.module:414
+#: ces_offerswants/ces_offerswants.module:1644
+msgid "Error processing message template."
+msgstr "Erro ao processar templates de mensagens"
+
+#: ces_message/ces_message.module:440
+msgid "No accounts to test"
+msgstr "Nenhuma conta para testar"
+
+#: ces_message/ces_message.module:453
+msgid "Mail sent to user"
+msgstr "Mail enviado ao/à usuário/a"
+
+#: ces_message/ces_message.module:479
+msgid "No access. Messages from your account are shown"
+msgstr "Acesso restrito. São mostradas as mensagens da sua conta"
+
+#: ces_message/ces_message.module:177
+msgid "Messages"
+msgstr "Mensagens"
+
+#: ces_message/ces_message.module:200
+msgid "List all"
+msgstr "Listar tudo"
+
+#: ces_message/ces_message.module:210
+msgid "Templates"
+msgstr "Templates"
+
+#: ces_message/ces_message.module211;222
+msgid "Administer message templates"
+msgstr "Administrar templates de mensagens"
+
+#: ces_message/ces_message.module:230
+msgid "Add"
+msgstr "Adicionar"
+
+#: ces_message/ces_message.module:231
+msgid "Add message templates"
+msgstr "Adicionar templates de mensagens"
+
+#: ces_message/ces_message.install:340
+msgid "Action !action not found while installing template."
+msgstr "Ação !action não achada durante a instalação do template."
+
+#: ces_message/ces_message.info:0
+msgid "ICES Message"
+msgstr "Mensagem do ICES"
+
+#: ces_message/ces_message.info:0
+msgid "System message for ICES"
+msgstr "Mensagem de sistema para ICES"
+
+#: ces_message/includes/ces_message.message.inc:93
+#: ces_message/includes/ces_message.templates.inc:177
+msgid "Created date"
+msgstr "Data criada"
+
+#: ces_message/includes/ces_message.message.inc:98
+msgid "Type message"
+msgstr "Escreva a mensagem"
+
+#: ces_message/includes/ces_message.message.inc:99
+msgid "@type"
+msgstr "@type"
+
+#: ces_message/includes/ces_message.message.inc:103
+#: ces_message/includes/ces_message.templates.inc122;192;238;263;347
+#: ces_message/views/ces_message.views.inc:46
+#: ces_message/views/ces_message.views_default.inc135;325;375;438;442
+msgid "Subject"
+msgstr "Assunto"
+
+#: ces_message/includes/ces_message.message.inc:110
+#: ces_message/includes/ces_message.templates.inc199;243;268;356
+#: ces_message/views/ces_message.views.inc:63
+msgid "Body"
+msgstr "Corpo"
+
+#: ces_message/includes/ces_message.message.inc:232
+msgid "Inserted message %action"
+msgstr "Mensagem inserida %action"
+
+#: ces_message/includes/ces_message.templates.inc:21
+msgid "The entity ces message provides a template entity."
+msgstr "A mensagem ces de entidade fornece uma entidade de template. "
+
+#: ces_message/includes/ces_message.templates.inc:121
+msgid "Languages"
+msgstr "Idiomas"
+
+#: ces_message/includes/ces_message.templates.inc:131
+msgid "No ces message template entities currently exist."
+msgstr "Não existem atualmente entidades de template ces."
+
+#: ces_message/includes/ces_message.templates.inc:141
+msgid "@ces_action"
+msgstr "@ces_action"
+
+#: ces_message/includes/ces_message.templates.inc:183
+#: ces_user/ces_user.module:277
+msgid "@description"
+msgstr "@description"
+
+#: ces_message/includes/ces_message.templates.inc187;233;234;258;259;307;331
+msgid "Language"
+msgstr "Idioma"
+
+#: ces_message/includes/ces_message.templates.inc239;264
+msgid "Subject of the message"
+msgstr "Assunto da mensagem"
+
+#: ces_message/includes/ces_message.templates.inc244;269
+msgid "Body of the message"
+msgstr "Corpo da mensagem"
+
+#: ces_message/includes/ces_message.templates.inc:248
+msgid "Creation date"
+msgstr "Data de criação"
+
+#: ces_message/includes/ces_message.templates.inc:249
+msgid "Creation date (an extra display field)"
+msgstr "Data de criação (campo extra)"
+
+#: ces_message/includes/ces_message.templates.inc:308
+msgid ""
+"The language code that will be saved with the field values. This is used to "
+"allow translation of fields."
+msgstr "O código de idioma que será salvo com os valores do campo.  Isto serve para permitir a tradução de campos."
+
+#: ces_message/includes/ces_message.templates.inc:329
+msgid "English"
+msgstr "Inglês"
+
+#: ces_message/includes/ces_message.templates.inc:335
+msgid "Select a action..."
+msgstr "Selecionar ação..."
+
+#: ces_message/includes/ces_message.templates.inc:339
+msgid "Select the ces action."
+msgstr "Selecione a ação CES"
+
+#: ces_message/includes/ces_message.templates.inc:393
+msgid ""
+"Enable the <a href=\"@drupal-token\">Token module</a> to view the available "
+"token browser."
+msgstr "Permitir o  <a href=\"@drupal-token\">Módulo de token</a> para visualizar o buscador de tokens disponíveis."
+
+#: ces_message/includes/ces_message.templates.inc:444
+msgid "The entity %subject (ID %id) has been deleted"
+msgstr "A entidade %subject (ID %id) foi eliminada"
+
+#: ces_message/includes/ces_message.templates.inc:554
+msgid "Inserted template %action."
+msgstr "Modelo inserido %action."
+
+#: ces_message/views/ces_message.views.inc:19
+msgid "Messages table"
+msgstr "Tabela de mensagens"
+
+#: ces_message/views/ces_message.views.inc:20
+msgid "Messages view."
+msgstr "Visualização de mensagens."
+
+#: ces_message/views/ces_message.views.inc:35
+msgid "Message Id"
+msgstr "Id da mensagem"
+
+#: ces_message/views/ces_message.views.inc:36
+msgid "Message identifier."
+msgstr "Identificador da mensagem."
+
+#: ces_message/views/ces_message.views.inc:47
+msgid "Subject of the message."
+msgstr "Assunto da mensagem."
+
+#: ces_message/views/ces_message.views.inc:64
+msgid "Body of the message."
+msgstr "Corpo da mensagem."
+
+#: ces_message/views/ces_message.views.inc:79
+msgid "Type of message."
+msgstr "Tipo de mensagem"
+
+#: ces_message/views/ces_message.views.inc:92
+msgid "Read"
+msgstr "Ler"
+
+#: ces_message/views/ces_message.views.inc:93
+msgid "Read on/off."
+msgstr "Ler ativo/inativo"
+
+#: ces_message/views/ces_message.views.inc:110
+msgid "Created"
+msgstr "Criado"
+
+#: ces_message/views/ces_message.views.inc:111
+msgid "Creation date."
+msgstr "Data de criação"
+
+#: ces_message/views/ces_message.views.inc:126
+msgid "Id of user."
+msgstr "Id do/a usuário/a"
+
+#: ces_message/views/ces_message.views.inc142;143
+msgid "Message users relationship"
+msgstr "Relação dos/as usuários/as de mensagens"
+
+#: ces_message/views/ces_message.views.inc:149
+msgid "Exchange."
+msgstr "Transação."
+
+#: ces_message/views/ces_message.views.inc165;166
+msgid "Message Exchange relationship"
+msgstr "Message Exchange relationship"
+
+#: ces_message/views/ces_message.views_default.inc39;192;232;430
+msgid "first"
+msgstr "primeiro"
+
+#: ces_message/views/ces_message.views_default.inc40;193;233;431
+msgid "previous"
+msgstr "prévio"
+
+#: ces_message/views/ces_message.views_default.inc41;194;234;432
+msgid "next"
+msgstr "seguinte"
+
+#: ces_message/views/ces_message.views_default.inc42;195;235;433
+msgid "last"
+msgstr "anterior"
+
+#: ces_message/views/ces_message.views_default.inc:182
+msgid "Ces Message"
+msgstr "Mensagem do Ces"
+
+#: ces_message/views/ces_message.views_default.inc:196
+msgid "Ces message Exchange relationship"
+msgstr "Ces message Exchange relationship"
+
+#: ces_message/views/ces_message.views_default.inc197;434
+msgid "Ces message users relationship"
+msgstr "Relação dos usuários de mensagens do Ces"
+
+#: ces_message/views/ces_message.views_default.inc198;435
+msgid "Id"
+msgstr "Id"
+
+#: ces_message/views/ces_message.views_default.inc200;318;437
+msgid "Data"
+msgstr "Data"
+
+#: ces_message/views/ces_message.views_default.inc:201
+msgid "Assumpte"
+msgstr "Assunto"
+
+#: ces_message/views/ces_message.views_default.inc:203
+msgid "Tot"
+msgstr "Tudo"
+
+#: ces_message/views/ces_message.views_default.inc:205
+msgid ""
+"A date in any machine readable format. CCYY-MM-DD HH:MM:SS is preferred."
+msgstr "Uma data em qualquer formato legível para máquina. É preferível CCYY-MM-DD HH:MM:SS."
+
+#: ces_message/views/ces_message.views_default.inc206;445
+msgid "Page"
+msgstr "Página"
+
+#: ces_message/views/ces_message.views_default.inc:420
+msgid "Ces Messages Admin"
+msgstr "Administração de mensagens CES"
+
+#: ces_offerswants/ces_offerwant.tpl.php:30
+#: ces_offerswants/ces_offerswants.module95;110;603;2051
+msgid "Category"
+msgstr "Categoria"
+
+#: ces_offerswants/ces_offerwant.tpl.php:33
+msgid "Status"
+msgstr "Status"
+
+#: ces_offerswants/ces_offerwant.tpl.php:35
+msgid "Updated"
+msgstr "Atualizado"
+
+#: ces_offerswants/ces_offerwant.tpl.php:37
+msgid "Expire"
+msgstr "Expira"
+
+#: ces_offerswants/ces_offerwant.tpl.php:39
+msgid "Keywords"
+msgstr "Palavras-chave"
+
+#: ces_offerswants/ces_offerwant.tpl.php48;54
+msgid "Seller's info"
+msgstr "Informações do vendedor"
+
+#: ces_offerswants/ces_offerswants.module:20
+msgid ""
+"Administer your offers: add, update, hide or delete offers. Keep them "
+"attractive and updated."
+msgstr "Administre suas ofertas: adicione, atualize, oculte ou exclua ofertas. Mantenha-as atrativas e atualizadas."
+
+#: ces_offerswants/ces_offerswants.module:23
+msgid ""
+"Administer your wants: add, update, hide or delete wants. Keep them clear "
+"and updated."
+msgstr "Administre suas demandas: adicione, atualize, oculte ou exclua demandas. Mantenha-as claras e atualizadas."
+
+#: ces_offerswants/ces_offerswants.module:27
+msgid "Enter the details of your want."
+msgstr "Insira os detalhes de sua demanda."
+
+#: ces_offerswants/ces_offerswants.module:32
+msgid ""
+"Enter the details of your offer. All offers that include national currency "
+"in the rate must include also %currenciesname. Filling the keywords field "
+"will improve the search of this offer. Remember to delete offers no longer "
+"available. The administrator may delete inappropriate ads."
+msgstr "Insira os detalhes da sua oferta. Todas as ofertas que incluam moeda nacional no preço devem incluir também %currenciesname. Preencher o campo de palavras-chave vai melhorar a busca por esta oferta. Lembre-se de excluir as ofertas que não estiverem mais disponíveis. O administrador poderá excluir anúncios inapropriados. "
+
+#: ces_offerswants/ces_offerswants.module:35
+msgid "Administer offers and wants categories."
+msgstr "Administrar as categorias de ofertas e demandas."
+
+#: ces_offerswants/ces_offerswants.module:39
+msgid "Enter the category details."
+msgstr "Introduza os detalhes das categorias."
+
+#: ces_offerswants/ces_offerswants.module:48
+msgid "Offer or want"
+msgstr "Oferta ou demanda"
+
+#: ces_offerswants/ces_offerswants.module66;2891
+msgid "Offer"
+msgstr "Oferta"
+
+#: ces_offerswants/ces_offerswants.module:74
+msgid "Want"
+msgstr "Demanda"
+
+#: ces_offerswants/ces_offerswants.module:84
+msgid "Full offer or want"
+msgstr "Oferta ou demanda completa"
+
+#: ces_offerswants/ces_offerswants.module:88
+msgid "In an offers or wants list"
+msgstr "Numa lista de ofertas ou demandas"
+
+#: ces_offerswants/ces_offerswants.module:120
+msgid "Full category"
+msgstr "Categoria plena"
+
+#: ces_offerswants/ces_offerswants.module:127
+msgid "Offer comment"
+msgstr "Comentário sobre a oferta"
+
+#: ces_offerswants/ces_offerswants.module:142
+msgid "Full OfferComment"
+msgstr "Comentário completo sobre a oferta. "
+
+#: ces_offerswants/ces_offerswants.module:470
+msgid ""
+"You don't have any offer yet. You should publish your goods and skills so "
+"others can ask you for them."
+msgstr "Você ainda não tem nenhuma oferta. Você deve publicar seus bens e habilidades para que outras pessoas possam solicitá-las."
+
+#: ces_offerswants/ces_offerswants.module471;259
+msgid "Add offer"
+msgstr "Adicionar oferta"
+
+#: ces_offerswants/ces_offerswants.module:477
+msgid ""
+"You don't have any want yet. Publishing a want is useful not only for you "
+"but also for other members searching for valued goods and skills."
+msgstr "Você ainda não tem nenhuma necessidade. Publicar uma necessidade é útil não apenas para você mas para outros membros procurando bens e habilidades de valor."
+
+#: ces_offerswants/ces_offerswants.module478;320
+msgid "Add want"
+msgstr "Adicionar demanda"
+
+#: ces_offerswants/ces_offerswants.module531;556;686
+msgid "Rate"
+msgstr "Valoração"
+
+#: ces_offerswants/ces_offerswants.module:600
+msgid "Select a category..."
+msgstr "Selecione uma categoria..."
+
+#: ces_offerswants/ces_offerswants.module:604
+msgid "Select the category that best matches your announcement."
+msgstr "Selecione a categoria que mais combina com seu anúncio."
+
+#: ces_offerswants/ces_offerswants.module:632
+msgid "Enter here a short but descriptive title."
+msgstr "Insira aqui um título curto mas descritivo."
+
+#: ces_offerswants/ces_offerswants.module:642
+msgid "Enter here a detailed description."
+msgstr "Insira aqui uma descrição detalhada."
+
+#: ces_offerswants/ces_offerswants.module:650
+msgid "keywords"
+msgstr "Palavras-chave"
+
+#: ces_offerswants/ces_offerswants.module:651
+msgid "Enter a comma-separated list of words to describe your content."
+msgstr "Escreva uma lista de palavras, separadas por comas, para descrever seu conteúdo."
+
+#: ces_offerswants/ces_offerswants.module:657
+msgid "Image"
+msgstr "Imagem"
+
+#: ces_offerswants/ces_offerswants.module:658
+msgid "Upload an image for your announce."
+msgstr "Carregar uma imagem para seu anúncio"
+
+#: ces_offerswants/ces_offerswants.module:664
+msgid "Valid until"
+msgstr "Válida até"
+
+#: ces_offerswants/ces_offerswants.module:665
+msgid "The announce will be automatically hidden this date"
+msgstr "O anúncio será desativado automaticamente nesta data"
+
+#: ces_offerswants/ces_offerswants.module:675
+msgid "Hide"
+msgstr "Ocultar"
+
+#: ces_offerswants/ces_offerswants.module:676
+msgid "Check it if you don't want to publish the announcememnt."
+msgstr "Selecione caso não queira publicar seu anúncio."
+
+#: ces_offerswants/ces_offerswants.module:689
+msgid "Eg: '2.5' or '5.00%symbol and transport' or 'Contact me' or 'Free'."
+msgstr "ex: '2.5' ou '5.00%symbol e 'transporte' ou 'Entre em contato' ou 'Grátis'."
+
+#: ces_offerswants/ces_offerswants.module:699
+msgid "Expire date must be in the future."
+msgstr "Data de validade deve estar no futuro."
+
+#: ces_offerswants/ces_offerswants.module:705
+msgid "Select a category."
+msgstr "Selecione uma categoria."
+
+#: ces_offerswants/ces_offerswants.module:764
+msgid "Are you sure you want to delete the offer %offer?"
+msgstr "Tem certeza que quer excluir a oferta %offer?"
+
+#: ces_offerswants/ces_offerswants.module:767
+msgid "Are you sure you want to delete the want %want?"
+msgstr "Tem certeza que quer excluir a demanda %want?"
+
+#: ces_offerswants/ces_offerswants.module:772
+msgid ""
+"You can simply hide the announcement so it becomes invisible to all other "
+"members but you can publish it later."
+msgstr "Você pode simplesmente ocultar o anúncio e assim ele fica invisível para todos os outros membros, mas você pode republicá-lo mais tarde."
+
+#: ces_offerswants/ces_offerswants.module:784
+msgid "Offer %offer has been deleted."
+msgstr "A oferta %offer foi excluída."
+
+#: ces_offerswants/ces_offerswants.module:794
+msgid "- All offer comments have been deleted too."
+msgstr "Todos os comentários da oferta foram excluídos também."
+
+#: ces_offerswants/ces_offerswants.module:798
+msgid "Want %want has been deleted."
+msgstr "A demanda %want foi excluída."
+
+#: ces_offerswants/ces_offerswants.module:880
+msgid "Visible"
+msgstr "Visível"
+
+#: ces_offerswants/ces_offerswants.module:895
+msgid "Details"
+msgstr "Detalhes"
+
+#: ces_offerswants/ces_offerswants.module:908
+msgid "Comments("
+msgstr "Comentários"
+
+#: ces_offerswants/ces_offerswants.module911;295
+msgid "Send Notify"
+msgstr "Enviar notificação"
+
+#: ces_offerswants/ces_offerswants.module:989
+msgid "Enter here the name of the category"
+msgstr "Insira aqui o  nome da categoria."
+
+#: ces_offerswants/ces_offerswants.module:998
+msgid "Enter here a detailed description with examples."
+msgstr "Insira aqui uma descrição detalhada com exemplos."
+
+#: ces_offerswants/ces_offerswants.module1009;1029;1816;2423;2437
+msgid "None"
+msgstr "Nenhum"
+
+#: ces_offerswants/ces_offerswants.module:1012
+msgid "Parent category"
+msgstr "Categoria-mãe"
+
+#: ces_offerswants/ces_offerswants.module:1013
+msgid ""
+"Do not select enything if this is a root category. Otherwise, if you are "
+"editing a subcategory, choose the parent category."
+msgstr "Não selecione nada se essa for uma categoria raiz. Ou então, se você está editando uma subcategoria, escolha a categoria-mãe."
+
+#: ces_offerswants/ces_offerswants.module1027;1794
+msgid "Context"
+msgstr "Contexto"
+
+#: ces_offerswants/ces_offerswants.module1030;1797;1820;2316;221
+msgid "Offers"
+msgstr "Ofertas"
+
+#: ces_offerswants/ces_offerswants.module1031;1800;1824;2333;233
+msgid "Wants"
+msgstr "Necessidades"
+
+#: ces_offerswants/ces_offerswants.module1032;1828
+msgid "Both"
+msgstr "Ambas"
+
+#: ces_offerswants/ces_offerswants.module:1034
+msgid "Choose whether this category is applicable to offers, wants or both."
+msgstr "Escolha se essa categoria é aplicável a ofertas, demandas ou ambas."
+
+#: ces_offerswants/ces_offerswants.module:1051
+msgid "A title from category is necessary."
+msgstr "É necessário um título da categoria."
+
+#: ces_offerswants/ces_offerswants.module:1054
+msgid "A description from category is necessary."
+msgstr "É necessária uma descrição da categoria."
+
+#: ces_offerswants/ces_offerswants.module:1057
+msgid "A exchange from category is necessary."
+msgstr "É necessária uma troca da categoria."
+
+#: ces_offerswants/ces_offerswants.module:1060
+msgid "A context from category is necessary."
+msgstr "É necessário um contexto da categoria."
+
+#: ces_offerswants/ces_offerswants.module:1079
+msgid "Are you sure you want to delete the category %category?"
+msgstr "Você está certo que quer excluir a categoria %category?"
+
+#: ces_offerswants/ces_offerswants.module:1083
+msgid ""
+"%category is used by %count offers or wants. It is highly recommended that "
+"you change the category of these offers or wants before you delete it. If "
+"the category is deleted now they may become unusable or may not display "
+"correctly."
+msgstr "A categoria %category é usada por ofertas ou demandas de %count. É altamente recomendável que você mude a categoria dessas ofertas ou demandas antes de excluí-la. Se a categoria for excluída agora, elas poderão ficar inutilizadas ou poderão não aparecer corretamente."
+
+#: ces_offerswants/ces_offerswants.module:1094
+msgid "Category %category has been deleted."
+msgstr "Categoria %category foi excluída."
+
+#: ces_offerswants/ces_offerswants.module:1147
+msgid ""
+"Note: If enabled, the system checks these email alerts every time cron is "
+"run, usually once every 24h (ask for exact frequency to your site admin). "
+"All users can enable/disable these alerts in their profiles, once exchange "
+"administrator enables it here. Email templates can be personalized in "
+"Administration > Templates."
+msgstr "Nota: Se habilitado, o sistema verifica esses alertas de email sempre que o cronômetro for acionado, usualmente a cada 24 horas (pergunte a frequência exata à administração do seu site). Esses alertas podem ser habilitados nos seus perfis, uma vez que já habilitado pela administração da rede. Os templates de email podem ser personalizados em Administração > Templates."
+
+#: ces_offerswants/ces_offerswants.module:1151
+msgid "Expired offer or want alert."
+msgstr "Alerta de oferta ou demanda expirada."
+
+#: ces_offerswants/ces_offerswants.module:1156
+msgid "Enable expired alert."
+msgstr "Habilitar alerta de vencimento."
+
+#: ces_offerswants/ces_offerswants.module:1158
+msgid ""
+"The system will check for last expired offers and wants, and will send an "
+"email to the user owner.  If no offer or want is expired since last time "
+"cron run, no email is sent. By default, this is enabled for all exchange "
+"users."
+msgstr "O sistema verificará as últimas ofertas e demandas expiradas e enviará um email ao proprietário. Se nenhuma oferta ou demanda expirar desde a última vez que o cronômetro for executado, nenhum email será enviado. Essa opção é habilitada por padrão."
+
+#: ces_offerswants/ces_offerswants.module1162;2493
+msgid "New offer alert."
+msgstr "Novo alerta de oferta."
+
+#: ces_offerswants/ces_offerswants.module:1167
+msgid "Enable new offer alert."
+msgstr "Habilitar novo alerta de oferta."
+
+#: ces_offerswants/ces_offerswants.module:1169
+msgid ""
+"The system will check for last created offers, and will send an email to all"
+" users of the exchange. If no offer is created since last time cron run, no "
+"email is sent. By default, this is disabled for all exchange users, but they"
+" can enable it in their profiles."
+msgstr "O sistema verificará as últimas ofertas criadas e enviará um email a todas as pessoas da rede. Se nenhuma oferta for criada desde a última vez que o cronômetro for executado, nenhum email será enviado. Essa função é desativada por padrão, mas poderá ser ativada em seus perfis."
+
+#: ces_offerswants/ces_offerswants.module1173;2502
+msgid "New want alert."
+msgstr "Novo alerta de demanda."
+
+#: ces_offerswants/ces_offerswants.module:1178
+msgid "Enable new want alert."
+msgstr "Habilitar novo alerta de demanda."
+
+#: ces_offerswants/ces_offerswants.module:1180
+msgid ""
+"The system will check for last created wants, and will send an email to all "
+"users of the exchange. If no want is created since last time cron run, no "
+"email is sent. By default, this is disabled for all exchange users, but they"
+" can enable it in their profiles."
+msgstr "O sistema verificará a última demanda criada e enviará um email para todas as pessoas da rede. Se nenhum pedido for criado desde a última vez em que o cronômetro for executado, nenhum e-mail será enviado. Essa opção é desativada por padrão, mas poderá ser ativada em seus perfis."
+
+#: ces_offerswants/ces_offerswants.module1184;2511
+msgid "Offers periodical alert."
+msgstr "Alerta periódico de ofertas."
+
+#: ces_offerswants/ces_offerswants.module:1189
+msgid "Frequency of offers periodical alert."
+msgstr "Alerta periódico de frequência de ofertas."
+
+#: ces_offerswants/ces_offerswants.module1191;1209
+msgid "Disabled"
+msgstr "Desabilitado"
+
+#: ces_offerswants/ces_offerswants.module1192;1210
+msgid "Once a week"
+msgstr "Um vez por semana"
+
+#: ces_offerswants/ces_offerswants.module1193;1211
+msgid "Once every two weeks"
+msgstr "Uma vez a cada 2 semanas"
+
+#: ces_offerswants/ces_offerswants.module1194;1212
+msgid "Once a month"
+msgstr "Uma vez por mês"
+
+#: ces_offerswants/ces_offerswants.module1195;1213
+msgid "Once every two months"
+msgstr "Uma vez a cada 2 meses"
+
+#: ces_offerswants/ces_offerswants.module:1198
+msgid ""
+"With the frequency you select, the system will send an email to all users of"
+" the exchange with a list of last updated offers. When you enable this email"
+" alert, the first mailing will be done today (next time cron runs), the "
+"second will be in the period of time you selected, and so on. By default, "
+"this is disabled for all exchange users, but they can enable it in their "
+"profiles."
+msgstr "Com a frequência que você seleciona, o sistema enviará um email a todas as pessoas dessa rede com uma lista das ofertas atualizadas. Ao ativar este alerta de emails, o primeiro envio será feito hoje (próxima vez que o cronômetro for executado), o segundo será no intervalo que você escolheu, e assim por diante. Por padrão, esta opção está desabilitada, mas pode ser habilitada nos seus perfis pessoais."
+
+#: ces_offerswants/ces_offerswants.module1202;2520
+msgid "Wants periodical alert."
+msgstr "Alerta periódico das demandas."
+
+#: ces_offerswants/ces_offerswants.module:1207
+msgid "Frequency of wants periodical alert."
+msgstr "Periodicidade do alerta periódico de demandas."
+
+#: ces_offerswants/ces_offerswants.module:1216
+msgid ""
+"With the frequency you select, the system will send an email to all users of"
+" the exchange with a list of last updated wants. When you enable this email "
+"alert, the first mailing will be done today (next time cron runs), the "
+"second will be in the period of time you selected, and so on. By default, "
+"this is disabled for all exchange users, but they can enable it in their "
+"profiles."
+msgstr "Com a frequência que você selecionar, o sistema enviará um e-mail a todas as pessoas dessa rede com uma lista das demandas atualizadas. Ao ativar este alerta de e-mails, o primeiro envio será feito hoje (próxima vez que o cronômetro for executado), o segundo será no intervalo que você escolheu, e assim por diante. Por padrão, esta opção está desabilitada, mas pode ser habilitada nos seus perfis pessoais."
+
+#: ces_offerswants/ces_offerswants.module:1309
+msgid "The email alerts for exchange :excode have been created."
+msgstr "Os alertas de e-mail para a rede :excode foi criado.  "
+
+#: ces_offerswants/ces_offerswants.module:1317
+msgid "The email alerts for exchange :excode have been updated."
+msgstr "Os alertas de e-mail para a rede :excode foi atualizado.  "
+
+#: ces_offerswants/ces_offerswants.module:1710
+msgid "All Internal exchanges"
+msgstr "Todas as trocas internas"
+
+#: ces_offerswants/ces_offerswants.module:1772
+msgid ""
+"Your exchange does not have any category yet. It is very recommended to "
+"divide the offers and/or wants into several categories. A good first "
+"approach is to create 10-15 categories for offers but a single category for "
+"wants."
+msgstr "A sua rede não tem categorias ainda. É muito recomendável dividir as ofertas e/ou demandas em diversas categorias. Uma boa recomendação é criar 10-15 categorias para ofertas, mas uma única categoria para as demandas."
+
+#: ces_offerswants/ces_offerswants.module1773;369
+msgid "Add category"
+msgstr "Adicionar categoria"
+
+#: ces_offerswants/ces_offerswants.module:1970
+msgid "CES offers and wants filter"
+msgstr "Filtro do CES para ofertas e demandas"
+
+#: ces_offerswants/ces_offerswants.module:2066
+msgid "Update time"
+msgstr "Atualizar hora"
+
+#: ces_offerswants/ces_offerswants.module:2067
+msgid "Creation time"
+msgstr "Criar tempo"
+
+#: ces_offerswants/ces_offerswants.module:2073
+msgid "Order by"
+msgstr "Ordenar por"
+
+#: ces_offerswants/ces_offerswants.module:2171
+msgid ""
+"There are no results. Try broaden your search criteria in order to get some "
+"results."
+msgstr "Não achamos! Tente ampliar os critérios da sua busca para conseguir resultados."
+
+#: ces_offerswants/ces_offerswants.module:2186
+msgid "Action not known"
+msgstr "Ação não conhecida"
+
+#: ces_offerswants/ces_offerswants.module:2237
+msgid "Offers and wants"
+msgstr "Ofertas e demandas"
+
+#: ces_offerswants/ces_offerswants.module:2320
+msgid "No offers."
+msgstr "Sem ofertas."
+
+#: ces_offerswants/ces_offerswants.module:2337
+msgid "No wants."
+msgstr "Sem demandas."
+
+#: ces_offerswants/ces_offerswants.module:2389
+msgid "Add offer >>"
+msgstr "Adicionar oferta >>"
+
+#: ces_offerswants/ces_offerswants.module:2401
+msgid "Add want >>"
+msgstr "Adicionar demanda >>"
+
+#: ces_offerswants/ces_offerswants.module:2420
+msgid "Minimum offers on register"
+msgstr "Mínimo de ofertas registradas"
+
+#: ces_offerswants/ces_offerswants.module:2421
+msgid ""
+"The minimum number of offers that a member must fill in the registration "
+"form."
+msgstr "Quantidade mínima de ofertas que um membro deve inserir ao se cadastrar."
+
+#: ces_offerswants/ces_offerswants.module:2434
+msgid "Minimum wants on register"
+msgstr "Quantidade mínima de demandas ao se cadastrar."
+
+#: ces_offerswants/ces_offerswants.module:2435
+msgid ""
+"The minimum number of wants that a member must fill in the registration "
+"form."
+msgstr "Quantidade mínima de demandas que um membro deve inserir ao se cadastrar."
+
+#: ces_offerswants/ces_offerswants.module:2462
+msgid "disabled"
+msgstr "desabilitado"
+
+#: ces_offerswants/ces_offerswants.module:2462
+msgid "every week"
+msgstr "toda semana"
+
+#: ces_offerswants/ces_offerswants.module:2462
+msgid "every two weeks"
+msgstr "cada 2 semanas"
+
+#: ces_offerswants/ces_offerswants.module:2462
+msgid "every month"
+msgstr "cada mês"
+
+#: ces_offerswants/ces_offerswants.module:2462
+msgid "every two months"
+msgstr "cada 2 meses"
+
+#: ces_offerswants/ces_offerswants.module:2477
+msgid "Email alerts for"
+msgstr "Alertas de e-mail para"
+
+#: ces_offerswants/ces_offerswants.module:2484
+msgid "Offer/want expired alert."
+msgstr "Alerta de oferta/demanda expirada."
+
+#: ces_offerswants/ces_offerswants.module:2486
+msgid "The system will send you a message when your offers/wants expired."
+msgstr "O sistema te enviará uma mensagem quando tuas ofertas/demandas expirem."
+
+#: ces_offerswants/ces_offerswants.module:2495
+msgid ""
+"The system will send you an email when a new offer is created in your "
+"exchange."
+msgstr "O sistema te enviará um e-mail quando uma nova oferta seja criada na tua rede."
+
+#: ces_offerswants/ces_offerswants.module:2504
+msgid ""
+"The system will send you an email when a new want is created in your "
+"exchange."
+msgstr "O sistema te enviará um e-mail quando uma nova demanda seja criada na tua rede."
+
+#: ces_offerswants/ces_offerswants.module2513;2522
+msgid "The system will send you an email"
+msgstr "O sistema te enviará um e-mail"
+
+#: ces_offerswants/ces_offerswants.module:2513
+msgid "with last updated offers in your exchange."
+msgstr "com as últimas ofertas atualizadas da tua rede."
+
+#: ces_offerswants/ces_offerswants.module:2522
+msgid "with last updated wants in your exchange."
+msgstr "com as últimas demandas atualizadas da tua rede."
+
+#: ces_offerswants/ces_offerswants.module:2637
+msgid "The email alerts configuration has been updated."
+msgstr "A configuração de alertas de e-mail tem sido atualizada."
+
+#: ces_offerswants/ces_offerswants.module:2821
+msgid "There is no offer with @offerid id number."
+msgstr "Não tem nenhuma oferta com o número id @offerid."
+
+#: ces_offerswants/ces_offerswants.module:2835
+msgid "Add a new comment and rating to this offer."
+msgstr "Escreva um novo comentário e uma avaliação para esta oferta."
+
+#: ces_offerswants/ces_offerswants.module:2840
+msgid "Comment"
+msgstr "Comentário"
+
+#: ces_offerswants/ces_offerswants.module:2847
+msgid "Rating from 0 to 5"
+msgstr "Avaliação de 0 a 5"
+
+#: ces_offerswants/ces_offerswants.module:2866
+msgid "Save comment"
+msgstr "Salve seu comentári"
+
+#: ces_offerswants/ces_offerswants.module:2880
+msgid "Your comment has been successfully saved."
+msgstr "Comentário salvo com sucesso."
+
+#: ces_offerswants/ces_offerswants.module:2892
+msgid "Tokens for offer."
+msgstr "Tokens for offer."
+
+#: ces_offerswants/ces_offerswants.module:2895
+msgid "Notify"
+msgstr "Notificar"
+
+#: ces_offerswants/ces_offerswants.module:2896
+msgid "Tokens for user notify."
+msgstr "Tokens para notificar usuários."
+
+#: ces_offerswants/ces_offerswants.module:2902
+msgid "Id of offer"
+msgstr "Id da oferta"
+
+#: ces_offerswants/ces_offerswants.module:2903
+msgid "The id of offer."
+msgstr "O id da oferta"
+
+#: ces_offerswants/ces_offerswants.module:2907
+msgid "Title of offer."
+msgstr "Título da oferta."
+
+#: ces_offerswants/ces_offerswants.module:2911
+msgid "Type of offer: offer or want."
+msgstr "Tipo de anúncio: oferta ou demanda."
+
+#: ces_offerswants/ces_offerswants.module:2914
+msgid "User name"
+msgstr "Nome de usuário/a"
+
+#: ces_offerswants/ces_offerswants.module:2915
+msgid "Name of the user who owns the offer."
+msgstr "Nome da/o usuária/o que colocou a oferta."
+
+#: ces_offerswants/ces_offerswants.module:2920
+msgid "Body of User notify"
+msgstr "Body of User notify"
+
+#: ces_offerswants/ces_offerswants.module:2921
+msgid "Body of User notify."
+msgstr "Body of User notify."
+
+#: ces_offerswants/ces_offerswants.module:222
+msgid "View available offers"
+msgstr "Ver as ofertas disponíveis"
+
+#: ces_offerswants/ces_offerswants.module:234
+msgid "View people's wants"
+msgstr "Ver as demandas da rede"
+
+#: ces_offerswants/ces_offerswants.module245;254
+msgid "My offers"
+msgstr "Minhas ofertas"
+
+#: ces_offerswants/ces_offerswants.module:246
+msgid "View my current offers"
+msgstr "Ver as minhas ofertas atuais"
+
+#: ces_offerswants/ces_offerswants.module268;329
+msgid "View offer"
+msgstr "Ver oferta"
+
+#: ces_offerswants/ces_offerswants.module277;338
+msgid "Edit offer"
+msgstr "Editar oferta"
+
+#: ces_offerswants/ces_offerswants.module286;347
+msgid "Delete offer"
+msgstr "Eliminar oferta"
+
+#: ces_offerswants/ces_offerswants.module306;315
+msgid "My wants"
+msgstr "Minhas demandas"
+
+#: ces_offerswants/ces_offerswants.module:307
+msgid "View my current wants"
+msgstr "Ver minhas demandas atuais"
+
+#: ces_offerswants/ces_offerswants.module:356
+msgid "Edit categories"
+msgstr "Editar categorias"
+
+#: ces_offerswants/ces_offerswants.module357;370
+msgid "View, edit and add categories for your exchange"
+msgstr "Ver, editar e adicionar categorias para sua rede"
+
+#: ces_offerswants/ces_offerswants.module:364
+msgid "List categories"
+msgstr "Lista de categorias"
+
+#: ces_offerswants/ces_offerswants.module379;380
+msgid "Edit category"
+msgstr "Editar categoria"
+
+#: ces_offerswants/ces_offerswants.module389;390
+msgid "Delete category"
+msgstr "Eliminar categoria"
+
+#: ces_offerswants/ces_offerswants.module:399
+msgid "Offer comments and ratings"
+msgstr "Comentários e avaliações das ofertas"
+
+#: ces_offerswants/ces_offerswants.module:400
+msgid "View offer with comments and ratings"
+msgstr "Ver oferta com comentários e avaliações"
+
+#: ces_offerswants/ces_offerswants.module:406
+msgid "Email alerts"
+msgstr "Alertas de e-mail"
+
+#: ces_offerswants/ces_offerswants.module:407
+msgid "Preferences about offers and wants email alerts"
+msgstr "Preferências sobre os e-mails de alerta de ofertas e demandas"
+
+#: ces_offerswants/ces_offerswants.info:0
+msgid "ICES Offers and Wants"
+msgstr "ICES ofertas e demandas"
+
+#: ces_offerswants/ces_offerswants.info:0
+msgid "Simple offers and wants module."
+msgstr "Módulo simples de ofertas e demandas"
+
+#: ces_offerswants/includes/ces_offerswants_send_notify.inc:24
+msgid "Enter here a description."
+msgstr "Escreva aqui uma descrição"
+
+#: ces_offerswants/includes/ces_offerswants_send_notify.inc:32
+msgid "Send"
+msgstr "Enviar"
+
+#: ces_offerswants/includes/ces_offerswants_send_notify.inc:42
+msgid "The body of message is empty."
+msgstr "O texto da mensagem está vazio."
+
+#: ces_statistics/ces_statistics.module:84
+msgid "Installation of"
+msgstr "Instalação de"
+
+#: ces_statistics/ces_statistics.module:86
+msgid "Download the package with the necessary libraries"
+msgstr "Descarregue o pacote com as libraries necessárias"
+
+#: ces_statistics/ces_statistics.module:139
+msgid "Help"
+msgstr "Ajuda"
+
+#: ces_statistics/ces_statistics.module:205
+msgid "Total inactivity"
+msgstr "Inatividade total"
+
+#: ces_statistics/ces_statistics.module:205
+msgid "1-3 transactions"
+msgstr "1-3 transações"
+
+#: ces_statistics/ces_statistics.module:205
+msgid "4-6 transactions"
+msgstr "4-6 transações"
+
+#: ces_statistics/ces_statistics.module:206
+msgid "6-12 transactions"
+msgstr "6-12 transações"
+
+#: ces_statistics/ces_statistics.module:206
+msgid "+12 transactions"
+msgstr "+12 transações"
+
+#: ces_statistics/ces_statistics.module:304
+msgid "Number of accounts:"
+msgstr "Quantidade de contas"
+
+#: ces_statistics/ces_statistics.module:306
+msgid "Amount of transactions:"
+msgstr "Número de transações"
+
+#: ces_statistics/ces_statistics.module:307
+msgid "Average transaction:"
+msgstr "Média de transações:"
+
+#: ces_statistics/ces_statistics.module:309
+msgid "Number of accounts"
+msgstr "Quantidade de contas"
+
+#: ces_statistics/ces_statistics.module:311
+msgid "Last year accounts activity"
+msgstr "Atividade das contas no último ano"
+
+#: ces_statistics/ces_statistics.module:313
+msgid "Number of transactions"
+msgstr "Número de transações"
+
+#: ces_statistics/ces_statistics.module:315
+msgid "Amount of transactions in"
+msgstr "Quantidade de transações em"
+
+#: ces_statistics/ces_statistics.module48;58
+msgid "Statistics"
+msgstr "Estatísticas"
+
+#: ces_statistics/ces_statistics.module:49
+msgid "View exchange statistics."
+msgstr "Ver as estatísticas da rede"
+
+#: ces_statistics/ces_statistics.module:59
+msgid "View other exchange statistics."
+msgstr "Ver as estatísticas de outras redes."
+
+#: ces_statistics/ces_statistics.info:0
+msgid "ICES Statistics"
+msgstr "Estatísticas do ICES"
+
+#: ces_statistics/ces_statistics.info:0
+msgid "Some exchange statistics."
+msgstr "Estatísticas de algumas redes"
+
+#: ces_summaryblock/ces_summaryblock.module:19
+msgid "CES bank account summary"
+msgstr "Resumo da conta bancária do CES"
+
+#: ces_summaryblock/ces_summaryblock.module:77
+msgid "You haven't traded yet."
+msgstr "Você ainda não fez nenhuma negociação."
+
+#: ces_summaryblock/ces_summaryblock.module:86
+msgid "No offers yet!"
+msgstr "Sem ofertas ainda!"
+
+#: ces_summaryblock/ces_summaryblock.module:117
+msgid "Last trade"
+msgstr "Última troca"
+
+#: ces_summaryblock/ces_summaryblock.module:123
+msgid "You may be interested"
+msgstr "Talvez seja interessante para você"
+
+#: ces_summaryblock/ces_summaryblock.module:236
+msgid "Today"
+msgstr "Hoje"
+
+#: ces_summaryblock/ces_summaryblock.module:237
+msgid "Yesterday"
+msgstr "Ontem"
+
+#: ces_summaryblock/ces_summaryblock.module:238
+msgid "This week"
+msgstr "Essa semana"
+
+#: ces_summaryblock/ces_summaryblock.module:239
+msgid "Last week"
+msgstr "Última semana"
+
+#: ces_summaryblock/ces_summaryblock.module:240
+msgid "Last 7 days"
+msgstr "Últimos 7 dias"
+
+#: ces_summaryblock/ces_summaryblock.module:241
+msgid "Last 15 days"
+msgstr "Últimos 15 dias"
+
+#: ces_summaryblock/ces_summaryblock.module:242
+msgid "Last 30 days"
+msgstr "Últimos 30 dias"
+
+#: ces_summaryblock/ces_summaryblock.module:243
+msgid "This month"
+msgstr "Esse mês"
+
+#: ces_summaryblock/ces_summaryblock.module:244
+msgid "Last month"
+msgstr "Último mês"
+
+#: ces_summaryblock/ces_summaryblock.module:245
+msgid "182 days"
+msgstr "182 dias"
+
+#: ces_summaryblock/ces_summaryblock.module:246
+msgid "365 days"
+msgstr "365 dias"
+
+#: ces_summaryblock/ces_summaryblock.module:247
+msgid "This year"
+msgstr "Esse ano"
+
+#: ces_summaryblock/ces_summaryblock.module:248
+msgid "Last year"
+msgstr "Último ano"
+
+#: ces_summaryblock/ces_summaryblock.info:0
+msgid "ICES summary block"
+msgstr "Bloco de resumo do ICES"
+
+#: ces_summaryblock/ces_summaryblock.info:0
+msgid "Block with ICES bank account summary."
+msgstr "Bloco com o resumo da conta bancária do ICES"
+
+#: ces_user/ces_user.module:251
+msgid "Forgot password?"
+msgstr "Esqueceu sua senha?"
+
+#: ces_user/ces_user.module:251
+msgid "Request new password via e-mail."
+msgstr "Solicite uma nova senha por e-mail."
+
+#: ces_user/ces_user.module:274
+msgid "@title"
+msgstr "@title"
+
+#: ces_user/ces_user.module:335 ces_user/ces_user.install:152
+msgid "Address"
+msgstr "Endereço"
+
+#: ces_user/ces_user.module:352
+msgid "CES register"
+msgstr "Registro do CES"
+
+#: ces_user/ces_user.module:356
+msgid "CES front links"
+msgstr "CES front links"
+
+#: ces_user/ces_user.module:379
+msgid "Documentation"
+msgstr "Documentação"
+
+#: ces_user/ces_user.module:380
+msgid "Developers"
+msgstr "Desenvolvedores"
+
+#: ces_user/ces_user.module:381
+msgid "Donate"
+msgstr "Fazer doação"
+
+#: ces_user/ces_user.module:382
+msgid "Terms of service"
+msgstr "Condições do serviço"
+
+#: ces_user/ces_user.module:411
+msgid "Select country..."
+msgstr "Escolha um país"
+
+#: ces_user/ces_user.module:416
+msgid "New to IntegralCES?"
+msgstr "Novo/a no IntegralCES?"
+
+#: ces_user/ces_user.module:421
+msgid "Find an exchange near you and start using social money:"
+msgstr "Encontre uma rede de trocas perto de você e comece a usar a moeda social:"
+
+#: ces_user/ces_user.module:430
+msgid "Register"
+msgstr "Registro"
+
+#: ces_user/ces_user.module:456
+msgid "Welcome to <strong>Integral Community Exchange System</strong>,"
+msgstr "Bem-vindo/a ao <strong>Integral Community Exchange System</strong>,"
+
+#: ces_user/ces_user.module:461
+msgid ""
+"an open source platform featuring social currencies management for "
+"communities."
+msgstr "uma plataforma de código aberto que possibilita a gestão de moedas sociais para comunidades."
+
+#: ces_user/ces_user.module:466
+msgid "Boost local economy, return it to human scale."
+msgstr "Reforce a economia local, tragamos ela de volta a uma escala humana."
+
+#: ces_user/ces_user.module:467
+msgid "Help the environment, lower contamination."
+msgstr "Ajude o meio ambiente, diminua a contaminação."
+
+#: ces_user/ces_user.module:468
+msgid "Gain the control over money, prevent speculation and abuse."
+msgstr "Recupere o control sobre o dinheiro, previna especulação e abuso."
+
+#: ces_user/ces_user.module:469
+msgid "Create a solid alternative to the current financial system."
+msgstr "Crie uma alternativa sólida ao sistema financeiro atual."
+
+#: ces_user/ces_user.module:470
+msgid "Empower your community. Have fun playing with social currency."
+msgstr "Empodere sua comunidade. Divirta-se utilizando a moeda social."
+
+#: ces_user/ces_user.module:484
+msgid "Full user name"
+msgstr "Nome de usuário/a completo"
+
+#: ces_user/ces_user.module:485
+msgid "The full real user name"
+msgstr "O nome real do usuário/a completo"
+
+#: ces_user/ces_user.module:488
+msgid "Main user telephone"
+msgstr "Telefone principal do/a usuário/a"
+
+#: ces_user/ces_user.module:489
+msgid "The main user telephone"
+msgstr "O telefone principal do/a usuário/a"
+
+#: ces_user/ces_user.module:529
+msgid ""
+"You have successfully registered to the exchange %name in the Integral "
+"Community Exchange System."
+msgstr "Você se registrou com sucesso na rede %name do ICES (Integral Community Exchange System)"
+
+#: ces_user/ces_user.module:535
+msgid ""
+"Before you can start using the system, the administration of your exchange "
+"must authorize your account. You will receive an email when your account is "
+"activated with further instructions. If you have no news in these comming "
+"days, contact your exchange administration at %mail."
+msgstr "Para poder começar a usar o sistema, os administradores da sua rede devem autorizar sua conta. Receberá um e-mail com mais instruções quando sua conta seja ativada. Caso não entrem em contato com você nos próximos dias, entre em contato com os administradores da sua rede: %mail."
+
+#: ces_user/ces_user.module:541
+msgid "See you soon!"
+msgstr "Até já!"
+
+#: ces_user/ces_user.module:553
+msgid "New exchange URL"
+msgstr "URL da nova troca"
+
+#: ces_user/ces_user.module:555
+msgid ""
+"The URL of the new exchange form or intermediate custom page. You can use "
+"the placeholder @langcode for the current language ISO code. If you let it "
+"empty the link will be hidden."
+msgstr "URL do formulário da nova rede ou da página customizada. Você pode usar o marcador @langcode para o código ISO de língua. Caso deixe ele vazío, o link ficará oculto."
+
+#: ces_user/ces_user.module:559
+msgid "Documentation URL"
+msgstr "URL da documentação"
+
+#: ces_user/ces_user.module:561
+msgid "The url of the general documentation page."
+msgstr "URL da página de documentação geral."
+
+#: ces_user/ces_user.module:565
+msgid "Developers URL"
+msgstr "URL dos desenvolvedores"
+
+#: ces_user/ces_user.module:567
+msgid "The url of the IntegralCES develop site."
+msgstr "URL do site de desenvolvimento do IntegralCES"
+
+#: ces_user/ces_user.module:571
+msgid "Donate URL"
+msgstr "URL de doação"
+
+#: ces_user/ces_user.module:573
+msgid "The url of the donations page."
+msgstr "URL da página de doações."
+
+#: ces_user/ces_user.module:577
+msgid "Terms of service URL"
+msgstr "Condições do serviço URL"
+
+#: ces_user/ces_user.module:579
+msgid "The terms of service page."
+msgstr "Condições da página de serviço"
+
+#: ces_user/ces_user.module:583
+msgid "About URL"
+msgstr "Sobre o URL"
+
+#: ces_user/ces_user.module:585
+msgid "The about page."
+msgstr "Sobre a página"
+
+#: ces_user/ces_user.module:71
+msgid "Welcome to Integral CES"
+msgstr "Bem-vinda/o ao IntegralCES"
+
+#: ces_user/ces_user.module:77
+msgid "Successfuly registered to Integral CES"
+msgstr "Registrado com sucesso no Integral CES"
+
+#: ces_user/ces_user.module:84
+msgid "ICES user settings"
+msgstr "ICES configurações de usuário/a"
+
+#: ces_user/ces_user.module:85
+msgid "Change global settings related to IntegralCES user module"
+msgstr "Modificar as configurações ggerais relacionadas ao módulo de usuário de Integral CES"
+
+#: ces_user/ces_user.install:150
+msgid "Your first name or the name of the organization."
+msgstr "Seu nome ou nome da sua organização"
+
+#: ces_user/ces_user.install:153
+msgid "Eg. 15 Main Street"
+msgstr "ex. Rua Jacareí, 28"
+
+#: ces_user/ces_user.install:155
+msgid "Postcode"
+msgstr "CEP"
+
+#: ces_user/ces_user.install:156
+msgid "Phone (mobile)"
+msgstr "Telefone (celular)"
+
+#: ces_user/ces_user.install:157
+msgid "The main phone to be displayed."
+msgstr "Telefone principal (visível para toda a rede)."
+
+#: ces_user/ces_user.install:158
+msgid "Phone (work)"
+msgstr "Telefone (trabalho)"
+
+#: ces_user/ces_user.install159;161
+msgid "Will only be displayed in your account details"
+msgstr "Só aparecerá nos detalhes da sua conta"
+
+#: ces_user/ces_user.install:160
+msgid "Phone (home)"
+msgstr "Telefone (residencial)"
+
+#: ces_user/ces_user.install:163
+msgid "Your personal or organization website address"
+msgstr "Sua web pessoal ou da sua organização"
+
+#: (duplicate) ces_user/ces_user.install:21
+msgid "Error creating user fields."
+msgstr "Erro ao criar campos de usuário."
+
+#: ces_user/ces_user.info:0
+msgid "ICES user profile"
+msgstr "ICES perfil de usuário/a"
+
+#: ces_user/ces_user.info:0
+msgid ""
+"Add some fields to the standard user profile and an api to access them."
+msgstr "Adicione campos ao perfil de usuário padrão e uma api para acesá-los."
