@@ -16,6 +16,7 @@ if [ "$ECOXARXA" == "" ] ; then
   echo
   echo "Uso: $0 [ID_ECOXARXA] [DATABSE]"
   echo
+  exit
 
 fi
 
