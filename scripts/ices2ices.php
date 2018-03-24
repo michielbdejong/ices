@@ -118,7 +118,7 @@ $SQLS['settings']['sql'] = "SELECT
     '' AS 'HidePsw',
     '' AS 'NoDetails',
     '' AS 'BudRate'
-    FROM ces_exchange 
+    FROM ces_exchange
     WHERE id = " . $ECOXARXA_ID . "
     ";
 
@@ -240,7 +240,6 @@ $SQLS['users']['sql'] = "SELECT
 
 	" ORDER BY ca.name";
 
-
 /**
  * announce.csv
  */
@@ -262,10 +261,40 @@ $SQLS['announce']['sql'] = "SELECT
 	JOIN field_data_body fdb ON fdb.entity_id = node.nid
 	WHERE fdcbe.ces_blog_exchange_value = " . $ECOXARXA_ID;
 
-//
-// ==> balances.csv <==
-// UID,Sales,Income,Purchases,Expenditure,Levy,Balance
-//
+/**
+ * balances.csv
+ * UID,Sales,Income,Purchases,Expenditure,Levy,Balance
+ */
+$SQLS['balances']['heads'] = array(
+ 'UID','Sales','Income','Purchases','Expenditure','Levy','Balance'
+);
+$SQLS['balances']['sql'] = "SELECT
+
+		ca.name AS 'UID',
+		( SELECT count(amount) 
+				FROM ces_transaction WHERE ces_transaction.toaccount = ca.id 
+		) AS 'Sales',
+		( SELECT SUM(amount) 
+				FROM ces_transaction WHERE ces_transaction.toaccount = ca.id 
+		) AS 'Income',
+		( SELECT count(amount) 
+			FROM ces_transaction WHERE ces_transaction.fromaccount = ca.id 
+		) AS 'Purchases',
+		( SELECT SUM(amount) 
+			FROM ces_transaction WHERE ces_transaction.fromaccount = ca.id 
+		) AS 'Expenditure',
+		0 AS 'Levy',
+		FORMAT(ca.balance,2) AS 'Balance'
+
+	FROM ces_account ca
+	LEFT JOIN ces_accountuser cau ON cau.account = ca.id
+	LEFT JOIN users u ON u.uid = cau.user
+	LEFT JOIN ces_offerwant o ON o.user = cau.user AND o.type = 'offer'
+	LEFT JOIN ces_offerwant w ON w.user = cau.user AND w.type = 'want'
+
+	WHERE ca.exchange = " . $ECOXARXA_ID .
+	" ORDER BY ca.name";
+
 // ==> offers.csv <==
 // ID,UID,Remote,Category,Subcat,Title,Description,Image,Keys,Rate,ConRate,DateAdded,DateExpires,Hidden
 //
@@ -286,7 +315,7 @@ function csv_file($SQLS, $csv, $enlace = FALSE) {
 	// echo "<br/>";
 	// echo "HEADS: ";
 	// echo "<br/>";
-  // print_r($HEADS);
+    // print_r($HEADS);
 	// echo "<br/>";
 	// echo "SQL: ";
 	// echo "<br/>";
@@ -296,7 +325,7 @@ function csv_file($SQLS, $csv, $enlace = FALSE) {
 
 	$result = $enlace->query($SQL);
 	if (!$result) {
-		print_r(mysqli_error($enlace)); 
+		print_r(mysqli_error($enlace));
 		exit();
 	}
 	$num_fields = mysql_num_fields($result);
