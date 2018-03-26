@@ -331,12 +331,68 @@ $SQLS['trades']['sql'] = "
 	WHERE af.exchange = ". $ECOXARXA_ID . "
 		OR at.exchange = " . $ECOXARXA_ID;
 
+/**
+ * offers.csv
+ * ID,UID,Remote,Category,Subcat,Title,Description,Image,Keys,Rate,ConRate,DateAdded,DateExpires,Hidden
+ */
+$SQLS['offers']['heads'] = array(
+ 'ID','UID','Remote','Category','Subcat','Title','Description','Image','Keys','Rate','ConRate','DateAdded','DateExpires','Hidden'
+);
+$SQLS['offers']['sql'] = "
+SELECT
+	cow.id AS 'ID',
+	au.name AS 'UID',
+	'' AS 'Remote',
+	cc.title AS 'Category',
+	'' AS 'Subcat',
+	cow.title AS 'Title',
+	cow.body AS 'Description',
+	'' AS 'Image',
+	cow.keywords AS 'Keys',
+	fdcor.ces_offer_rate_value AS 'Rate',
+	'' AS 'ConRate',
+	cow.created AS 'DateAdded',
+	cow.expire AS 'DateExpires',
+    CASE cow.state
+    WHEN 0 THEN 1
+    WHEN 1 THEN 0
+    ELSE 1
+  END AS 'Hidden'
 
-// ==> offers.csv <==
-// ID,UID,Remote,Category,Subcat,Title,Description,Image,Keys,Rate,ConRate,DateAdded,DateExpires,Hidden
-//
-// ==> wants.csv <==
-// ID,UID,Keep,DateAdded,Title,Description
+FROM ces_offerwant cow
+	INNER JOIN users u ON cow.user = u.uid
+	INNER JOIN ces_accountuser cau ON cau.user = u.uid
+	INNER JOIN ces_account au ON au.id = cau.account
+	INNER JOIN ces_category cc ON cc.id = cow.category
+	JOIN field_data_ces_offer_rate fdcor ON fdcor.entity_id = cow.id
+
+WHERE cow.type = 'offer' AND au.exchange = " . $ECOXARXA_ID;
+
+/**
+ * wants.csv
+ * ID,UID,Keep,DateAdded,Title,Description
+ */
+$SQLS['wants']['heads'] = array(
+ 'ID','UID','Keep','DateAdded','Title','Description'
+);
+$SQLS['wants']['sql'] = "
+SELECT
+
+	cow.id AS 'ID',
+	au.name AS 'UID',
+	cow.state AS 'Keep',
+	cow.created AS 'DateAdded',
+	cow.title AS 'Title',
+	cow.body AS 'Description'
+
+FROM ces_offerwant cow
+	INNER JOIN users u ON cow.user = u.uid
+	INNER JOIN ces_accountuser cau ON cau.user = u.uid
+	INNER JOIN ces_account au ON au.id = cau.account
+
+WHERE cow.type = 'want' AND au.exchange = " . $ECOXARXA_ID;
+
+
 
 function csv_file($SQLS, $csv, $enlace = FALSE) {
 
