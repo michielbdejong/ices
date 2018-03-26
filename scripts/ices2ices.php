@@ -271,13 +271,13 @@ $SQLS['balances']['heads'] = array(
 $SQLS['balances']['sql'] = "SELECT
 
 		ca.name AS 'UID',
-		( SELECT count(amount) 
+		( SELECT count(id) 
 				FROM ces_transaction WHERE ces_transaction.toaccount = ca.id 
 		) AS 'Sales',
 		( SELECT SUM(amount) 
 				FROM ces_transaction WHERE ces_transaction.toaccount = ca.id 
 		) AS 'Income',
-		( SELECT count(amount) 
+		( SELECT count(id) 
 			FROM ces_transaction WHERE ces_transaction.fromaccount = ca.id 
 		) AS 'Purchases',
 		( SELECT SUM(amount) 
@@ -295,11 +295,45 @@ $SQLS['balances']['sql'] = "SELECT
 	WHERE ca.exchange = " . $ECOXARXA_ID .
 	" ORDER BY ca.name";
 
+/**
+ * trades.csv
+ * ID,Seller,Buyer,RemoteExchange,RemoteBuyer,RecordID,DateEntered,EnteredBy,Amount,Levy,LevyRate,Description
+ */
+$SQLS['trades']['heads'] = array(
+	'ID','Seller','Buyer','RemoteExchange','RemoteBuyer','RecordID','DateEntered',
+	'EnteredBy','Amount','Levy','LevyRate','Description'
+);
+$SQLS['trades']['sql'] = "
+	SELECT
+		ct.id AS 'ID',
+		af.name AS 'Seller',
+		at.name AS 'Buyer',
+		'' AS 'RemoteExchange',
+		'' AS 'RemoteBuyer',
+		'' AS 'RecordID',
+		ct.created AS 'DateEntered',
+		au.name AS 'EnteredBy',
+		ct.amount AS 'Amount',
+		'' AS 'Levy',
+		'' AS 'LevyRate',
+		ct.concept AS 'Description'
+
+	FROM ces_transaction ct
+    
+	INNER JOIN users u ON ct.user = u.uid
+	INNER JOIN ces_accountuser cau ON cau.user = u.uid
+
+	INNER JOIN ces_account af ON af.id = ct.toaccount
+	INNER JOIN ces_account at ON at.id = ct.fromaccount
+	INNER JOIN ces_account au ON au.id = cau.account
+
+
+	WHERE af.exchange = ". $ECOXARXA_ID . "
+		OR at.exchange = " . $ECOXARXA_ID;
+
+
 // ==> offers.csv <==
 // ID,UID,Remote,Category,Subcat,Title,Description,Image,Keys,Rate,ConRate,DateAdded,DateExpires,Hidden
-//
-// ==> trades.csv <==
-// ID,Seller,Buyer,RemoteExchange,RemoteBuyer,RecordID,DateEntered,EnteredBy,Amount,Levy,LevyRate,Description
 //
 // ==> wants.csv <==
 // ID,UID,Keep,DateAdded,Title,Description
@@ -361,6 +395,11 @@ $URL_BASE = $_SERVER['SCRIPT_NAME'];
 foreach ($SQLS as $CSV => $SQL) {
 	$URL = $URL_BASE . '?csv=' . $CSV;
 	echo '<br/><a href="' . $URL . '">' . $URL . '</a>';
+	if ( $DEBUG ) {
+		echo "<pre>";
+		print_r($SQL['sql']);
+		echo "<pre/>";
+	}
 }
 
 
