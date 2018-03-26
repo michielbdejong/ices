@@ -15,12 +15,12 @@ Ficheros finales:
 
  */
 
-$ECOXARXA_ID=31;
+$ECOXARXA_ID=$_GET['exchange'];
 $USER_DB="root";
 $PASS_DB="kkkk";
 $NAME_DB="integralcesservidor";
 
-$DEBUG=True;
+$DEBUG=FALSE;
 
 $enlace = mysqli_connect("127.0.0.1", $USER_DB, $PASS_DB, $NAME_DB);
 
@@ -438,6 +438,25 @@ function csv_file($SQLS, $csv, $enlace = FALSE) {
 
 }
 
+// Seleccionar ecoxarxa.
+if ( ! isset($_GET['exchange']) ) {
+	$SQL_EXCHANGES="SELECT id, code, state, shortname, name FROM ces_exchange";
+	$result = $enlace->query($SQL_EXCHANGES);
+	if (!$result) {
+		print_r(mysqli_error($enlace));
+		exit();
+	}
+  while ($row=mysqli_fetch_row($result)) {
+		printf (
+			"<br/><a href='?exchange=%s'>%s</a> (%s) %s %s $s\n",
+			$row[0],$row[0],$row[1],$row[2],$row[3],$row[4]
+			);
+    }
+  mysqli_free_result($result);
+	exit();
+	}
+
+
 if ( isset($_GET['csv']) ) {
 	csv_file($SQLS, $_GET['csv'], $enlace);
 	exit();
@@ -449,7 +468,7 @@ echo '<br/>';
 
 $URL_BASE = $_SERVER['SCRIPT_NAME'];
 foreach ($SQLS as $CSV => $SQL) {
-	$URL = $URL_BASE . '?csv=' . $CSV;
+	$URL = $URL_BASE . '?exchange=' . $ECOXARXA_ID . '&csv=' . $CSV;
 	echo '<br/><a href="' . $URL . '">' . $URL . '</a>';
 	if ( $DEBUG ) {
 		echo "<pre>";
