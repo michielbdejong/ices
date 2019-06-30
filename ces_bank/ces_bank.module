@@ -202,6 +202,31 @@ function ces_bank_menu() {
     'weight' => 900,
     'expanded' => TRUE,
   );
+  // Export exchange.
+  $menu['ces/admin/export'] = array(
+    'title' => 'Export',
+    'description' => 'Export exchange',
+    'access callback' => 'ces_bank_access',
+    'access arguments' => array('admin', 'exchange', CES_BANK_CURRENT_EXCHANGE),
+    'weight' => 905,
+    'page callback' => 'ces_bank_export_exchange_page',
+    'page arguments' => array(CES_BANK_CURRENT_EXCHANGE),
+    'file' => 'ces_bank.pages.export.inc',
+    'file path' => drupal_get_path('module', 'ces_bank'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $menu['ces/admin/export/%csv/csv'] = array(
+    'title' => 'Export CSV',
+    'description' => 'Export CSV',
+    'page callback' => 'ces_bank_export_csv',
+    'page arguments' => array(3),
+    'file' => 'ces_bank.pages.export.inc',
+    'file path' => drupal_get_path('module', 'ces_bank'),
+    'type' => MENU_LOCAL_TASK,
+    'access callback' => 'ces_bank_access',
+    'access arguments' => array('admin', 'exchange', CES_BANK_CURRENT_EXCHANGE),
+    'weight' => 4,
+  );
   // Accounts administration.
   $menu['ces/admin/account'] = array(
     'title' => 'Accounts',
