@@ -28,7 +28,7 @@ for d in docs/* ; do
   count=$(($count+1))
 done
 
-doxygen="/bin/doxygen"
+doxygen="doxygen"
 log_file=/tmp/doxygen.log
 tmp_conf=/tmp/doxygen.conf
 debug=0
@@ -139,6 +139,10 @@ for lang in ${languages[*]} ; do
   html_output="$(grep ^HTML_OUTPUT $doxygen_conf | cut -d= -f 2 | sed 's/^ //')"
   log_file="$(grep ^WARN_LOGFILE $doxygen_conf | cut -d= -f 2 | sed 's/^ //')"
 
+  [[ $debug == 1 ]] && echo "DIR FINAL: $dir_final"
+  [[ $debug == 1 ]] && echo "HTML OUTPUT: $html_output"
+  [[ $debug == 1 ]] && echo "LOG FILE: $log_file"
+
   cp "$doxygen_conf" "$tmp_conf"
   echo -e "\n\nOUTPUT_LANGUAGE=$lang_long" >> $tmp_conf
   echo -e "\n\nHTML_OUTPUT=$lang" >> $tmp_conf
@@ -187,25 +191,21 @@ for lang in ${languages[*]} ; do
     cat $tmp_conf | $doxygen - > /tmp/salida.dox 2> $errors_log
   fi
 
-  if [ $debug == 1 ] ; then
-    echo
-    echo Final dir: ${dir_final}${lang}
-    echo Output language: $lang_long
-    echo Log file: $log_file
-    echo 
-    echo -e "$conf"
-  fi
+  echo
+  echo Final dir: ${dir_final}${lang}
+  echo Output language: $lang_long
+  echo Log file: $log_file
+  echo 
+  echo -e "$conf"
 
   cd "$dir_actual"
 
   if [ $debug == 1 ] ; then
     echo
-    read -p "Abrir gvim con errores de doxygen (s/n): " OPCION
+	echo "Salida de doxygen: "
+	echo
+    cat "$log_file"
     echo
-    if [ "$OPCION" == 's' ] ; then
-      gvim -c "cfile $log_file" 
-      read
-    fi
   fi
 
 
