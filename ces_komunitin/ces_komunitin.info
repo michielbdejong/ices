@@ -1,0 +1,8 @@
+name = ICES Komunitin server side
+description = Implements miscelaneous backend features for the Komunitin app.
+core = 7.x
+package = ices
+
+dependencies[] = oauth2_server
+
+version = "7.x-1.12"
