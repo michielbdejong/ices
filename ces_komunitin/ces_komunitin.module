@@ -51,7 +51,7 @@ function ces_komunitin_openid_configuration() {
 function ces_komunitin_jwks() {
     // Get the certificate used by oauth2_server module.
     module_load_include('module', 'oauth2_server');
-    $keys = oauth2_server_generate_keys();
+    $keys = oauth2_server_get_keys();
     
     // Get the key details using openssl library.
     $cert = openssl_x509_read($keys['public_key']);
