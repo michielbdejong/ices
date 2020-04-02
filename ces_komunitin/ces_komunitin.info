@@ -4,5 +4,9 @@ core = 7.x
 package = ices
 
 dependencies[] = oauth2_server
+dependencies[] = cors
+dependencies[] = login_emailusername
+
+
 
 version = "7.x-1.12"
