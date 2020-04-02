@@ -1,7 +1,10 @@
-version: "3.0"
+version: "3.7"
 services:
   integralces:
     build: .
-    ports: 1234:80
+    ports: 
+      - 2029:80
     volumes:
-      - .:/var/www/html/sites/all/modules/ices
+      - type: bind
+        source: .
+        target: /var/www/html/sites/all/modules/ices

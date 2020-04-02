@@ -1,0 +1,89 @@
+<?php
+/**
+ * @file
+ * Installation for ces_komunitin module.
+ */
+
+/**
+ * Get scopes for komunitin oauth server.
+ * **/
+function _ces_komunitin_get_scopes() {
+  return array(
+    // KOounitin scopes.
+    'komunitin_social' => 'Manage exchange group membership, offers, needs...',
+    // OpenId scopes.
+    'openid' => 'Know your user information',
+    'offline_access' => "Access the API when you're not present.",
+    'email' => 'View your email address.',
+    'profile' => 'View basic information about your account.'
+  );
+}
+/**
+ * Implements hook_install().
+ *
+ * Create oauth2_server server and client.
+ */
+function ces_komunitin_install() {
+  // Create OAuth2 server.
+  $server = entity_create('oauth2_server', array());
+  $server->name = 'komunitin';
+  $server->label = 'komunitin';
+  $server->settings = array(
+    'default_scope' => '',
+    'enforce_state' => TRUE,
+    'allow_implicit' => TRUE,
+    'use_openid_connect' => TRUE,
+    'use_crypto_tokens' => TRUE,
+    'require_exact_redirect_uri' => TRUE,
+    'grant_types' => array(
+      'authorization_code' => 'authorization_code',
+      'refresh_token' => 'refresh_token',
+      'password' => 'password',
+    ),
+    'always_issue_new_refresh_token' => TRUE,
+    'id_lifetime' => 3600,
+    'access_lifetime' => 3600,
+    'refresh_token_lifetime' => 1209600,
+  );
+  $server->save();
+
+  // Create OAuth2 scopes.
+  $scopes = _ces_komunitin_get_scopes();
+
+  foreach ($scopes as $name => $description) {
+    $scope = entity_create('oauth2_server_scope', array());
+    $scope->server = $server->name;
+    $scope->name = $name;
+    $scope->description = $description;
+    $scope->save();
+  }
+
+  // Create OAuth2 client for Komunitin app.
+  $client = entity_create('oauth2_server_client', array());
+  $client->server = $server->name;
+  $client->client_key = 'komunitin-app';
+  $client->label = 'komunitin-app';
+  $client->redirect_uri="http://localhost:8080/auth/callback\n"
+    . "https://test.komunitin.org/auth/callback";
+  $client->automatic_authorization=FALSE;
+  $client->save();
+
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function ces_komunitin_uninstall() {
+  // Delete scopes.
+  $scopes = _ces_komunitin_get_scopes();
+  foreach ($scopes as $name => $description) {
+    $scope = oauth2_server_scope_load('komunitin', $name);
+    entity_delete('oauth2_server_scope', $scope->identifier());
+  }
+  // Delete client.
+  $client = oauth2_server_client_load('komunitin', 'komunitin-app');
+  entity_delete('oauth2_server_client', $client);
+  // Delete server.
+  $server = oauth2_server_load('komunitin');
+  entity_delete('oauth2_server', $server);
+}

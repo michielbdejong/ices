@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:latest as integralces-demo
 
 # Define env variables to avoid interactive console prompts in 
 # apt install of php tzdata module.
@@ -37,18 +37,32 @@ RUN chown -R www-data sites/default/files
 # Download theme
 RUN git clone --branch 7.x-1.x https://git.drupalcode.org/sandbox/esteve-1866046.git sites/all/themes/greences
 
-# Install modules, theme and add demo data.
+# Install modules and theme
 RUN service mysql start && sleep 2 && \
   drush dl -y ices services && \
   drush en -y \
   oauth2_server services image views \
   token libraries services_views \
   cors login_emailusername \
-  ices ces_bank ces_blog ces_interop ces_message ces_offerswants ces_qr ces_rest ces_statistics ces_summaryblock \
+  ices ces_bank ces_blog ces_interop ces_message ces_offerswants ces_qr ces_rest ces_statistics ces_summaryblock ces_user \
   greences && \
-  drush vset theme_default greences
+  drush vset theme_default greences && \
+  drush role-add-perm 'anonymous user' 'use oauth2 server' && \
+  drush role-add-perm 'authenticated user' 'use oauth2 server'
 
-# install development modules
+# download libraries.
+RUN git clone --branch master https://github.com/bshaffer/oauth2-server-php.git sites/all/libraries/oauth2-server-php
+
+FROM integralces-demo
+
+# Configure xdebug.
+RUN printf "\n[XDebug]\n\
+xdebug.remote_enable = 1\n\
+xdebug.remote_host = host.docker.internal\n\
+xdebug.remote_autostart = 1\n\
+xdebug.remote_port = 9029\n" >> /etc/php/7.2/apache2/php.ini
+
+# install development modules and add demo data.
 RUN service mysql start && sleep 2 && \
   drush dl -y devel && \
   drush en -y devel ces_develop simpletest maillog && \

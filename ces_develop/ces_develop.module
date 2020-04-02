@@ -111,6 +111,7 @@ function ces_develop_register_user($name) {
     $form_state['values']['op'] = t('Create new account');
     drupal_form_submit('user_register_form', $form_state);
   }
+  // Activate user.
   return user_load_by_name($name);
 }
 /**
@@ -133,5 +134,7 @@ function ces_develop_register_account($user, $exchange, $i) {
     ),
   );
   $bank->createAccount($account);
+  $user->status = 1;
+  user_save($user);
   $bank->activateAccount($account);
 }
