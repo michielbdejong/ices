@@ -11,6 +11,27 @@
  * ICES komunitin module.
  */
 
+ /**
+  * Implements hook_module_implements_alter
+  *
+  * Ensures this is the last init hook call.
+  */
+function ces_komunitin_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'init') {
+    $impl = $implementations['ces_komunitin'];
+    unset($implementations['ces_komunitin']);
+    $implementations['ces_komunitin'] = $impl;
+  }
+}
+/**
+ * Implements hook_init().
+ */
+function ces_komunitin_init() {
+  if ($_SERVER['REQUEST_METHOD'] == "OPTIONS") {
+    exit(0);
+  }
+}
+
 /**
  * Implements hook_menu().
  */

@@ -33,7 +33,8 @@ function ces_komunitin_install() {
     'enforce_state' => TRUE,
     'allow_implicit' => TRUE,
     'use_openid_connect' => TRUE,
-    'use_crypto_tokens' => TRUE,
+    // I'd like to use JWT tokens, but it seems that there are some bugs there (for example, /UserInfo endpoint does not work!).
+    'use_crypto_tokens' => FALSE,
     'require_exact_redirect_uri' => TRUE,
     'grant_types' => array(
       'authorization_code' => 'authorization_code',
