@@ -25,115 +25,11 @@ function ces_komunitin_module_implements_alter(&$implementations, $hook) {
 }
 /**
  * Implements hook_init().
+ * 
+ * Exit on OPTIONS requests so we dont check for AUthorization.
  */
 function ces_komunitin_init() {
   if ($_SERVER['REQUEST_METHOD'] == "OPTIONS") {
     exit(0);
   }
-}
-
-/**
- * Implements hook_menu().
- */
-function ces_komunitin_menu() {
-  $items = array();
-  $items['.well-known/openid-configuration'] = array(
-    'access callback' => TRUE,
-    'page callback' => 'ces_komunitin_openid_configuration',
-    'type' => MENU_CALLBACK,
-  );
-  $items['.well-known/jwks.json'] = array(
-    'access callback' => TRUE,
-    'page callback' => 'ces_komunitin_jwks',
-    'type' => MENU_CALLBACK,
-  );
-  return $items;
-}
-
-/**
- * Provides a response to the /.well-known/openid-configuration endpoint.
- */
-function ces_komunitin_openid_configuration() {
-  $object = array(
-    'issuer' => url('/', ['absolute' => TRUE]),
-    'authorization_endpoint' => url('oauth2/authorize', ['absolute' => TRUE]),
-    'token_endpoint' => url('oauth2/token', ['absolute' => TRUE]),
-    'userinfo_endpoint' => url('oauth2/UserInfo', ['absolute' => TRUE]),
-    'end_session_endpoint'=> url('user/logout', ['absolute' => TRUE]),
-    'jwks_uri' => url('.well-known/jwks.json', ['absolute' => TRUE]),
-  );
-  ces_komunitin_send_json($object);
-}
-
-
-/**
- * Provides a response to the /.well-known/openid-configuration endpoint.
- */
-function ces_komunitin_jwks() {
-    // Get the certificate used by oauth2_server module.
-    module_load_include('module', 'oauth2_server');
-    $keys = oauth2_server_get_keys();
-    
-    // Get the key details using openssl library.
-    $cert = openssl_x509_read($keys['public_key']);
-    $pk = openssl_pkey_get_public($cert);
-    openssl_x509_free($cert);
-    $details = openssl_pkey_get_details($pk);
-    openssl_pkey_free($pk);
-
-    // Build JWKS. https://tools.ietf.org/html/rfc7517
-    $jwk['e'] = ces_komunitin_base64url_encode($details['rsa']['e']);
-    $jwk['n'] = ces_komunitin_base64url_encode($details['rsa']['n']);
-    $jwk['mod'] = ces_komunitin_base64url_encode($details['rsa']['n']);
-    $jwk['exp'] = ces_komunitin_base64url_encode($details['rsa']['e']);
-    $jwk['x5c'][] = ces_komunitin_base64url_encode(ces_komunitin_pem2der($keys['public_key']));
-    $jwk['kty'] = 'RSA';
-    $jwk['use'] = "sig";
-    $jwk['alg'] = "RS256";
-    
-    $jwks = array(
-      'keys' => array($jwk)
-    );
-
-    // Send response.
-    ces_komunitin_send_json($jwks);
-}
-
-/**
- * Convert a Pem encoded to Der encoded certificate.
- * @param $pem_data
- * @return bool|string
- * @see http://php.net/manual/en/ref.openssl.php#74188
- */
-function ces_komunitin_pem2der($pem_data) {
-  $begin = "CERTIFICATE-----";
-  $end   = "-----END";
-  $pem_data = substr($pem_data, strpos($pem_data, $begin)+strlen($begin));
-  $pem_data = substr($pem_data, 0, strpos($pem_data, $end));
-  $der = base64_decode($pem_data);
-  return $der;
-}
-
-/**
-   * Do the specific Base64 encoding as used by OIDC.
-   * @param $data
-   * @return string
-   * @see http://php.net/manual/en/function.base64-encode.php#103849
-   */
-  function ces_komunitin_base64url_encode($data) {
-    return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
-  }
-
-/**
- * Send JSON object.
- * 
- * @param object $object
- *   The object to be returned.
- */
-function ces_komunitin_send_json($object) {
-  $content = drupal_json_encode($object);
-  drupal_add_http_header('Content-Type', 'application/json');
-  drupal_add_http_header('Content-Length', strlen($content));
-  echo $content;
-  drupal_exit();
 }

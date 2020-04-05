@@ -64,8 +64,9 @@ function ces_komunitin_install() {
   $client->server = $server->name;
   $client->client_key = 'komunitin-app';
   $client->label = 'komunitin-app';
-  $client->redirect_uri="http://localhost:8080/auth/callback\n"
-    . "https://test.komunitin.org/auth/callback";
+  $client->redirect_uri = "http://localhost:8080/auth/callback\n" // Local dev environment.
+    . "http://localhost:2030/auth/callback\n"  // Local docker environment.
+    . "https://test.komunitin.org/auth/callback";  // Public environment.
   $client->automatic_authorization=FALSE;
   $client->save();
 
