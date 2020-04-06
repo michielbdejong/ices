@@ -1700,7 +1700,6 @@ function ces_bank_allusers_autocomplete($string) {
     $fsname = check_plain($row->firstname) . check_plain($row->surname);
     $fsname = mb_strlen($fsname) > 20 ? mb_substr($fsname, 0, 16) . '...' : $fsname;
     $email = check_plain($row->mail);
-    $email = mb_strlen($email) > 20 ? mb_substr($email, 0, 16) . '...' : $email;
     $matches[$row->username] = check_plain($row->username) . ': ' . $fsname . ' -- ' . $email;
   }
   // Return for JS.
@@ -1821,9 +1820,6 @@ function ces_bank_views_pre_render(&$view) {
           '<a href="' . base_path() . 'user/' . $result->users_ces_accountuser_uid . '">' . 
           $result->users_ces_accountuser_name . 
           '</a>';
-      }
-      if (strlen($result->users_ces_accountuser_mail) > 20) {
-        $result->users_ces_accountuser_mail = mb_substr($result->users_ces_accountuser_mail, 0, 16) . '...';
       }
       if (array_key_exists($result->id, $ids_and_keys)) {
         $duplicate_key = $ids_and_keys[$result->id];
