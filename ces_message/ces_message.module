@@ -479,6 +479,16 @@ function ces_message_mail($key, &$message, $params) {
     }
   }
 
+  // Set Sender and Return-Path headers to the admin exchange mail, so
+  // eventually bounce emails go to the exchange admin instead of to the
+  // mailing service admin. I'm not sure if that will cause emails to get
+  // intercepted by spam or bounces actually delivered to admin exchanges.
+
+  if (isset($params['exchange'])) {
+    $adminmail = token_replace('[exchange:admin:mail]', $params);
+    $message['headers']['Return-Path'] = $adminmail;
+  }
+
 }
 /**
  * Provides a test.
