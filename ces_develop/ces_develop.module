@@ -135,6 +135,6 @@ function ces_develop_register_account($user, $exchange, $i) {
   );
   $bank->createAccount($account);
   $user->status = 1;
-  user_save($user);
+  user_save($user, array('pass' => 'integralces'));
   $bank->activateAccount($account);
 }
