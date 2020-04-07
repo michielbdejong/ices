@@ -34,17 +34,20 @@ RUN service mysql start && sleep 2 && \
   drush si standard --db-url=mysql://ices:ices@localhost/ices --account-name=admin --account-pass=adminpass --site-name=IntegralCES -y
 RUN chown -R www-data sites/default/files
 
+# Copy ices from workspace.
+COPY . sites/all/modules/ices
+
 # Download theme
 RUN git clone --branch 7.x-1.x https://git.drupalcode.org/sandbox/esteve-1866046.git sites/all/themes/greences
 
 # Install modules and theme
 RUN service mysql start && sleep 2 && \
-  drush dl -y ices services && \
+  drush dl -y services && \
   drush en -y \
   oauth2_server services image views \
   token libraries services_views \
-  cors login_emailusername \
-  ices ces_bank ces_blog ces_interop ces_message ces_offerswants ces_qr ces_rest ces_statistics ces_summaryblock ces_user \
+  cors login_emailusername  && \
+  drush en -y ices ces_bank ces_blog ces_interop ces_message ces_offerswants ces_qr ces_rest ces_statistics ces_summaryblock ces_user \
   greences && \
   drush vset theme_default greences && \
   drush role-add-perm 'anonymous user' 'use oauth2 server' && \
@@ -64,7 +67,7 @@ xdebug.remote_autostart = 1\n\
 xdebug.remote_port = 9029\n" >> /etc/php/7.2/apache2/php.ini
 
 # install development modules and add demo data.
-RUN service mysql start && sleep 2 && \
+RUN service mysql start && sleep 5 && \
   drush dl -y devel && \
   drush en -y devel ces_develop simpletest maillog && \
   drush vset maillog_send 0 && \
@@ -76,5 +79,3 @@ EXPOSE 80
 VOLUME /var/www/html/sites/all/modules/ices
 
 CMD service mysql start && /usr/sbin/apache2ctl -D FOREGROUND
-
-
