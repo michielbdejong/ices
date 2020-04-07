@@ -37,8 +37,8 @@ function ces_offerswants_help($path, $arg) {
     case 'ces/admin/categories/add':
     case 'ces/admin/categories/%/edit':
       return '<p>' . t('Enter the category details.') . '</p>';
-    
-    case: 'ces/admin/offerbook':
+
+    case 'ces/admin/offerbook':
       return '<p>' . t('Export all offers in your exchange in HTML format.') . ' '. t('You should then open this file with your document processor to add styling, branding, covers and so on before publishing to all members.') . '</p>';
 
   }
