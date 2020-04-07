@@ -37,6 +37,9 @@ function ces_offerswants_help($path, $arg) {
     case 'ces/admin/categories/add':
     case 'ces/admin/categories/%/edit':
       return '<p>' . t('Enter the category details.') . '</p>';
+    
+    case: 'ces/admin/offerbook':
+      return '<p>' . t('Export all offers in your exchange in HTML format.') . ' '. t('You should then open this file with your document processor to add styling, branding, covers and so on before publishing to all members.') . '</p>';
 
   }
 }
@@ -407,6 +410,17 @@ function ces_offerswants_menu() {
     'description' => 'Preferences about offers and wants email alerts',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ces_alerts_form'),
+    'access callback' => 'ces_bank_access',
+    'access arguments' => array('edit', 'exchange', CES_BANK_CURRENT_EXCHANGE),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $menu['ces/admin/offerbook'] = array(
+    'title' => 'Export offers book',
+    'description' => 'Export all offers in your exchange in HTML format.',
+    'file' => 'includes/ces_offerswants_book.inc',
+    'file path' => drupal_get_path('module', 'ces_offerswants'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ces_offerswants_book_form'),
     'access callback' => 'ces_bank_access',
     'access arguments' => array('edit', 'exchange', CES_BANK_CURRENT_EXCHANGE),
     'type' => MENU_NORMAL_ITEM,
