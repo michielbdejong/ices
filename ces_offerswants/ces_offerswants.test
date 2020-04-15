@@ -340,7 +340,7 @@ class CesOffersWantsTestCase extends DrupalWebTestCase {
         $wants++;
       }
       else {
-        $op = t('Create new account');
+        $op = t('Submit registration');
         $this->drupalPost(NULL, $edit, $op);
         $edit = FALSE;
       }
