@@ -11,9 +11,13 @@ RUN apt update && apt install -y \
   mysql-server \
   php libapache2-mod-php php-cli php-mbstring php-mysql php-gd php-curl php-ssh2 php-xml php-xdebug
 
-# Configure apache: enable mod_rewrite.
+# Configure apache: enable mod_rewrite and change port from 80 to 2029.
+# We ned to change the port so fomr inise the container the url localhost:2029 is accessible 
+# and hence drupal can access himself.
 RUN a2enmod rewrite && \
-  sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+  sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf && \
+  sed -i 's/Listen 80/Listen 2029/' /etc/apache2/ports.conf && \
+  sed -i 's/<VirtualHost \*:80>/<VirtualHost \*:2029>/' /etc/apache2/sites-available/000-default.conf
 
 # Install composer and drush
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -73,7 +77,7 @@ RUN service mysql start && sleep 5 && \
   drush vset maillog_send 0 && \
   drush php-script sites/all/modules/ices/ces_develop/demo.php
 
-EXPOSE 80
+EXPOSE 2029
 
 # Set ices modules dir as a volume for development
 VOLUME /var/www/html/sites/all/modules/ices

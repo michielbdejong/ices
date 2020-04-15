@@ -3,7 +3,7 @@ services:
   integralces:
     build: .
     ports: 
-      - 2029:80
+      - 2029:2029
     volumes:
       - type: bind
         source: .
