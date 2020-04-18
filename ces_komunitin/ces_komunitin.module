@@ -25,11 +25,43 @@ function ces_komunitin_module_implements_alter(&$implementations, $hook) {
 }
 /**
  * Implements hook_init().
- * 
- * Exit on OPTIONS requests so we dont check for AUthorization.
+ *
+ * Exit on OPTIONS requests so we dont check for Authorization.
  */
 function ces_komunitin_init() {
   if ($_SERVER['REQUEST_METHOD'] == "OPTIONS") {
     exit(0);
   }
+}
+/**
+ * Implements hook_menu.
+ */
+function ces_komunitin_menu() {
+  $items = array();
+  $items['ces/api'] = array(
+    'page callback' => 'ces_komunitin_api',
+    'type' => MENU_CALLBACK,
+    'file' => 'ces_komunitin.api.inc',
+    'file path' => drupal_get_path('module', 'ces_komunitin'),
+    'access callback' => TRUE
+  );
+  return $items;
+}
+/**
+ * Implements hook_libraries_info().
+ */
+function ces_komunitin_libraries_info()
+{
+  $libraries = array();
+  $libraries['json-api'] = array(
+    'name' => 'JSON API',
+    'vendor url' => 'https://github.com/neomerx/json-api',
+    'xautoload' => function ($adapter) {
+      /** @var \Drupal\xautoload\Adapter\LocalDirectoryAdapter $adapter */
+      // Scan sites/all/libraries/json-api/composer.json to look for
+      // autoload information.
+      $adapter->composerJson('composer.json');
+    },
+  );
+  return $libraries;
 }

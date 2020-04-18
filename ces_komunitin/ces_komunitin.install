@@ -11,6 +11,7 @@ function _ces_komunitin_get_scopes() {
   return array(
     // KOounitin scopes.
     'komunitin_social' => 'Manage exchange group membership, offers, needs...',
+    'komunitin_accounting' => 'Manage account, perform transactions, accept transactions...',
     // OpenId scopes.
     'openid' => 'Know your user information',
     'offline_access' => "Access the API when you're not present.",
