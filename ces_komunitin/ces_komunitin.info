@@ -3,8 +3,11 @@ description = Implements miscelaneous backend features for the Komunitin app.
 core = 7.x
 package = ices
 
+files[] = ces_komunitin.test
+
 dependencies[] = oauth2_server
 dependencies[] = cors
 dependencies[] = login_emailusername
+dependencies[] = libraries
 
 version = "7.x-1.12"

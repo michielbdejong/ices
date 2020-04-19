@@ -13,8 +13,6 @@
  * @code
  * cd sites/all/libraries
  * git clone --branch master https://github.com/bshaffer/oauth2-server-php.git
- * cd oauth2-server-php
- * git checkout v1.4
  * @endcode
  */
 

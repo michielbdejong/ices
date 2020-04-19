@@ -17,93 +17,109 @@ function _ces_komunitin_api_get_base_url() {
  */
 function ces_komunitin_api() {
   global $user;
+  try {
+    $request = new JsonApiRequest(_ces_komunitin_api_get_base_path());
 
-  $request = new JsonApiRequest(_ces_komunitin_api_get_base_path());
+    // Api namespace (social, accounting).
+    $path = explode('/', $request->path);
+    $api = $path[0];
+    _ces_komunitin_api_verify_api($api);
 
-  // Api namespace (social, accounting).
-  $path = explode('/', $request->path);
-  $api = $path[0];
-  _ces_komunitin_api_verify_api($api);
+    // Authorization.
+    $token = oauth2_server_check_access('komunitin', 'komunitin_' . $api);
+    if ($token instanceof OAuth2\Response) {
+      $error_code = $token->getStatusCode() == 403 ?
+        KomunitinApiError::FORBIDDEN : KomunitinApiError::UNAUTHORIZED;
+      ces_komunitin_api_send_error($error_code);
+    }
+    else {
+      // Login user identified by Authorization header token.
+      $user = user_load($token['user_id']);
+    }
 
-  // Authorization.
-  $token = oauth2_server_check_access('komunitin', 'komunitin_' . $api);
-  if ($token instanceof OAuth2\Response) {
-    $error_code = $response->getStatusCode() == 403 ?
-      KomunitinApiError::FORBIDDEN : KomunitinApiError::UNAUTHORIZED;
-    ces_komunitin_api_send_error($error_code);
-  }
-  else {
-    // Login user identified by Authorization header token.
-    $user = user_load($token['user_id']);
-  }
+    // Exchange
+    $exchange_code = $path[1];
+    $exchange = ces_bank_get_exchange_by_name($exchange_code);
+    if (!$exchange) {
+      ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+    }
 
-  // Exchange
-  $exchange_code = $path[1];
-  $exchange = ces_bank_get_exchange_by_name($exchange_code);
-  if (!$exchange) {
-    ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
-  }
+    // Endpoint
+    $type = $path[2] ?? 'currencies';
+    $endpoints = ces_komunitin_api_get_endpoints();
 
-  // Endpoint
-  $type = $path[2] ?? 'currencies';
-  $endpoints = ces_komunitin_api_get_endpoints();
+    if (!isset($endpoints[$api][$type])) {
+      ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+    }
+    $endpoint = $endpoints[$api][$type];
 
-  if (!isset($endpoints[$api][$type])) {
-    ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
-  }
-  $endpoint = $endpoints[$api][$type];
+    // Method
+    $methods = array(
+      'GET' => 'read',
+      'POST' => 'create',
+      'PATCH' => 'update',
+      'DELETE' => 'delete'
+    );
 
-  // Method
-  $methods = array(
-    'GET' => 'read',
-    'POST' => 'create',
-    'PATCH' => 'update',
-    'DELETE' => 'delete'
-  );
+    if (isset($path[3])) {
+      $endpoint = $endpoint['%'];
+      $resource_id = $path[3];
+    }
+    else {
+      $resource_id = null;
+    }
+    if (!isset($methods[$request->method]) || array_search($methods[$request->method], $endpoint['operations']) === FALSE) {
+      $operations = $endpoint['operations'];
+      array_keys(array_filter($methods, function($operation) use ($operations) {
+        return array_search($operation, $operations);
+      }));
+      drupal_set_header('Allow', join(', ', $operations));
+      ces_komunitin_api_send_error(KomunitinApiError::METHOD_NOT_ALLOWED);
+    }
+    $operation = $methods[$request->method];
 
-  if (isset($path[3])) {
-    $endpoint = $endpoint['%'];
-    $resource_id = $path[3];
-  }
-  else {
-    $resource_id = null;
-  }
-  if (!isset($methods[$request->method]) || array_search($methods[$request->method], $endpoint['operations']) === FALSE) {
-    $operations = $endpoint['operations'];
-    array_keys(array_filter($methods, function($operation) use ($operations) {
-      return array_search($operation, $operations);
-    }));
-    drupal_set_header('Allow', join(', ', $operations));
-    ces_komunitin_api_send_error(KomunitinApiError::METHOD_NOT_ALLOWED);
-  }
-  $operation = $methods[$request->method];
+    // Prepare parameters.
+    $parameters = [$exchange];
 
-  // Perform operation
-  $parameters = [];
-  // Load resource if it exists.
-  if ($resource_id) {
-    $resource = ces_komunitin_api_call_function('load', $api, $type, [$resource_id]);
-    $parameters[] = $resource;
-  }
+    // Load resource if it exists.
+    if ($resource_id) {
+      $resource = ces_komunitin_api_call_function('load', $api, $type, [$exchange, $resource_id]);
+      $parameters[] = $resource;
+    }
 
-  // Call operation if needed.
-  if ($operation != 'read') {
-    $result = ces_komunitin_api_call_function($operation, $api, $type, $parameters);
-  }
-  else {
-    $result = $resource;
-  }
+    // Read request body if needed.
+    if ($operation == 'create' || $operation == 'update') {
+      if (!$request->body) {
+        ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+      }
+      $body = json_decode($request->body);
+      if (json_last_error() !== JSON_ERROR_NONE) {
+        ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+      }
+      $parameters[] = $body;
+    }
 
-  $content = Encoder::instance(array(
-    Transaction::class => TransactionSchema::class
+    // Call operation if needed.
+    if ($operation != 'read') {
+      $result = ces_komunitin_api_call_function($operation, $api, $type, $parameters);
+    }
+    else {
+      $result = $resource;
+    }
+
+    $content = Encoder::instance(array(
+      Transaction::class => TransactionSchema::class
     ))
-    ->withUrlPrefix(_ces_komunitin_api_get_base_url() . '/' . $api . '/' . $exchange_code)
-    ->withEncodeOptions(JSON_PRETTY_PRINT)
-    ->encodeData($result);
-  $status = $operation == 'create' ? 201 : 200;
+      ->withUrlPrefix(_ces_komunitin_api_get_base_url() . '/' . $api . '/' . $exchange_code)
+      ->withEncodeOptions(JSON_PRETTY_PRINT)
+      ->encodeData($result);
+    $status = $operation == 'create' ? 201 : 200;
 
-  // Send response
-  ces_komunitin_api_send_response($status, $content);
+    // Send response
+    ces_komunitin_api_send_response($status, $content);
+  } catch (Exception $e) {
+    ces_komunitin_api_send_error(KomunitinApiError::INTERNAL_SERVER_ERROR);
+  }
 }
 
 function ces_komunitin_api_call_function($operation, $api, $type, $params = []) {
@@ -165,4 +181,18 @@ function _ces_komunitin_api_http_status_text($code) {
   // Take the array of HTTP status codes from OAuth2 module
   $text = OAuth2\Response::$statusTexts[$code];
   return $code . ' ' . $text;
+}
+
+
+/**
+ * Check if a given string is a valid UUID
+ *
+ * From https://gist.github.com/joel-james/3a6201861f12a7acf4f2
+ *
+ * @param   string  $uuid The string to check
+ * @return  boolean
+ */
+function ces_komunitin_api_check_valid_uuid($uuid) {
+  return (is_string($uuid) &&
+    (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $uuid)));
 }

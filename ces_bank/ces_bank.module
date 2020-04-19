@@ -1108,7 +1108,7 @@ function ces_bank_token_info() {
 /**
  * Implements hook_tokens().
  *
- * @todo Para poder obtener el identificador de la transacción del 
+ * @todo Para poder obtener el identificador de la transacción del
  *       comprador he sumado 1 al identificador de la transacción.
  *       Esto es muy mejorable si hacemos que la información venga
  *       desde CesBankBasicTransaction.
@@ -1806,9 +1806,9 @@ function ces_bank_views_pre_render(&$view) {
         }
       }
       if ($fsname) {
-        $result->users_ces_accountuser_name = 
-          '<a href="' . base_path() . 'user/' . $result->users_ces_accountuser_uid . '"' . 'title="' . str_replace('\'','\\\'',$fsname) . '"' . '>' . 
-          $result->users_ces_accountuser_name . 
+        $result->users_ces_accountuser_name =
+          '<a href="' . base_path() . 'user/' . $result->users_ces_accountuser_uid . '"' . 'title="' . str_replace('\'','\\\'',$fsname) . '"' . '>' .
+          $result->users_ces_accountuser_name .
           '</a>';
           if (mb_strlen($fsname) > 18) {
             $fsname = mb_substr($fsname, 0, 14) . '...';
@@ -1816,9 +1816,9 @@ function ces_bank_views_pre_render(&$view) {
         $result->users_ces_accountuser_name .= ' <span class="ces_bank_list_accounts_name">(' . $fsname  . ')</span>';
       }
       else {
-        $result->users_ces_accountuser_name = 
-          '<a href="' . base_path() . 'user/' . $result->users_ces_accountuser_uid . '">' . 
-          $result->users_ces_accountuser_name . 
+        $result->users_ces_accountuser_name =
+          '<a href="' . base_path() . 'user/' . $result->users_ces_accountuser_uid . '">' .
+          $result->users_ces_accountuser_name .
           '</a>';
       }
       if (array_key_exists($result->id, $ids_and_keys)) {

@@ -1,0 +1,179 @@
+<?php
+/**
+ * Komunitin test.
+ */
+class CesKomunitinestCase extends CesBankTestCase {
+
+  public function setUp() {
+    parent::setUp();
+
+    // Grant the anonymous users the permission to use oauth2.
+    $anon_role = user_role_load_by_name('anonymous user');
+    user_role_grant_permissions($anon_role->rid, array('use oauth2 server'));
+    $auth_role = user_role_load_by_name('authenticated user');
+    user_role_grant_permissions($auth_role->rid, array('use oauth2 server'));
+  }
+  /**
+   * Implementation of getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'ICES Komunitin',
+      'description' => 'Test Komunitin API implementation.',
+      'group' => 'ICES',
+    );
+  }
+  /**
+   * Overrides parent method..
+   */
+  protected function getNeededModules() {
+    $modules = parent::getNeededModules();
+    $modules[] = 'ces_komunitin';
+    return $modules;
+  }
+  /**
+   * Test All.
+   */
+  protected function testAll() {
+    $this->createExchanges();
+    $this->createAccounts();
+    // Now we are ready to test opentransact.
+    $this->doAccountingApi();
+  }
+
+  /**
+   * Test the accounting API.
+   */
+  protected function doAccountingApi() {
+    // Authenticate as HORA0001
+    $account = $this->account11;
+    $token = $this->authorize($account['account']['mail'], $account['account']['pass_raw']);
+    // Check access error.
+    $transaction = $this->doKomunitinTransaction($token, 'HORA', 'HORA0000', 'HORA0002', 100, 'Forbidden transaction', 403);
+    // Perform payment
+    $transaction = $this->doKomunitinTransaction($token, 'HORA', 'HORA0001', 'HORA0002', 400, 'First komunitin transaction');
+    // Get transaction
+    $transaction = $this->getKomunitinTransaction($token, 'HORA', $transaction->data->id, 200, $transaction);
+    // Perform charge
+    $transaction = $this->doKomunitinTransaction($token, 'HORA', 'HORA0002', 'HORA0001', 500, 'Second komunitin transaction');
+    // Check authorization error
+    $transaction = $this->doKomunitinTransaction('invalid', 'HORA', 'HORA0001', 'HORA0002', 100, 'Unauthorized transaction', 401);
+    // Check interexchange transaction (not implemented)
+    $transaction = $this->doKomunitinTransaction($token, 'HORA', 'HORA0001', 'BCNA0001', 100, 'Not implemented feature', 501);
+
+  }
+  /**
+   * Perform a Transaction.
+   *
+   * @return The decoded object in data response.
+   */
+  protected function doKomunitinTransaction($token, $exchange_id, $payer, $payee, $amount, $meta, $status = 201) {
+    $url = url('ces/api/accounting/' . $exchange_id . '/transactions', array('absolute' => TRUE));
+    $data = json_encode(array(
+      'data' => array(
+        'type' => 'transactions',
+        'id' => $this->uuid(),
+        'attributes' => array(
+          'transfers'=> array(
+            array(
+              'payer' => url('ces/api/accounting/' . $exchange_id . '/accounts/' . $payer, array('absolute' => TRUE)),
+              'payee' => url('ces/api/accounting/' . $exchange_id . '/accounts/' . $payee, array('absolute' => TRUE)),
+              'amount' => $amount,
+              'meta' => $meta
+            )
+          ),
+          'state' => 'committed'
+        ),
+      )
+    ));
+    $options = array(
+      'method' => 'POST',
+      'data' => $data,
+      'headers' => array(
+        'Authorization' => 'Bearer ' . $token,
+        'Content-Type' => 'application/vnd.api+json',
+      ),
+    );
+    $result = drupal_http_request($url, $options);
+    $this->verbose(highlight_string('<?php ' . var_export($result, TRUE), TRUE));
+    $this->assertEqual($result->code, $status, format_string('Status code should be @status but is @code', array('@status' => $status, '@code' => $result->code)));
+    $this->assertEqual($result->headers['content-type'], "application/vnd.api+json");
+    $data = json_decode($result->data);
+    if ($status == 201) {
+      $this->assertEqual($data->data->attributes->state, 'committed');
+    }
+    return $data;
+  }
+  /**
+   * Test GET /transaction/id
+   *
+   * @return The decoded object in data response.
+   */
+  protected function getKomunitinTransaction($token, $exchange_id, $id, $status = 200, $transaction = NULL) {
+    $url = url('ces/api/accounting/' . $exchange_id . '/transactions/' . $id, array('absolute' => TRUE));
+    $options = array(
+      'headers' => array(
+        'Authorization' => 'Bearer ' . $token
+      )
+    );
+    $result = drupal_http_request($url, $options);
+    $this->assertEqual($result->code, $status, 'Get transaction status code.');
+    $this->assertEqual($result->headers['content-type'], "application/vnd.api+json");
+    $response = json_decode($result->data);
+    if ($transaction != NULL) {
+      $this->assertEqual($transaction->data->attributes->state, $response->data->attributes->state);
+      $response_transfer = $response->data->attributes->transfers[0];
+      $transfer = $transaction->data->attributes->transfers[0];
+      $this->assertEqual($transfer->payer, $response_transfer->payer);
+      $this->assertEqual($transfer->payee, $response_transfer->payee);
+      $this->assertEqual($transfer->amount, $response_transfer->amount);
+      $this->assertEqual($transfer->meta, $response_transfer->meta);
+    }
+    return $response;
+  }
+
+  /**
+   * Call to the token endpoint with credentials from given user.
+   *
+   * @return The access_token string.
+   */
+  protected function authorize($mail, $password) {
+    $data = array(
+      'grant_type' => 'password',
+      'username' => $mail,
+      'password' => $password,
+      'client_id' => 'komunitin-app',
+      'scope' => 'komunitin_accounting'
+    );
+
+    $options = array(
+      'method' => 'POST',
+      'data' => http_build_query($data),
+      'headers' => array(
+        'Content-Type' => 'application/x-www-form-urlencoded',
+      ),
+    );
+
+    $url = url('oauth2/token', array('absolute' => TRUE));
+
+    $response = drupal_http_request($url, $options);
+
+    $result = json_decode($response->data);
+    return ($result->access_token);
+  }
+
+  /**
+   * Generate v4 uuid.
+   *
+   * From https://stackoverflow.com/questions/2040240/php-function-to-generate-v4-uuid
+   */
+  protected function uuid() {
+    $data = random_bytes(16);
+    $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
+    $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+  }
+
+
+
+}

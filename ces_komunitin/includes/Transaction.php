@@ -42,6 +42,8 @@ class Transaction {
   public const STATE_COMMITTED = 'committed';
   public const STATE_REJECTED = 'rejected';
   public const STATE_DELETED = 'deleted';
+
+  public const STATES = [self::STATE_NEW, self::STATE_PENDING, self::STATE_ACCEPTED, self::STATE_COMMITTED, self::STATE_REJECTED, self::STATE_DELETED];
   /**
    * Error is an internal state, not to be returned by API.
    */
@@ -117,7 +119,7 @@ class Transaction {
     }
 
     $decimals = $exchange['currencyscale'];
-    $this->transfer->amount = round($decimals * $bank->getTransactionAmount($transaction, $exchange));
+    $this->transfer->amount = round(pow(10, $decimals) * $bank->getTransactionAmount($transaction, $exchange));
 
     $this->transfer->meta = $transaction['concept'];
   }
@@ -145,10 +147,12 @@ class TransactionSchema extends BaseSchema{
     assert($transaction instanceof Transaction);
     $attributes = [
       'transfers' => array(
-        'payer' => $transaction->transfer->getPayerUrl(),
-        'payee' => $transaction->transfer->getPayeeUrl(),
-        'amount' => $transaction->transfer->amount,
-        'meta' => $transaction->transfer->meta
+        array(
+          'payer' => $transaction->transfer->getPayerUrl(),
+          'payee' => $transaction->transfer->getPayeeUrl(),
+          'amount' => $transaction->transfer->amount,
+          'meta' => $transaction->transfer->meta
+        )
       ),
       'state'  => $transaction->state,
       'created' => $transaction->created,
@@ -156,11 +160,11 @@ class TransactionSchema extends BaseSchema{
     ];
     $localPayer = $transaction->transfer->getLocalPayerUrl();
     if ($localPayer) {
-      $attributes['transfers']['local-payer'] = $localPayer;
+      $attributes['transfers'][0]['local-payer'] = $localPayer;
     }
     $localPayee = $transaction->transfer->getLocalPayeeUrl();
     if ($localPayee) {
-      $attributes['transfers']['local-payee'] = $localPayee;
+      $attributes['transfers'][0]['local-payee'] = $localPayee;
     }
     return $attributes;
   }

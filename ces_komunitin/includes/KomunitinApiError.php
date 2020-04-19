@@ -8,13 +8,17 @@ class KomunitinApiError {
   public const FORBIDDEN = '1003';
   public const NOT_FOUND = '1004';
   public const METHOD_NOT_ALLOWED = '1005';
+  public const BAD_REQUEST = '1006';
+  public const INTERNAL_SERVER_ERROR = '1007';
 
   public static $errors = array(
-    self::NOT_IMPLEMENTED => array('Not implemented', 500),
+    self::NOT_IMPLEMENTED => array('Not implemented', 501),
     self::UNAUTHORIZED => array('Unauthorized', 401),
     self::FORBIDDEN => array('Forbiden', 403),
     self::NOT_FOUND => array('Not Found', 404),
     self::METHOD_NOT_ALLOWED => array('Method Not Allowed', 405),
+    self::BAD_REQUEST => array('Bad Request', 400),
+    self::INTERNAL_SERVER_ERROR => array('Bad Request', 500),
   );
 
   protected $code;
