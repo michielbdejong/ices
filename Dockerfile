@@ -59,9 +59,17 @@ RUN service mysql start && sleep 2 && \
   drush ev "variable_set('cors_domains', array('*'=>'<mirror>|GET,POST,OPTIONS|Content-Type,Authorization|true'));"
 
 # download libraries.
-RUN git clone --branch master https://github.com/bshaffer/oauth2-server-php.git sites/all/libraries/oauth2-server-php
+RUN git clone --branch master https://github.com/bshaffer/oauth2-server-php.git sites/all/libraries/oauth2-server-php && \
+  git clone --branch master https://github.com/neomerx/json-api.git sites/all/libraries/json-api
 
-FROM integralces-demo
+EXPOSE 2029
+
+# Set ices modules dir as a volume for development
+VOLUME /var/www/html/sites/all/modules/ices
+
+CMD service mysql start && /usr/sbin/apache2ctl -D FOREGROUND
+
+FROM integralces-demo as integralces-test
 
 # Configure xdebug.
 RUN printf "\n[XDebug]\n\
@@ -77,9 +85,5 @@ RUN service mysql start && sleep 5 && \
   drush vset maillog_send 0 && \
   drush php-script sites/all/modules/ices/ces_develop/demo.php
 
-EXPOSE 2029
-
-# Set ices modules dir as a volume for development
-VOLUME /var/www/html/sites/all/modules/ices
-
-CMD service mysql start && /usr/sbin/apache2ctl -D FOREGROUND
+# install phpmyadmin
+# RUN apt install -y phpmyadmin php-gettext
