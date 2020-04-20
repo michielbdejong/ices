@@ -678,6 +678,7 @@ function ces_interop_exchange_form_validate($form, &$form_state) {
         'data' => drupal_http_build_query(array(
           'nid' => $form_state['values']['cenip_user'],
           'password' => !empty($form_state['values']['cenip_pass']) ? $form_state['values']['cenip_pass'] : $cenip_pass,
+          'system' => 'ices',
         )),
         'headers' => array(
           'Content-Type' => 'application/x-www-form-urlencoded',
