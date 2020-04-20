@@ -94,29 +94,13 @@ function ces_bank_access($permission, $object, $objectid, $account = NULL) {
   if ($objectid === FALSE) {
     return FALSE;
   }
-
-  // Check account permissions.
-  if (($permission == 'admin' && $object == 'account' && $objectid) ||
-    ($permission == 'view' && $object == 'account transactions' && $objectid) ||
-    ($permission == 'use' && $object == 'exchange accounts' && $objectid) ||
-    ($permission == 'use' && $object == 'account seller' && $objectid)) {
-    if (empty($account)) {
-      $account = ces_bank_get_current_account();
-      $account = $account['id'];
-    }
-    $sql = 'SELECT id FROM {ces_accountuser} WHERE user = :uid AND account = :account AND privilege = 0';
-    $result = db_query($sql, array(':uid' => $user->uid, ':account' => $account));
-    if ($result->rowCount() > 0) {
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
+  // Some menu hooks use %ces_account to automatically load the account.
+  if (is_array($objectid) && isset($objectid['id'])) {
+    $args[2] = $objectid['id'];
   }
 
   $bank = new CesBank();
   return $bank->access($args[0], $args[1], $args[2], $args[3]);
-
 }
 /**
  * Menu hook for ces_bank. Includes most CES menu functions.
@@ -433,7 +417,7 @@ function ces_bank_menu() {
     'expanded' => TRUE,
     'weight' => 100,
   );
-  // Managing Users Account.
+  // Managing account users.
   $menu['ces/bank/account/%ces_account/users'] = array(
     'title' => 'Account users',
     'description' => 'Admin account users',
@@ -442,7 +426,7 @@ function ces_bank_menu() {
     'file' => 'ces_bank.pages.account_users.inc',
     'file path' => drupal_get_path('module', 'ces_bank'),
     'access callback' => 'ces_bank_access',
-    'access arguments' => array('admin', 'account', 3),
+    'access arguments' => array('edit', 'account', 3),
     'type' => MENU_NORMAL_ITEM,
     'weight' => 990,
   );
@@ -460,31 +444,31 @@ function ces_bank_menu() {
     'file path' => drupal_get_path('module', 'ces_bank'),
     'type' => MENU_LOCAL_TASK,
     'access callback' => 'ces_bank_access',
-    'access arguments' => array('admin', 'account', 3),
+    'access arguments' => array('edit', 'account', 3),
     'weight' => 4,
   );
-  $menu['ces/bank/account/%user/users_account/delete'] = array(
+  $menu['ces/bank/account/%ces_account/users_account/%user/delete'] = array(
     'title' => 'Delete account user',
     'description' => 'Delete account user',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('ces_bank_account_user_delete_form', 3),
+    'page arguments' => array('ces_bank_account_user_delete_form', 5, 3),
     'file' => 'ces_bank.forms.account_users.inc',
     'file path' => drupal_get_path('module', 'ces_bank'),
     'type' => MENU_LOCAL_TASK,
     'access callback' => 'ces_bank_access',
-    'access arguments' => array('admin', 'account', 4),
+    'access arguments' => array('edit', 'account', 3),
     'weight' => 4,
   );
-  $menu['ces/bank/account/%user/users_account/edit'] = array(
+  $menu['ces/bank/account/%ces_account/users_account/%user/edit'] = array(
     'title' => 'Edit account user',
     'description' => 'Edit account user',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('ces_bank_account_user_form', 3),
+    'page arguments' => array('ces_bank_account_user_form', 5, 3),
     'file' => 'ces_bank.forms.account_users.inc',
     'file path' => drupal_get_path('module', 'ces_bank'),
     'type' => MENU_LOCAL_TASK,
     'access callback' => 'ces_bank_access',
-    'access arguments' => array('admin', 'account', 4),
+    'access arguments' => array('edit', 'account', 3),
     'weight' => 4,
   );
   $menu['ces/bank/exchange'] = array(
@@ -1462,7 +1446,7 @@ function ces_bank_form_user_profile_form_alter(&$form, &$form_state) {
         '#description' => t('Write one account per line. The payments from these accounts will be automatically accepted.'),
         '#default_value' => implode("\n", $account['data']['accept']['whitelist']),
       );
-      if (ces_bank_access('admin', 'account', $account)) {
+      if (ces_bank_access('edit', 'account', $account['id'])) {
         $fieldset['account_users'] = array(
           '#type' => 'item',
           '#markup' => l(t('Manage account users'), 'ces/bank/account/' . $account['id'] . '/users', array('attributes' => array('class' => array('button')))),

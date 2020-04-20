@@ -955,7 +955,7 @@ class CesBankTestCase extends DrupalWebTestCase {
     $this->clickLink(t('List users'));
     $this->assertText(t('account21@integralces.net'));
     $this->clickLink(t('Add account users'));
-    $this->drupalPost(NULL, array('users[0][username]' => 'account22', 'privilege' => 1), t('Save'));
+    $this->drupalPost(NULL, array('username' => 'account22', 'privilege' => 1), t('Save'));
     // Delete.
     $this->drupalGet('ces/admin/account');
     $this->clickLink('BCNA9001');
