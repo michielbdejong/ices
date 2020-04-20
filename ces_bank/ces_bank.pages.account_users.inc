@@ -59,8 +59,8 @@ function ces_bank_account_users_admin($administrator = NULL, $account = NULL) {
       $link_delete_not_user   = 'ces/admin/account/users/' . $account->id . '/users_account/' . $account_user->user . '/delete_not_user';
     }
     else {
-      $link_delete = 'ces/bank/account/' . $account_user->user . '/users_account/delete';
-      $link_edit   = 'ces/bank/account/' . $account_user->user . '/users_account/edit';
+      $link_delete = 'ces/bank/account/' . $account->id . '/users_account/' . $account_user->user . '/delete';
+      $link_edit   = 'ces/bank/account/' . $account->id . '/users_account/'. $account_user->user . '/edit';
     }
     if ($user_drupal) {
       $row = array(

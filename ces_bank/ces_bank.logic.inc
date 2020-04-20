@@ -175,7 +175,7 @@ class CesBank {
       $accountusers = $account->getUsers();
       foreach ($accountusers as $accountuser) {
         $perm = array(
-          'permission' => CesBankPermission::PERMISSION_EDIT,
+          'permission' => CesBankPermission::PERMISSION_ADMIN,
           'object' => 'account',
           'objectid' => $account->id,
           'scope' => CesBankPermission::SCOPE_USER,
@@ -610,6 +610,81 @@ class CesBank {
     unset($record['balance']);
     try {
       return $this->updateObject('CesBankLocalAccount', $record);
+    }
+    catch (Exception $e) {
+      $t->rollback();
+      throw $e;
+    }
+  }
+
+  /**
+   * Creates a new user for an account.
+   */
+  public function createAccountUser(array &$record) {
+    $t = IcesSerializer::DBTransaction();
+    try {
+      // Create ces_accountuser record.
+      unset($record['id']);
+      $this->updateObject('CesBankAccountUser', $record);
+      // Create ces_permission record.
+      $perm = array(
+        'permission' => $record['privilege'] ? CesBankPermission::PERMISSION_ADMIN : CesBankPermission::PERMISSION_EDIT,
+        'object' => 'account',
+        'objectid' => $record['account'],
+        'scope' => CesBankPermission::SCOPE_USER,
+        'scopeid' => $record['user'],
+      );
+      $this->createPermission($perm);
+      return TRUE;
+    }
+    catch (Exception $e) {
+      $t->rollback();
+      throw $e;
+    }
+  }
+  /**
+   * Delete a user account.
+   */
+  public function deleteAccountUser($id) {
+    $t = IcesSerializer::DBTransaction();
+    try {
+      $s = new IcesSerializer('CesBankAccountUser');
+      $accuser = $s->load($id);
+      $s->delete($accuser);
+      // Delete associated permissions (should be just one).
+      $s = new IcesSerializer('CesBankPermission');
+      $permissions = $s->loadCollection(array(
+        'object' => 'account',
+        'objectid' => $accuser->account,
+        'scope' => 'user',
+        'scopeid' => $accuser-> user
+      ));
+      foreach($permissions as $perm) {
+        $s->delete($perm);
+      }
+    }
+    catch (Exception $e) {
+      $t->rollback();
+      throw $e;
+    }
+  }
+
+  public function updateAccountUser(array &$record) {
+    $t = IcesSerializer::DBTransaction();
+    try {
+      $this->updateObject('CesBankAccountUser', $record);
+      // Update associated permission.
+      $s = new IcesSerializer('CesBankPermission');
+      $permissions = $s->loadCollection(array(
+        'object' => 'account',
+        'objectid' => $record['account'],
+        'scope' => 'user',
+        'scopeid' => $record['user']
+      ));
+      foreach ($permissions as $perm) {
+        $perm->permission = $record['privilege'] ? CesBankPermission::PERMISSION_ADMIN : CesBankPermission::PERMISSION_EDIT;
+        $s->save($perm);
+      }
     }
     catch (Exception $e) {
       $t->rollback();
@@ -1900,17 +1975,7 @@ class CesBankLocalAccount extends IcesDBObject implements CesBankAccountInterfac
       $s->delete($accuser);
     }
   }
-  /**
-   * Delete user account.
-   */
-  public function deleteUserAccount($id) {
-    $s = new IcesSerializer('CesBankAccountUser');
-    foreach ($this->users as $accuser) {
-      if ($accuser->user == $id) {
-        $s->delete($accuser);
-      }
-    }
-  }
+
   /**
    * Gets limit chain.
    *
@@ -2344,10 +2409,10 @@ class CesBankAbsoluteCreditLimit extends CesBankAccountLimit {
  *   A transaction is an amount of money to be transferred from one account to
  *   another account. The basic transaction moves certanin quantity of money
  *   through two accounts within the same exchange. There are other kind of
- *   transactions moving currency between servers or third party applications. 
+ *   transactions moving currency between servers or third party applications.
  *   In each exchange there is an special account called 'virtual account'.
- *   This account acts as the foreign account for all inter-exchange 
- *   transactions. It is also used to temporally save the money in delayed 
+ *   This account acts as the foreign account for all inter-exchange
+ *   transactions. It is also used to temporally save the money in delayed
  *   transactions.
  */
 interface CesBankTransactionInterface {
@@ -3283,7 +3348,10 @@ class CesBankUserPermission {
         return TRUE;
       }
       // Strip non-scope keywords from object1.
-      $object1 = substr($object1, 0, strpos($object1, ' '));
+      $space = strpos($object1, ' ');
+      if ($space !== FALSE) {
+        $object1 = substr($object1, 0, $space);
+      }
       // At this point we know that $object2 is one of 'account', 'exchange' and
       // $object1 one of 'account', 'exchange', 'global'
       // and $object2 != $object1
