@@ -87,8 +87,7 @@ class Transaction {
    * Create a Transaction object.
    */
   function __construct($base_url, $transaction, $exchange) {
-    // TODO make that UUID
-    $this->id = $transaction['id'];
+    $this->id = $transaction['uuid'];
 
     // Tempos
     $this->created = $this->encodeDate($transaction['created']);

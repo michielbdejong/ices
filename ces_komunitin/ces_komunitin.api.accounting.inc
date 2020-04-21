@@ -8,7 +8,8 @@
 function ces_komunitin_api_accounting_transactions_load($exchange, $id) {
   try {
     // This function may either return FALSE or throw exception.
-    $transaction = ces_transaction_load($id);
+    $bank = new CesBank();
+    $transaction = $bank->getTransactionByUuid($id);
   } catch (Exception $e) {
     ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
   }
@@ -41,8 +42,14 @@ function ces_komunitin_api_accounting_transactions_create($exchange, $body) {
   if ($data->type !== 'transactions') {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
   }
-  if (!ces_komunitin_api_check_valid_uuid($data->id)) {
+  $id = $data->id;
+  if (!ces_komunitin_api_check_valid_uuid($id)) {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+  }
+  $bank = new CesBank();
+  $duplicated = $bank->getTransactionByUuid($id);
+  if (!empty($duplicated)) {
+    ces_komunitin_api_send_error(KomunitinApiError::DUPLICATED_ID);
   }
 
   // 1.3 Attributes
@@ -92,6 +99,7 @@ function ces_komunitin_api_accounting_transactions_create($exchange, $body) {
 
   // 2. Perform transaction.
   $transaction = array(
+    'uuid' => $id,
     'fromaccount' => $payer['id'],
     'toaccount' => $payee['id'],
     'amount' => $amount,
@@ -104,7 +112,6 @@ function ces_komunitin_api_accounting_transactions_create($exchange, $body) {
   }
 
   // 2.2 Create transaction
-  $bank = new CesBank();
   $bank->createTransaction($transaction);
 
   // 2.3 Apply transaction

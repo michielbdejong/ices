@@ -48,31 +48,35 @@ class CesKomunitinestCase extends CesBankTestCase {
     // Authenticate as HORA0001
     $account = $this->account11;
     $token = $this->authorize($account['account']['mail'], $account['account']['pass_raw']);
-    // Check access error.
-    $transaction = $this->doKomunitinTransaction($token, 'HORA', 'HORA0000', 'HORA0002', 100, 'Forbidden transaction', 403);
     // Perform payment
     $transaction = $this->doKomunitinTransaction($token, 'HORA', 'HORA0001', 'HORA0002', 400, 'First komunitin transaction');
     // Get transaction
     $transaction = $this->getKomunitinTransaction($token, 'HORA', $transaction->data->id, 200, $transaction);
+    // Check duplicated id.
+    $transaction = $this->doKomunitinTransaction($token, 'HORA', 'HORA0001', 'HORA0002', 100, 'Duplicated id transaction', 403, $transaction->data->id);
     // Perform charge
     $transaction = $this->doKomunitinTransaction($token, 'HORA', 'HORA0002', 'HORA0001', 500, 'Second komunitin transaction');
     // Check authorization error
     $transaction = $this->doKomunitinTransaction('invalid', 'HORA', 'HORA0001', 'HORA0002', 100, 'Unauthorized transaction', 401);
     // Check interexchange transaction (not implemented)
     $transaction = $this->doKomunitinTransaction($token, 'HORA', 'HORA0001', 'BCNA0001', 100, 'Not implemented feature', 501);
-
+    // Check access error.
+    $transaction = $this->doKomunitinTransaction($token, 'HORA', 'HORA0000', 'HORA0002', 100, 'Forbidden transaction', 403);
   }
   /**
    * Perform a Transaction.
    *
    * @return The decoded object in data response.
    */
-  protected function doKomunitinTransaction($token, $exchange_id, $payer, $payee, $amount, $meta, $status = 201) {
+  protected function doKomunitinTransaction($token, $exchange_id, $payer, $payee, $amount, $meta, $status = 201, $id = NULL) {
     $url = url('ces/api/accounting/' . $exchange_id . '/transactions', array('absolute' => TRUE));
+    if ($id === NULL) {
+      $id = $this->uuid();
+    }
     $data = json_encode(array(
       'data' => array(
         'type' => 'transactions',
-        'id' => $this->uuid(),
+        'id' => $id,
         'attributes' => array(
           'transfers'=> array(
             array(
@@ -101,6 +105,7 @@ class CesKomunitinestCase extends CesBankTestCase {
     $data = json_decode($result->data);
     if ($status == 201) {
       $this->assertEqual($data->data->attributes->state, 'committed');
+      $this->assertEqual($data->data->id, $id);
     }
     return $data;
   }
@@ -173,7 +178,5 @@ class CesKomunitinestCase extends CesBankTestCase {
     $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
   }
-
-
 
 }

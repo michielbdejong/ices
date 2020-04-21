@@ -441,6 +441,11 @@ function ces_bank_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
+      'uuid' => array (
+        'type' => 'varchar',
+        'length' => '36',
+        'not null' => TRUE
+      ),
       'fromaccount' => array(
         'type' => 'varchar',
         'length' => '31',
@@ -517,6 +522,9 @@ function ces_bank_schema() {
         'columns' => array('user' => 'uid'),
       ),
     ),
+    'unique keys' => array(
+      'transaction_unique_uuid' => array('uuid'),
+    ),
   );
   $schema['ces_permission'] = array(
     'description' => 'Permissions',
@@ -576,5 +584,20 @@ function ces_bank_uninstall() {
 function ces_bank_update_7100() {
   $schema = ces_bank_schema();
   db_add_field('ces_account', 'data', $schema['ces_account']['data']);
+}
+
+/**
+ * Add uuid field to transactions (needed by komunitin).
+ */
+function ces_bank_update_7101() {
+  // Add UUID field
+  $schema = ces_bank_schema();
+  $spec = $schema['ces_transaction']['fields']['uuid'];
+  $spec['initial'] = '00000000-0000-0000-0000-000000000000';
+  db_add_field('ces_transaction', 'uuid', $spec);
+  // Populate uuid field
+  db_query('UPDATE {ces_transaction} SET uuid = (SELECT UUID())');
+  // Add index
+  db_add_unique_key('ces_transaction', 'transaction_unique_uuid', array('uuid'));
 }
 /** @} */

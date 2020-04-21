@@ -342,11 +342,25 @@ class CesBank {
    * @param int $id
    *   Transaction identifier.
    *
-   * @return CesBankTransactionInterface
+   * @return array
    *   a transaction record given its id.
    */
   public function getTransaction($id) {
     return $this->getObjectRecord('CesBankBasicTransaction', $id);
+  }
+  /**
+   * Get a transaction record given its uuid.
+   *
+   * @return array
+   *   The transaction record or FALSE.
+   */
+  public function getTransactionByUuid($uuid) {
+    $s = new IcesSerializer('CesBankBasicTransaction');
+    $transaction = $s->loadFromUniqueKey('uuid', $uuid);
+    if ($transaction === FALSE) {
+      return FALSE;
+    }
+    return $transaction->getRecord();
   }
   /**
    * Get the buyer's account given a transaction.
@@ -2578,6 +2592,11 @@ class CesBankBasicTransaction extends IcesDBObject implements CesBankTransaction
    */
   public $id;
   /**
+   * @var string
+   *   Transaction Komunitin unique identifier.
+   */
+  public $uuid;
+  /**
    * @var int
    *   Buyer account identifier.
    */
@@ -2622,6 +2641,15 @@ class CesBankBasicTransaction extends IcesDBObject implements CesBankTransaction
    */
   public $data;
   public static $table = 'ces_transaction';
+
+  public function __construct($record) {
+    parent::__construct($record);
+    // Create uuid if not set on construct.
+    if (empty($this->uuid)) {
+      $this->uuid = $this->uuid();
+    }
+  }
+
   /**
    * Get Id.
    *
