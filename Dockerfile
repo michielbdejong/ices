@@ -51,7 +51,7 @@ RUN service mysql start && sleep 2 && \
   oauth2_server services image views \
   token libraries services_views \
   cors login_emailusername  && \
-  drush en -y ices ces_bank ces_blog ces_interop ces_message ces_offerswants ces_qr ces_rest ces_statistics ces_summaryblock ces_user \
+  drush en -y ices ces_bank ces_blog ces_interop ces_message ces_offerswants ces_qr ces_rest ces_statistics ces_summaryblock ces_user ces_komunitin \
   greences && \
   drush vset theme_default greences && \
   drush role-add-perm 'anonymous user' 'use oauth2 server' && \
