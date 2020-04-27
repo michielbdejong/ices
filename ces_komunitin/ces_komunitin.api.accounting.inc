@@ -44,7 +44,7 @@ function ces_komunitin_api_accounting_transactions_create($exchange, $body) {
   }
   $id = $data->id;
   if (!ces_komunitin_api_check_valid_uuid($id)) {
-    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+    ces_komunitin_api_send_error(KomunitinApiError::INVALID_ID);
   }
   $bank = new CesBank();
   $duplicated = $bank->getTransactionByUuid($id);
@@ -70,9 +70,12 @@ function ces_komunitin_api_accounting_transactions_create($exchange, $body) {
 
   // 1.4.1 Accounts.
   $payer = ces_komunitin_api_accounting_get_account_from_url($transfer->payer);
+  if (!$payer) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_PAYER);
+  }
   $payee = ces_komunitin_api_accounting_get_account_from_url($transfer->payee);
-  if (!$payer || !$payee) {
-    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+  if (!$payee) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_PAYEE);
   }
   // Only support local transaction by now.
   if ($payer['exchange'] != $exchange['id'] || $payee['exchange'] != $exchange['id']) {
@@ -86,7 +89,7 @@ function ces_komunitin_api_accounting_transactions_create($exchange, $body) {
 
   // 1.4.2 Amount.
   if (!is_int($transfer->amount) || $transfer->amount <= 0) {
-    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_AMOUNT);
   }
   $amount = $transfer->amount / pow(10, $exchange['currencyscale']);
 
@@ -94,7 +97,7 @@ function ces_komunitin_api_accounting_transactions_create($exchange, $body) {
   $state = $attributes->state ?? Transaction::STATE_NEW;
   // Allow only new and committed states on creation.
   if ($state !== Transaction::STATE_NEW && $state !== Transaction::STATE_COMMITTED) {
-    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_TRANSACTION_STATE);
   }
 
   // 2. Perform transaction.
