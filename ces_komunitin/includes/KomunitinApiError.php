@@ -25,7 +25,7 @@ class KomunitinApiError {
     self::METHOD_NOT_ALLOWED => array('Method Not Allowed', 405),
     self::BAD_REQUEST => array('Bad Request', 400),
     self::INTERNAL_SERVER_ERROR => array('Internal Server Error', 500),
-    self::DUPLICATED_ID => array('Duplicated identifier', 403),
+    self::DUPLICATED_ID => array('Duplicated identifier', 409),
     self::INVALID_ID => array('Invalid id', 400),
     self::BAD_PAYER => array('Invalid payer account', 400),
     self::BAD_PAYEE => array('Invalid payee account', 400),
