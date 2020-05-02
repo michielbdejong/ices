@@ -49,19 +49,33 @@ class CesKomunitinestCase extends CesBankTestCase {
     $account = $this->account11;
     $token = $this->authorize($account['account']['mail'], $account['account']['pass_raw']);
     // Perform payment
-    $transaction = $this->doKomunitinTransaction($token, 'HORA', 'HORA0001', 'HORA0002', 400, 'First komunitin transaction');
+    $transaction1 = $this->doKomunitinTransaction($token, 'HORA', 'HORA0001', 'HORA0002', 400, 'First komunitin transaction');
     // Get transaction
-    $transaction = $this->getKomunitinTransaction($token, 'HORA', $transaction->data->id, 200, $transaction);
+    $transaction1 = $this->getKomunitinTransaction($token, 'HORA', $transaction1->data->id, 200, $transaction1);
     // Check duplicated id.
-    $transaction = $this->doKomunitinTransaction($token, 'HORA', 'HORA0001', 'HORA0002', 100, 'Duplicated id transaction', 403, $transaction->data->id);
+    $this->doKomunitinTransaction($token, 'HORA', 'HORA0001', 'HORA0002', 100, 'Duplicated id transaction', 409, $transaction1->data->id);
     // Perform charge
-    $transaction = $this->doKomunitinTransaction($token, 'HORA', 'HORA0002', 'HORA0001', 500, 'Second komunitin transaction');
+    $transaction2 = $this->doKomunitinTransaction($token, 'HORA', 'HORA0002', 'HORA0001', 500, 'Second komunitin transaction');
+
     // Check authorization error
-    $transaction = $this->doKomunitinTransaction('invalid', 'HORA', 'HORA0001', 'HORA0002', 100, 'Unauthorized transaction', 401);
+    $this->doKomunitinTransaction('invalid', 'HORA', 'HORA0001', 'HORA0002', 100, 'Unauthorized transaction', 401);
     // Check interexchange transaction (not implemented)
-    $transaction = $this->doKomunitinTransaction($token, 'HORA', 'HORA0001', 'BCNA0001', 100, 'Not implemented feature', 501);
+    $this->doKomunitinTransaction($token, 'HORA', 'HORA0001', 'BCNA0001', 100, 'Not implemented feature', 501);
     // Check access error.
-    $transaction = $this->doKomunitinTransaction($token, 'HORA', 'HORA0000', 'HORA0002', 100, 'Forbidden transaction', 403);
+    $this->doKomunitinTransaction($token, 'HORA', 'HORA0000', 'HORA0002', 100, 'Forbidden transaction', 403);
+
+    // Delete transaction2 (OK/No content)
+    $this->deleteKomunitinTransaction($token, 'HORA', $transaction1->data->id, 204);
+    // Delete again (not found)
+    $this->deleteKomunitinTransaction($token, 'HORA', $transaction1->data->id, 404);
+
+    // Authenticate as BCNA0001
+    $account2 = $this->account21;
+    $token = $this->authorize($account2['account']['mail'], $account2['account']['pass_raw']);
+
+    // Check access error (API returns 404 on read access forbidden).
+    $this->getKomunitinTransaction($token, 'HORA', $transaction1->data->id, 404);
+    $this->deleteKomunitinTransaction($token, 'HORA', $transaction1->data->id, 404);
   }
   /**
    * Perform a Transaction.
@@ -110,7 +124,7 @@ class CesKomunitinestCase extends CesBankTestCase {
     return $data;
   }
   /**
-   * Test GET /transaction/id
+   * Test GET /transactions/id
    *
    * @return The decoded object in data response.
    */
@@ -122,6 +136,7 @@ class CesKomunitinestCase extends CesBankTestCase {
       )
     );
     $result = drupal_http_request($url, $options);
+    $this->verbose(highlight_string('<?php ' . var_export($result, TRUE), TRUE));
     $this->assertEqual($result->code, $status, 'Get transaction status code.');
     $this->assertEqual($result->headers['content-type'], "application/vnd.api+json");
     $response = json_decode($result->data);
@@ -135,6 +150,21 @@ class CesKomunitinestCase extends CesBankTestCase {
       $this->assertEqual($transfer->meta, $response_transfer->meta);
     }
     return $response;
+  }
+  /**
+   * Test DELETE /transactions/id
+   */
+  protected function deleteKomunitinTransaction($token, $exchange_id, $id, $status = 204) {
+    $url = url('ces/api/accounting/' . $exchange_id . '/transactions/' . $id, array('absolute' => TRUE));
+    $options = array(
+      'method' => 'DELETE',
+      'headers' => array(
+        'Authorization' => 'Bearer ' . $token
+      )
+    );
+    $result = drupal_http_request($url, $options);
+    $this->verbose(highlight_string('<?php ' . var_export($result, TRUE), TRUE));
+    $this->assertEqual($result->code, $status, format_string('Status code should be @status but is @code', array('@status' => $status, '@code' => $result->code)));
   }
 
   /**

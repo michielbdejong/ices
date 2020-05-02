@@ -73,7 +73,7 @@ function ces_komunitin_api() {
       array_keys(array_filter($methods, function($operation) use ($operations) {
         return array_search($operation, $operations);
       }));
-      drupal_set_header('Allow', join(', ', $operations));
+      drupal_add_http_header('Allow', join(', ', $operations));
       ces_komunitin_api_send_error(KomunitinApiError::METHOD_NOT_ALLOWED);
     }
     $operation = $methods[$request->method];
@@ -83,8 +83,8 @@ function ces_komunitin_api() {
 
     // Load resource if it exists.
     if ($resource_id) {
-      $resource = ces_komunitin_api_call_function('load', $api, $type, [$exchange, $resource_id]);
-      $parameters[] = $resource;
+      $record = ces_komunitin_api_call_function('load', $api, $type, [$exchange, $resource_id]);
+      $parameters[] = $record;
     }
 
     // Read request body if needed.
@@ -99,22 +99,24 @@ function ces_komunitin_api() {
       $parameters[] = $body;
     }
 
-    // Call operation if needed.
-    if ($operation != 'read') {
-      $result = ces_komunitin_api_call_function($operation, $api, $type, $parameters);
+    // Call operation.
+    $result = ces_komunitin_api_call_function($operation, $api, $type, $parameters);
+
+
+    if ($result === TRUE) {
+      // Success but no content.
+      $status = 204;
+      $content = '';
     }
     else {
-      $result = $resource;
+      $content = Encoder::instance(array(
+        Transaction::class => TransactionSchema::class
+      ))
+        ->withUrlPrefix(_ces_komunitin_api_get_base_url() . '/' . $api . '/' . $exchange_code)
+        ->withEncodeOptions(JSON_PRETTY_PRINT)
+        ->encodeData($result);
+      $status = $operation == 'create' ? 201 : 200;
     }
-
-    $content = Encoder::instance(array(
-      Transaction::class => TransactionSchema::class
-    ))
-      ->withUrlPrefix(_ces_komunitin_api_get_base_url() . '/' . $api . '/' . $exchange_code)
-      ->withEncodeOptions(JSON_PRETTY_PRINT)
-      ->encodeData($result);
-    $status = $operation == 'create' ? 201 : 200;
-
     // Send response
     ces_komunitin_api_send_response($status, $content);
   } catch (Exception $e) {
@@ -134,9 +136,9 @@ function ces_komunitin_api_get_endpoints() {
   return array(
     'accounting' => array(
       'transactions' => array(
-        'operations' => 'create',
+        'operations' => array('create'),
         '%' => array(
-          'operations' => array('read')
+          'operations' => array('read', 'delete')
         )
       )
     )
@@ -154,8 +156,8 @@ function _ces_komunitin_api_verify_api($api) {
  *
  * @param $code An error code from KomunitinApiError.
  */
-function ces_komunitin_api_send_error($code) {
-  $kerror = new KomunitinApiError($code);
+function ces_komunitin_api_send_error($code, $details = null) {
+  $kerror = new KomunitinApiError($code, $details);
   $error = $kerror->getJsonApiError();
   $response = Encoder::instance()->encodeError($error);
   ces_komunitin_api_send_response($kerror->getStatusCode(), $response);
@@ -168,9 +170,11 @@ function ces_komunitin_api_send_error($code) {
 function ces_komunitin_api_send_response($status, $content) {
   $status_text = _ces_komunitin_api_http_status_text($status);
   drupal_add_http_header('Status', $status_text);
-  drupal_add_http_header('Content-Type', 'application/vnd.api+json');
-  drupal_add_http_header('Content-Length', strlen($content));
-  echo $content;
+  if ($content) {
+    drupal_add_http_header('Content-Type', 'application/vnd.api+json');
+    drupal_add_http_header('Content-Length', strlen($content));
+    echo $content;
+  }
   drupal_exit();
 }
 

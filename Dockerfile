@@ -56,7 +56,8 @@ RUN service mysql start && sleep 2 && \
   drush vset theme_default greences && \
   drush role-add-perm 'anonymous user' 'use oauth2 server' && \
   drush role-add-perm 'authenticated user' 'use oauth2 server' && \
-  drush ev "variable_set('cors_domains', array('*'=>'<mirror>|GET,POST,OPTIONS|Content-Type,Authorization|true'));"
+  drush ev "variable_set('cors_domains', array('*'=>'<mirror>|GET,POST,OPTIONS|Content-Type,Authorization|true'));" && \
+  service mysql stop
 
 # download libraries.
 RUN git clone --branch master https://github.com/bshaffer/oauth2-server-php.git sites/all/libraries/oauth2-server-php && \

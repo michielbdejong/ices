@@ -16,6 +16,7 @@ class KomunitinApiError {
   public const BAD_PAYEE = '1011';
   public const BAD_AMOUNT = '1012';
   public const BAD_TRANSACTION_STATE = '1013';
+  public const TRANSACTION_ERROR = '1014';
 
   public static $errors = array(
     self::NOT_IMPLEMENTED => array('Not implemented', 501),
@@ -31,15 +32,21 @@ class KomunitinApiError {
     self::BAD_PAYEE => array('Invalid payee account', 400),
     self::BAD_AMOUNT => array('Invalid amount', 400),
     self::BAD_TRANSACTION_STATE => array('Invalid transaction state', 400),
+    self::TRANSACTION_ERROR => array('Error operating transaction', 400),
   );
 
+  // API error code.
   protected $code;
 
-  function __construct($code) {
+  // Extra info.
+  protected $details = null;
+
+  function __construct($code, $details = null) {
     if (!isset(self::$errors[$code])) {
       throw 'Invalid Komunitin Api Error Code';
     }
     $this->code = $code;
+    $this->details = $details;
   }
 
   function getMessage() {
@@ -51,6 +58,6 @@ class KomunitinApiError {
   }
 
   function getJsonApiError() {
-    return new Error(null, null, null, $this->getStatusCode(), $this->code, $this->getMessage());
+    return new Error(null, null, null, $this->getStatusCode(), $this->code, $this->getMessage(), $this->details);
   }
 }

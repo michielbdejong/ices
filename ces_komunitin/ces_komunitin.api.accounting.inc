@@ -3,7 +3,7 @@
 /**
  * Check access and load a Transaction object. Send error on failure.
  *
- * @return Transaction
+ * @return array transaction record.
  */
 function ces_komunitin_api_accounting_transactions_load($exchange, $id) {
   try {
@@ -16,16 +16,29 @@ function ces_komunitin_api_accounting_transactions_load($exchange, $id) {
   if (!$transaction) {
     ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
   }
+  return $transaction;
+}
+
+/**
+ * Read a transaction.
+ *
+ * @return Transaction
+ */
+function ces_komunitin_api_accounting_transactions_read($exchange, array $transaction) {
   if (!ces_transaction_access('view', $transaction)) {
-    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+    // Return a 404 Not found error when the user does not have access to READ
+    // the resource. This way we don't disclose whether the record actually
+    // exists or not.
+    ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
   }
+
   return new Transaction(_ces_komunitin_api_get_base_url(), $transaction, $exchange);
 }
 
 /**
  * Create a new transaction. Depending on the initial state, tries to commit it.
  *
- * @param $data Object
+ * @param $body Object
  *
  * @return Transaction
  */
@@ -42,7 +55,7 @@ function ces_komunitin_api_accounting_transactions_create($exchange, $body) {
   if ($data->type !== 'transactions') {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
   }
-  $id = $data->id;
+  $id = strtolower($data->id);
   if (!ces_komunitin_api_check_valid_uuid($id)) {
     ces_komunitin_api_send_error(KomunitinApiError::INVALID_ID);
   }
@@ -119,12 +132,36 @@ function ces_komunitin_api_accounting_transactions_create($exchange, $body) {
 
   // 2.3 Apply transaction
   if ($state == Transaction::STATE_COMMITTED) {
-    $bank->applyTransaction($transaction['id']);
+    try {
+      $bank->applyTransaction($transaction['id']);
+    }
+    catch (Exception $e) {
+      ces_komunitin_api_send_error(KomunitinApiError::TRANSACTION_ERROR, $e->getMessage());
+    }
   }
 
   // 3. Return transaction.
   $transaction = $bank->getTransaction($transaction['id']);
   return new Transaction(_ces_komunitin_api_get_base_url(), $transaction, $exchange);
+}
+
+/**
+ * Check access and delete an existing transaction.
+ */
+function ces_komunitin_api_accounting_transactions_delete($exchange, array $transaction) {
+  // Check access.
+  if (!ces_transaction_access('edit', $transaction)) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+  // Delete transaction.
+  $bank = new CesBank();
+  try {
+    $bank->deleteTransaction($transaction['id']);
+    return TRUE;
+  }
+  catch (Exception $e) {
+    ces_komunitin_api_send_error(KomunitinApiError::TRANSACTION_ERROR, $e->getMessage());
+  }
 }
 
 /**
