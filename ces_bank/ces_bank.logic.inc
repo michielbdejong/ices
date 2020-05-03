@@ -573,6 +573,10 @@ class CesBank {
       if ($transaction->getState() == CesBankTransactionInterface::STATE_COMMITTED) {
         $transaction->revoke();
       }
+      // Reject pending transaction.
+      if ($transaction->getState() == CesBankTransactionInterface::STATE_TRIGGERED) {
+        $transaction->setState(CesBankTransactionInterface::STATE_REJECTED);
+      }
       // The following statement will throw an exception if the transaction is
       // not new, revoked or rejected.
       $transaction->setState(CesBankTransactionInterface::STATE_DISCARDED);

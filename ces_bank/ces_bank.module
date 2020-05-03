@@ -837,19 +837,25 @@ function ces_transaction_access($permission, $transaction, $account = NULL) {
     return FALSE;
   }
   elseif ($permission == 'edit') {
-    if ($transaction['state'] == CesBankTransactionInterface::STATE_COMMITTED ||
-      $transaction['state'] == CesBankTransactionInterface::STATE_DISCARDED ||
-      $transaction['state'] == CesBankTransactionInterface::STATE_REJECTED) {
-      return TRUE;
-    }
-    else {
+    // Restrict transaction edition on some states.
+    if (
+      // Forbid editing as transaction is being processed right now.
+      $transaction['state'] == CesBankTransactionInterface::STATE_ACCEPTED ||
+      $transaction['state'] == CesBankTransactionInterface::STATE_REVOKE_ACCEPTED ||
+      // Forbid editing as transaction is permanently archived
+      $transaction['state'] == CesBankTransactionInterface::STATE_ARCHIVED ||
+      $transaction['state'] == CesBankTransactionInterface::STATE_DISCARDED) {
       return FALSE;
     }
+    // Allow edition of error transactions only to payee exchange admin.
+    if ($transaction['state'] == CesBankTransactionInterface::STATE_ERROR) {
+      $toaccount = ces_account_load($transaction['toaccount']);
+      return ces_bank_access('admin', 'exchange', $toaccount['exchange'], $account);
+    }
   }
-  else {
-    return ces_bank_access($permission, 'account buyer', $transaction['fromaccount'], $account)
-      || ces_bank_access($permission, 'account seller', $transaction['toaccount'], $account);
-  }
+
+  return ces_bank_access($permission, 'account buyer', $transaction['fromaccount'], $account)
+    || ces_bank_access($permission, 'account seller', $transaction['toaccount'], $account);
 }
 /**
  * Implements hook_load().
