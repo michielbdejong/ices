@@ -159,11 +159,11 @@ class TransactionSchema extends BaseSchema{
     ];
     $localPayer = $transaction->transfer->getLocalPayerUrl();
     if ($localPayer) {
-      $attributes['transfers'][0]['local-payer'] = $localPayer;
+      $attributes['transfers'][0]['localPayer'] = $localPayer;
     }
     $localPayee = $transaction->transfer->getLocalPayeeUrl();
     if ($localPayee) {
-      $attributes['transfers'][0]['local-payee'] = $localPayee;
+      $attributes['transfers'][0]['localPayee'] = $localPayee;
     }
     return $attributes;
   }
