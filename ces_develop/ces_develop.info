@@ -6,4 +6,7 @@ package = ices
 dependencies[] = ices
 dependencies[] = ces_bank
 dependencies[] = ces_message
+dependencies[] = ces_komunitin
+dependencies[] = oauth2_server
+
 version = "7.x-1.18"

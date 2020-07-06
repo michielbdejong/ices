@@ -230,3 +230,16 @@ Happy testing!', $net1, $users['Riemann']);
 ces_develop_post_blog('Lorem ipsum', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', $net1, $users['Riemann']);
 ces_develop_post_blog('May exchange newsletter', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', $net2, $users['Fermat']);
 ces_develop_post_blog('Another post', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', $net2, $users['Fermat']);
+
+
+// Create demo OAuth2 client for Odoo integration.
+module_load_include('module', 'oauth2_server');
+
+$client = entity_create('oauth2_server_client', array());
+$client->server = 'komunitin';
+$client->client_key = 'odoo-pos-komunitin';
+$client->label = 'odoo-pos-komunitin';
+$client->redirect_uri = "http://localhost:8069/auth/callback\n"  // Local docker environment.
+  . "https://pi.ecoxarxadelbages.org/auth/callback";  // PI deploy.
+$client->automatic_authorization = FALSE;
+$client->save();
