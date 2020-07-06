@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Check access and load a Transaction object. Send error on failure.
+ * Check access and load a transaction ces_bank record. Send error on failure.
  *
  * @return array transaction record.
  */
-function ces_komunitin_api_accounting_transactions_load($exchange, $id) {
+function ces_komunitin_api_accounting_transfers_load($exchange, $id) {
   try {
     // This function may either return FALSE or throw exception.
     $bank = new CesBank();
@@ -22,9 +22,9 @@ function ces_komunitin_api_accounting_transactions_load($exchange, $id) {
 /**
  * Read a transaction.
  *
- * @return Transaction
+ * @return Transfer
  */
-function ces_komunitin_api_accounting_transactions_read($exchange, array $transaction) {
+function ces_komunitin_api_accounting_transfers_read($exchange, array $transaction) {
   if (!ces_transaction_access('view', $transaction)) {
     // Return a 404 Not found error when the user does not have access to READ
     // the resource. This way we don't disclose whether the record actually
@@ -32,17 +32,17 @@ function ces_komunitin_api_accounting_transactions_read($exchange, array $transa
     ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
   }
 
-  return new Transaction(_ces_komunitin_api_get_base_url(), $transaction, $exchange);
+  return new Transfer($transaction, $exchange);
 }
 
 /**
- * Create a new transaction. Depending on the initial state, tries to commit it.
+ * Create a new transfer. Depending on the initial state, tries to commit it.
  *
  * @param $body Object
  *
- * @return Transaction
+ * @return Transfer
  */
-function ces_komunitin_api_accounting_transactions_create($exchange, $body) {
+function ces_komunitin_api_accounting_transfers_create($exchange, $body) {
   // 1. Validation.
 
   // 1.1 Root object.
@@ -52,8 +52,8 @@ function ces_komunitin_api_accounting_transactions_create($exchange, $body) {
   $data = $body->data;
 
   // 1.2 type & id.
-  if ($data->type !== 'transactions') {
-    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+  if ($data->type !== 'transfers') {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Bad type');
   }
   $id = strtolower($data->id);
   if (!ces_komunitin_api_check_valid_uuid($id)) {
@@ -67,50 +67,50 @@ function ces_komunitin_api_accounting_transactions_create($exchange, $body) {
 
   // 1.3 Attributes
   if (!isset($data->attributes)) {
-    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Missing attributes');
   }
-
-  // 1.4 Transfer
   $attributes = $data->attributes;
-  if (empty($attributes->transfers) || ! is_array($attributes->transfers)) {
-    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
-  }
-  // Only a single transfer per transaction is implemented here.
-  if (count($attributes->transfers) !== 1) {
-    ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED);
-  }
-  $transfer = $attributes->transfers[0];
 
-  // 1.4.1 Accounts.
-  $payer = ces_komunitin_api_accounting_get_account_from_url($transfer->payer);
+  // 1.3.1 Meta. Only support string by now.
+  if (!is_string($attributes->meta)) {
+    ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED, 'Invalid meta');
+  }
+  $meta = $attributes->meta;
+
+  // 1.3.2 Amount.
+  if (!is_int($attributes->amount) || $attributes->amount <= 0) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_AMOUNT);
+  }
+  $amount = $attributes->amount / pow(10, $exchange['currencyscale']);
+
+  // 1.3.3 State
+  $state = $attributes->state ?? Transfer::STATE_NEW;
+  // Allow only new and committed states on creation.
+  if ($state !== Transfer::STATE_NEW && $state !== Transfer::STATE_COMMITTED) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_TRANSFER_STATE);
+  }
+
+  // 1.4 Relationships.
+  if (!isset($data->relationships) || !isset($data->relationships->payer) || !isset($data->relationships->payee)
+  || !isset($data->relationships->payer->data) || !isset($data->relationships->payee->data)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Missing payer or payee in transfer');
+  }
+
+  // 1.4.1 Payer.
+  $payer = $bank->getAccountByUUID($data->relationships->payer->data->id);
   if (!$payer) {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_PAYER);
   }
-  $payee = ces_komunitin_api_accounting_get_account_from_url($transfer->payee);
+
+  // 1.4.2 Payee.
+  $payee = $bank->getAccountByUUID($data->relationships->payee->data->id);
   if (!$payee) {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_PAYEE);
   }
-  // Only support local transaction by now.
+
+  // Only support local transfers by now.
   if ($payer['exchange'] != $exchange['id'] || $payee['exchange'] != $exchange['id']) {
-    ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED);
-  }
-  // Only support string meta by now.
-  if (!is_string($transfer->meta)) {
-    ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED);
-  }
-  $meta = $transfer->meta;
-
-  // 1.4.2 Amount.
-  if (!is_int($transfer->amount) || $transfer->amount <= 0) {
-    ces_komunitin_api_send_error(KomunitinApiError::BAD_AMOUNT);
-  }
-  $amount = $transfer->amount / pow(10, $exchange['currencyscale']);
-
-  // 1.5 State
-  $state = $attributes->state ?? Transaction::STATE_NEW;
-  // Allow only new and committed states on creation.
-  if ($state !== Transaction::STATE_NEW && $state !== Transaction::STATE_COMMITTED) {
-    ces_komunitin_api_send_error(KomunitinApiError::BAD_TRANSACTION_STATE);
+    ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED, 'External transfers are not supported');
   }
 
   // 2. Perform transaction.
@@ -131,24 +131,24 @@ function ces_komunitin_api_accounting_transactions_create($exchange, $body) {
   $bank->createTransaction($transaction);
 
   // 2.3 Apply transaction
-  if ($state == Transaction::STATE_COMMITTED) {
+  if ($state == Transfer::STATE_COMMITTED) {
     try {
       $bank->applyTransaction($transaction['id']);
     }
     catch (Exception $e) {
-      ces_komunitin_api_send_error(KomunitinApiError::TRANSACTION_ERROR, $e->getMessage());
+      ces_komunitin_api_send_error(KomunitinApiError::TRANSFER_ERROR, $e->getMessage());
     }
   }
 
   // 3. Return transaction.
   $transaction = $bank->getTransaction($transaction['id']);
-  return new Transaction(_ces_komunitin_api_get_base_url(), $transaction, $exchange);
+  return new Transfer($transaction, $exchange);
 }
 
 /**
  * Check access and delete an existing transaction.
  */
-function ces_komunitin_api_accounting_transactions_delete($exchange, array $transaction) {
+function ces_komunitin_api_accounting_transfers_delete($exchange, array $transaction) {
   // Check access.
   if (!ces_transaction_access('edit', $transaction)) {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
@@ -160,21 +160,32 @@ function ces_komunitin_api_accounting_transactions_delete($exchange, array $tran
     return TRUE;
   }
   catch (Exception $e) {
-    ces_komunitin_api_send_error(KomunitinApiError::TRANSACTION_ERROR, $e->getMessage());
+    ces_komunitin_api_send_error(KomunitinApiError::TRANSFER_ERROR, $e->getMessage());
   }
+}
+
+function ces_komunitin_api_accounting_accounts_load($exchange, $code) {
+  try {
+    // This function may either return FALSE or throw exception.
+    $bank = new CesBank();
+    $account = $bank->getAccountByName($code);
+  } catch (Exception $e) {
+    ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+  }
+  if (!$account) {
+    ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+  }
+  return $account;
 }
 
 /**
- * @return Account record or FALSE.
+ * Read an Account.
+ *
+ * @return Account
  */
-function ces_komunitin_api_accounting_get_account_from_url($url) {
-  $name = array_pop(explode('/', $url));
-  if ($name) {
-    $bank = new CesBank();
-    return $bank->getAccountByName($name);
-  }
-  else {
-    return FALSE;
-  }
+function ces_komunitin_api_accounting_accounts_read($exchange, array $account)
+{
+  // Allow all authorized users to see basic account information: id, code,
+  // balance, credit/debit limits for all accounts in all exchange groups.
+  return new Account($account, $exchange);
 }
-

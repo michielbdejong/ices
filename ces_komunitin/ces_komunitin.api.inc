@@ -1,7 +1,10 @@
 <?php
+require_once dirname(__FILE__) . '/ces_komunitin.api.accounting.inc';
+
 require_once dirname(__FILE__) . '/includes/JsonApiRequest.php';
 require_once dirname(__FILE__) . '/includes/KomunitinApiError.php';
-require_once dirname(__FILE__) . '/includes/Transaction.php';
+require_once dirname(__FILE__) . '/includes/Account.php';
+require_once dirname(__FILE__) . '/includes/Transfer.php';
 
 use Neomerx\JsonApi\Encoder\Encoder;
 
@@ -45,7 +48,7 @@ function ces_komunitin_api() {
     }
 
     // Endpoint
-    $type = $path[2] ?? 'currencies';
+    $type = ($path[2] === 'currency') ? 'currencies' : $path[2];
     $endpoints = ces_komunitin_api_get_endpoints();
 
     if (!isset($endpoints[$api][$type])) {
@@ -110,7 +113,8 @@ function ces_komunitin_api() {
     }
     else {
       $content = Encoder::instance(array(
-        Transaction::class => TransactionSchema::class
+        Transfer::class => TransferSchema::class,
+        Account:: class => AccountSchema::class
       ))
         ->withUrlPrefix(_ces_komunitin_api_get_base_url() . '/' . $api . '/' . $exchange_code)
         ->withEncodeOptions(JSON_PRETTY_PRINT)
@@ -120,12 +124,11 @@ function ces_komunitin_api() {
     // Send response
     ces_komunitin_api_send_response($status, $content);
   } catch (Exception $e) {
-    ces_komunitin_api_send_error(KomunitinApiError::INTERNAL_SERVER_ERROR);
+    ces_komunitin_api_send_error(KomunitinApiError::INTERNAL_SERVER_ERROR, $e->getMessage());
   }
 }
 
 function ces_komunitin_api_call_function($operation, $api, $type, $params = []) {
-  require_once dirname(__FILE__) . '/ces_komunitin.api.' . $api . '.inc';
   $name = 'ces_komunitin_api_' . $api . '_' . $type  . '_' . $operation;
   return call_user_func_array($name, $params);
 }
@@ -135,10 +138,15 @@ function ces_komunitin_api_call_function($operation, $api, $type, $params = []) 
 function ces_komunitin_api_get_endpoints() {
   return array(
     'accounting' => array(
-      'transactions' => array(
+      'transfers' => array(
         'operations' => array('create'),
         '%' => array(
           'operations' => array('read', 'delete')
+        )
+        ),
+      'accounts' => array(
+        '%' => array(
+          'operations' => array('read')
         )
       )
     )

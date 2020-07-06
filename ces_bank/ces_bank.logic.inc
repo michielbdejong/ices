@@ -739,6 +739,20 @@ class CesBank {
     return $account->getRecord();
   }
   /**
+   * Get an account record given its uuid.
+   *
+   * @return array
+   *   The account record or FALSE.
+   */
+  public function getAccountByUuid($uuid){
+    $s = new IcesSerializer('CesBankLocalAccount');
+    $account = $s->loadFromUniqueKey('uuid', $uuid);
+    if ($account === FALSE) {
+      return FALSE;
+    }
+    return $account->getRecord();
+  }
+  /**
    * Gets an account's historic value.
    *
    * @todo: Use protected function?
@@ -1881,6 +1895,10 @@ class CesBankLocalAccount extends IcesDBObject implements CesBankAccountInterfac
    */
   public $id;
   /**
+   * @var string
+   */
+  public $uuid;
+  /**
    * @var int
    */
   public $exchange;
@@ -1933,6 +1951,14 @@ class CesBankLocalAccount extends IcesDBObject implements CesBankAccountInterfac
   const TYPE_COMPANY = 3;
   const TYPE_PUBLIC = 4;
   const TYPE_VIRTUAL = 5;
+
+  public function __construct($record) {
+    parent::__construct($record);
+    // Create uuid if not set on construct.
+    if (empty($this->uuid)) {
+      $this->uuid = $this->uuid();
+    }
+  }
   /**
    * LoadRecord loads loadRecord function from the parent IcesDBObject.
    */

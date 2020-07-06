@@ -1,10 +1,13 @@
 <?php
+require_once dirname(__FILE__) . '/../ces_bank/ces_bank.test';
 /**
  * Komunitin test.
  */
-class CesKomunitinestCase extends CesBankTestCase {
+class CesKomunitinestCase extends CesBankTestCase
+{
 
-  public function setUp() {
+  public function setUp()
+  {
     parent::setUp();
 
     // Grant the anonymous users the permission to use oauth2.
@@ -16,7 +19,8 @@ class CesKomunitinestCase extends CesBankTestCase {
   /**
    * Implementation of getInfo().
    */
-  public static function getInfo() {
+  public static function getInfo()
+  {
     return array(
       'name' => 'ICES Komunitin',
       'description' => 'Test Komunitin API implementation.',
@@ -26,7 +30,8 @@ class CesKomunitinestCase extends CesBankTestCase {
   /**
    * Overrides parent method..
    */
-  protected function getNeededModules() {
+  protected function getNeededModules()
+  {
     $modules = parent::getNeededModules();
     $modules[] = 'ces_komunitin';
     return $modules;
@@ -34,7 +39,8 @@ class CesKomunitinestCase extends CesBankTestCase {
   /**
    * Test All.
    */
-  protected function testAll() {
+  protected function testAll()
+  {
     $this->createExchanges();
     $this->createAccounts();
     // Now we are ready to test opentransact.
@@ -44,65 +50,103 @@ class CesKomunitinestCase extends CesBankTestCase {
   /**
    * Test the accounting API.
    */
-  protected function doAccountingApi() {
+  protected function doAccountingApi()
+  {
     // Authenticate as HORA0001
     $account = $this->account11;
     $token = $this->authorize($account['account']['mail'], $account['account']['pass_raw']);
+    // Get account objects.
+    $hora1 = $this->getAccount($token, 'HORA', 'HORA0001');
+    $hora2 = $this->getAccount($token, 'HORA', 'HORA0002');
+
     // Perform payment
-    $transaction1 = $this->doKomunitinTransaction($token, 'HORA', 'HORA0001', 'HORA0002', 400, 'First komunitin transaction');
+    $transaction1 = $this->doKomunitinTransfer($token, 'HORA', $hora1->data->id, $hora2->data->id, 400, 'First komunitin transaction');
     // Get transaction
-    $transaction1 = $this->getKomunitinTransaction($token, 'HORA', $transaction1->data->id, 200, $transaction1);
+    $transaction1 = $this->getKomunitinTransfer($token, 'HORA', $transaction1->data->id, 200, $transaction1);
     // Check duplicated id.
-    $this->doKomunitinTransaction($token, 'HORA', 'HORA0001', 'HORA0002', 100, 'Duplicated id transaction', 409, $transaction1->data->id);
-    // Perform charge
-    $transaction2 = $this->doKomunitinTransaction($token, 'HORA', 'HORA0002', 'HORA0001', 500, 'Second komunitin transaction');
+    $this->doKomunitinTransfer($token, 'HORA', $hora1->data->id, $hora2->data->id, 100, 'Duplicated id transaction', 409, $transaction1->data->id);
+    // Perform charge.
+    $transaction2 = $this->doKomunitinTransfer($token, 'HORA', $hora2->data->id, $hora1->data->id, 500, 'Second komunitin transaction');
 
     // Check authorization error
-    $this->doKomunitinTransaction('invalid', 'HORA', 'HORA0001', 'HORA0002', 100, 'Unauthorized transaction', 401);
+    $this->doKomunitinTransfer('invalid', 'HORA', $hora1->data->id, $hora2->data->id, 100, 'Unauthorized transaction', 401);
+    // Get external account
+    $bcna1 = $this->getAccount($token, 'BCNA', 'BCNA0001');
     // Check interexchange transaction (not implemented)
-    $this->doKomunitinTransaction($token, 'HORA', 'HORA0001', 'BCNA0001', 100, 'Not implemented feature', 501);
+    $this->doKomunitinTransfer($token, 'HORA', $hora1->data->id, $bcna1->data->id, 100, 'Not implemented feature', 501);
+    $hora0 = $this->getAccount($token, 'HORA', 'HORA0000');
     // Check access error.
-    $this->doKomunitinTransaction($token, 'HORA', 'HORA0000', 'HORA0002', 100, 'Forbidden transaction', 403);
+    $this->doKomunitinTransfer($token, 'HORA', $hora0->data->id, $hora2->data->id, 100, 'Forbidden transaction', 403);
 
     // Delete transaction2 (OK/No content)
-    $this->deleteKomunitinTransaction($token, 'HORA', $transaction1->data->id, 204);
+    $this->deleteKomunitinTransfer($token, 'HORA', $transaction1->data->id, 204);
     // Delete again (not found)
-    $this->deleteKomunitinTransaction($token, 'HORA', $transaction1->data->id, 404);
+    $this->deleteKomunitinTransfer($token, 'HORA', $transaction1->data->id, 404);
 
     // Authenticate as BCNA0001
     $account2 = $this->account21;
     $token = $this->authorize($account2['account']['mail'], $account2['account']['pass_raw']);
 
     // Check access error (API returns 404 on read access forbidden).
-    $this->getKomunitinTransaction($token, 'HORA', $transaction1->data->id, 404);
-    $this->deleteKomunitinTransaction($token, 'HORA', $transaction1->data->id, 404);
+    $this->getKomunitinTransfer($token, 'HORA', $transaction1->data->id, 404);
+    $this->deleteKomunitinTransfer($token, 'HORA', $transaction1->data->id, 404);
   }
   /**
-   * Perform a Transaction.
+   * Get a komunitin account object given its code.
+   */
+  protected function getAccount($token, $exchange_id, $account_code, $status = 200)
+  {
+    $url = url('ces/api/accounting/' . $exchange_id . '/accounts/' . $account_code, array('absolute' => TRUE));
+    $options = array(
+      'method' => 'GET',
+      'headers' => array(
+        'Authorization' => 'Bearer ' . $token,
+      ),
+    );
+    $result = drupal_http_request($url, $options);
+    $this->assertEqual($result->code, $status, format_string('Status code should be @status but is @code', array('@status' => $status, '@code' => $result->code)));
+    $this->assertEqual($result->headers['content-type'], "application/vnd.api+json");
+    $data = json_decode($result->data);
+    $this->assertEqual($data->data->type, 'accounts');
+    $this->assertEqual($data->data->attributes->code, $account_code);
+    return $data;
+  }
+
+  /**
+   * Perform a Transfer.
    *
    * @return The decoded object in data response.
    */
-  protected function doKomunitinTransaction($token, $exchange_id, $payer, $payee, $amount, $meta, $status = 201, $id = NULL) {
-    $url = url('ces/api/accounting/' . $exchange_id . '/transactions', array('absolute' => TRUE));
+  protected function doKomunitinTransfer($token, $exchange_id, $payer_id, $payee_id, $amount, $meta, $status = 201, $id = NULL)
+  {
+    $url = url('ces/api/accounting/' . $exchange_id . '/transfers', array('absolute' => TRUE));
     if ($id === NULL) {
       $id = $this->uuid();
     }
     $data = json_encode(array(
       'data' => array(
-        'type' => 'transactions',
+        'type' => 'transfers',
         'id' => $id,
         'attributes' => array(
-          'transfers'=> array(
-            array(
-              'payer' => url('ces/api/accounting/' . $exchange_id . '/accounts/' . $payer, array('absolute' => TRUE)),
-              'payee' => url('ces/api/accounting/' . $exchange_id . '/accounts/' . $payee, array('absolute' => TRUE)),
-              'amount' => $amount,
-              'meta' => $meta
-            )
-          ),
-          'state' => 'committed'
+          'state' => 'committed',
+          'amount' => $amount,
+          'meta' => $meta,
         ),
-      )
+        'relationships' => array(
+          'payer' => array(
+            'data' => array(
+              'type' => 'accounts',
+              'id' => $payer_id
+            ),
+          ),
+          'payee' => array(
+            'data' => array(
+              'type' => 'accounts',
+              'id' => $payee_id
+            ),
+          ),
+        )
+      ),
     ));
     $options = array(
       'method' => 'POST',
@@ -124,12 +168,13 @@ class CesKomunitinestCase extends CesBankTestCase {
     return $data;
   }
   /**
-   * Test GET /transactions/id
+   * Test GET /transfers/id
    *
    * @return The decoded object in data response.
    */
-  protected function getKomunitinTransaction($token, $exchange_id, $id, $status = 200, $transaction = NULL) {
-    $url = url('ces/api/accounting/' . $exchange_id . '/transactions/' . $id, array('absolute' => TRUE));
+  protected function getKomunitinTransfer($token, $exchange_id, $id, $status = 200, $transfer = NULL)
+  {
+    $url = url('ces/api/accounting/' . $exchange_id . '/transfers/' . $id, array('absolute' => TRUE));
     $options = array(
       'headers' => array(
         'Authorization' => 'Bearer ' . $token
@@ -137,25 +182,25 @@ class CesKomunitinestCase extends CesBankTestCase {
     );
     $result = drupal_http_request($url, $options);
     $this->verbose(highlight_string('<?php ' . var_export($result, TRUE), TRUE));
-    $this->assertEqual($result->code, $status, 'Get transaction status code.');
+    $this->assertEqual($result->code, $status, 'Get transfer status code.');
     $this->assertEqual($result->headers['content-type'], "application/vnd.api+json");
     $response = json_decode($result->data);
-    if ($transaction != NULL) {
-      $this->assertEqual($transaction->data->attributes->state, $response->data->attributes->state);
-      $response_transfer = $response->data->attributes->transfers[0];
-      $transfer = $transaction->data->attributes->transfers[0];
-      $this->assertEqual($transfer->payer, $response_transfer->payer);
-      $this->assertEqual($transfer->payee, $response_transfer->payee);
-      $this->assertEqual($transfer->amount, $response_transfer->amount);
-      $this->assertEqual($transfer->meta, $response_transfer->meta);
+    if ($transfer != NULL) {
+      $this->assertEqual($transfer->data->id, $response->data->id);
+      $this->assertEqual($transfer->data->attributes->state, $response->data->attributes->state);
+      $this->assertEqual($transfer->data->relationships->payer->data->id, $response->data->relationships->payer->data->id);
+      $this->assertEqual($transfer->data->relationships->payee->data->id, $response->data->relationships->payee->data->id);
+      $this->assertEqual($transfer->data->attributes->amount, $response->data->attributes->amount);
+      $this->assertEqual($transfer->data->attributes->meta, $response->data->attributes->meta);
     }
     return $response;
   }
   /**
-   * Test DELETE /transactions/id
+   * Test DELETE /transfers/id
    */
-  protected function deleteKomunitinTransaction($token, $exchange_id, $id, $status = 204) {
-    $url = url('ces/api/accounting/' . $exchange_id . '/transactions/' . $id, array('absolute' => TRUE));
+  protected function deleteKomunitinTransfer($token, $exchange_id, $id, $status = 204)
+  {
+    $url = url('ces/api/accounting/' . $exchange_id . '/transfers/' . $id, array('absolute' => TRUE));
     $options = array(
       'method' => 'DELETE',
       'headers' => array(
@@ -172,7 +217,8 @@ class CesKomunitinestCase extends CesBankTestCase {
    *
    * @return The access_token string.
    */
-  protected function authorize($mail, $password) {
+  protected function authorize($mail, $password)
+  {
     $data = array(
       'grant_type' => 'password',
       'username' => $mail,
@@ -202,11 +248,11 @@ class CesKomunitinestCase extends CesBankTestCase {
    *
    * From https://stackoverflow.com/questions/2040240/php-function-to-generate-v4-uuid
    */
-  protected function uuid() {
+  protected function uuid()
+  {
     $data = random_bytes(16);
     $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
     $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
   }
-
 }

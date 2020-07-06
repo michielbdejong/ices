@@ -315,6 +315,11 @@ function ces_bank_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
+      'uuid' => array(
+        'type' => 'varchar',
+        'length' => '36',
+        'not null' => TRUE
+      ),
       'exchange' => array(
         'description' => 'To which exchange belongs this account',
         'type' => 'int',
@@ -378,6 +383,7 @@ function ces_bank_schema() {
     'primary key' => array('id'),
     'unique keys' => array(
       'name' => array('name'),
+      'ces_account_unique_uuid' => array('uuid'),
     ),
     'foreign keys' => array(
       'exchange' => array(
@@ -523,7 +529,7 @@ function ces_bank_schema() {
       ),
     ),
     'unique keys' => array(
-      'transaction_unique_uuid' => array('uuid'),
+      'ces_transaction_unique_uuid' => array('uuid'),
     ),
   );
   $schema['ces_permission'] = array(
@@ -587,17 +593,36 @@ function ces_bank_update_7100() {
 }
 
 /**
+ * @param $table string Table name.
+ * @param $field string UUID field name
+ * @param $index boolean Add unique index?
+ */
+function _add_uuid_field($table, $field, $index) {
+  $schema = ces_bank_schema();
+  $spec = $schema[$table]['fields'][$field];
+  $spec['initial'] = '00000000-0000-0000-0000-000000000000';
+  db_add_field($table, $field, $spec);
+  // Populate uuid field
+  db_update($table)
+    ->expression($field, '(SELECT UUID())')
+    ->execute();
+  if ($index) {
+    db_add_unique_key($table, $table . '_unique_' . $field, array($field));
+  }
+}
+
+/**
  * Add uuid field to transactions (needed by komunitin).
  */
 function ces_bank_update_7101() {
-  // Add UUID field
-  $schema = ces_bank_schema();
-  $spec = $schema['ces_transaction']['fields']['uuid'];
-  $spec['initial'] = '00000000-0000-0000-0000-000000000000';
-  db_add_field('ces_transaction', 'uuid', $spec);
-  // Populate uuid field
-  db_query('UPDATE {ces_transaction} SET uuid = (SELECT UUID())');
-  // Add index
-  db_add_unique_key('ces_transaction', 'transaction_unique_uuid', array('uuid'));
+  _add_uuid_field('ces_transaction', 'uuid', TRUE);
 }
+
+/**
+ * Add uuid field to accounts (needed by komunitin).
+ */
+function ces_bank_update_7102() {
+  _add_uuid_field('ces_account', 'uuid', TRUE);
+}
+
 /** @} */

@@ -15,8 +15,8 @@ class KomunitinApiError {
   public const BAD_PAYER = '1010';
   public const BAD_PAYEE = '1011';
   public const BAD_AMOUNT = '1012';
-  public const BAD_TRANSACTION_STATE = '1013';
-  public const TRANSACTION_ERROR = '1014';
+  public const BAD_TRANSFER_STATE = '1013';
+  public const TRANSFER_ERROR = '1014';
 
   public static $errors = array(
     self::NOT_IMPLEMENTED => array('Not implemented', 501),
@@ -31,8 +31,8 @@ class KomunitinApiError {
     self::BAD_PAYER => array('Invalid payer account', 400),
     self::BAD_PAYEE => array('Invalid payee account', 400),
     self::BAD_AMOUNT => array('Invalid amount', 400),
-    self::BAD_TRANSACTION_STATE => array('Invalid transaction state', 400),
-    self::TRANSACTION_ERROR => array('Error operating transaction', 400),
+    self::BAD_TRANSFER_STATE => array('Invalid transaction state', 400),
+    self::TRANSFER_ERROR => array('Error operating transaction', 400),
   );
 
   // API error code.
