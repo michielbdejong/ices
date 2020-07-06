@@ -15,7 +15,7 @@ Tu oferta/demanda ha caducado:
 [offer:title]
 
 Para actualizarla, puedes visitar:
-[site:url]ces/bank/account/my[offer:type]s/[offer:id]/edit
+[site:url]/ces/bank/account/my[offer:type]s/[offer:id]/edit
 
 Feliz intercambio!
 

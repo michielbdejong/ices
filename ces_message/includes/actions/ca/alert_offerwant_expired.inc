@@ -15,7 +15,7 @@ La teva oferta/demanda ha caducat:
 [offer:title]
 
 Per a actualitzar-la, pots visitar:
-[site:url]ces/bank/account/my[offer:type]s/[offer:id]/edit
+[site:url]/ces/bank/account/my[offer:type]s/[offer:id]/edit
 
 Bons intercanvis!
 

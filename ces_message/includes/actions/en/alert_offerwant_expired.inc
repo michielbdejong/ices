@@ -15,7 +15,7 @@ Your [offer:type] is expired:
 [offer:title]
 
 To update your [offer:type], please visit:
-[site:url]ces/bank/account/my[offer:type]s/[offer:id]/edit
+[site:url]/ces/bank/account/my[offer:type]s/[offer:id]/edit
 
 Happy trading!
 
