@@ -275,6 +275,14 @@ function ces_message_update_7111() {
   ces_message_install_action('exchange_activated', 'Exchange activated');
   ces_message_install_default_templates();
 }
+
+/**
+ * Update 06/07/2020
+ */
+function ces_message_update_7112() {
+  // Fix bug in offerwant expired action default template.
+  ces_message_install_default_templates();
+}
 /**
  * Implements hook_uninstall().
  *
