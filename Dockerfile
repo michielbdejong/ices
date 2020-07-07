@@ -1,4 +1,4 @@
-FROM ubuntu:latest as integralces-demo
+FROM ubuntu:bionic as integralces-demo
 
 # Define env variables to avoid interactive console prompts in 
 # apt install of php tzdata module.
