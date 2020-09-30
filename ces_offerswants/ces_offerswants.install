@@ -216,12 +216,6 @@ function ces_offerswants_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'expired_noalertusers' => array(
-        'description' => 'Users not to send alert offerwant expired.',
-        'type' => 'blob',
-        'not null' => TRUE,
-        'serialize' => TRUE,
-      ),
       'newoffer_status' => array(
         'description' => 'Enabled/disabled alert newoffer.',
         'type' => 'int',
@@ -235,12 +229,6 @@ function ces_offerswants_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
-      ),
-      'newoffer_onlyusers' => array(
-        'description' => 'Users to send alert newoffer.',
-        'type' => 'blob',
-        'not null' => TRUE,
-        'serialize' => TRUE,
       ),
       'newwant_status' => array(
         'description' => 'Enabled/disabled alert newwant.',
@@ -256,12 +244,6 @@ function ces_offerswants_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'newwant_onlyusers' => array(
-        'description' => 'Users to send alert newwant.',
-        'type' => 'blob',
-        'not null' => TRUE,
-        'serialize' => TRUE,
-      ),
       'offersperiodical_status' => array(
         'description' => 'Alert offers periodical: disabled(0), weekly(1), biweekly(2), monthly(3), bimonthly(4).',
         'type' => 'int',
@@ -275,12 +257,6 @@ function ces_offerswants_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
-      ),
-      'offersperiodical_onlyusers' => array(
-        'description' => 'Users to send alert offers periodical.',
-        'type' => 'blob',
-        'not null' => TRUE,
-        'serialize' => TRUE,
       ),
       'wantsperiodical_status' => array(
         'description' => 'Alert wants periodical: disabled(0), weekly(1), biweekly(2), monthly(3), bimonthly(4).',
@@ -296,12 +272,6 @@ function ces_offerswants_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'wantsperiodical_onlyusers' => array(
-        'description' => 'Users to send alert wants periodical.',
-        'type' => 'blob',
-        'not null' => TRUE,
-        'serialize' => TRUE,
-      ),
       'created' => array(
         'type' => 'int',
         'unsigned' => TRUE,
@@ -311,6 +281,76 @@ function ces_offerswants_schema() {
       ),
     ),
     'primary key' => array('id'),
+  );
+  $schema['ces_user_alerts'] = array(
+    'description' => 'Email subscription for each user to different events and newsletters.',
+    'fields' => array(
+      'user' => array(
+        'description' => 'The drupal user uid',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'alert' => array(
+        'description' => 'The ces_alert id',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'expired' => array(
+        'description' => 'Boolean. Subscribed to own offer/want expire event.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'default' => 1,
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'newoffer' => array(
+        'description' => 'Boolean. Subscribed to new offer event.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'default' => 1,
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'newwant' => array(
+        'description' => 'Boolean. Subscribed to new want event.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'default' => 1,
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'offersperiodical' => array(
+        'description' => 'Boolean. Subscribed to periodical last offers newsletter.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'default' => 1,
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'wantsperiodical' => array(
+        'description' => 'Boolean. Subscribed to periodical last wants newsletter.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'default' => 1,
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('user', 'alert'),
+    'foreign keys' => array(
+      'user' => array(
+        'table' => 'user',
+        'columns' => array('user' => 'uid'),
+      ),
+      'exchange' => array(
+        'table' => 'ces_exchange',
+        'columns' => array('exchange' => 'id'),
+      ),
+    ),
   );
   return $schema;
 }
@@ -319,48 +359,7 @@ function ces_offerswants_schema() {
  * Implements hook_update_N().
  */
 function ces_offerswants_update_7100() {
-  $schema['ces_offercomment'] = array(
-    'description' => 'Table for comments and ratings on offers.',
-    'fields' => array(
-      'cid' => array(
-        'description' => 'Primary Key: Unique comment ID.',
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
-      'oid' => array(
-        'description' => 'The {ces_offerwant}.id of the parent offer.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'default' => 0,
-      ),
-      'uid' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'The {users}.uid who authored the comment.',
-      ),
-      'body' => array(
-        'description' => 'The body of this comment. It is HTML.',
-        'type' => 'text',
-        'size' => 'big',
-        'not null' => TRUE,
-      ),
-      'rating' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'description' => 'Rating of the offer: from 0 to 5.',
-      ),
-      'created' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'The time that the comment was created, as a Unix timestamp.',
-      ),
-    ),
-    'primary key' => array('cid'),
-  );
+  $schema = ces_offerswants_schema();
   db_create_table('ces_offercomment', $schema['ces_offercomment']);
 }
 
@@ -368,131 +367,7 @@ function ces_offerswants_update_7100() {
  * Implements hook_update_N().
  */
 function ces_offerswants_update_7101() {
-  $schema['ces_alerts'] = array(
-    'description' => 'Table for offers&wants alerts of each exchange.',
-    'fields' => array(
-      'id' => array(
-        'description' => 'Primary Key: Unique alert ID.',
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
-      'exchange' => array(
-        'description' => 'The {ces_exchange}.id of the alerts.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'default' => 0,
-      ),
-      'expired_status' => array(
-        'description' => 'Enabled/disabled alert offerwant expired.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 1,
-      ),
-      'expired_lasttime' => array(
-        'description' => 'Last time cron runs alert offerwant expired, as a Unix timestamp.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'expired_noalertusers' => array(
-        'description' => 'Users not to send alert offerwant expired.',
-        'type' => 'blob',
-        'not null' => TRUE,
-        'serialize' => TRUE,
-      ),
-      'newoffer_status' => array(
-        'description' => 'Enabled/disabled alert newoffer.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 1,
-      ),
-      'newoffer_lasttime' => array(
-        'description' => 'Last time cron runs alert newoffer, as a Unix timestamp.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'newoffer_onlyusers' => array(
-        'description' => 'Users to send alert newoffer.',
-        'type' => 'blob',
-        'not null' => TRUE,
-        'serialize' => TRUE,
-      ),
-      'newwant_status' => array(
-        'description' => 'Enabled/disabled alert newwant.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 1,
-      ),
-      'newwant_lasttime' => array(
-        'description' => 'Last time cron runs alert newwant, as a Unix timestamp.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'newwant_onlyusers' => array(
-        'description' => 'Users to send alert newwant.',
-        'type' => 'blob',
-        'not null' => TRUE,
-        'serialize' => TRUE,
-      ),
-      'offersperiodical_status' => array(
-        'description' => 'Alert offers periodical: disabled(0), weekly(1), biweekly(2), monthly(3), bimonthly(4).',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 1,
-      ),
-      'offersperiodical_lasttime' => array(
-        'description' => 'Last time cron runs alert offers periodical, as a Unix timestamp.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'offersperiodical_onlyusers' => array(
-        'description' => 'Users to send alert offers periodical.',
-        'type' => 'blob',
-        'not null' => TRUE,
-        'serialize' => TRUE,
-      ),
-      'wantsperiodical_status' => array(
-        'description' => 'Alert wants periodical: disabled(0), weekly(1), biweekly(2), monthly(3), bimonthly(4).',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 1,
-      ),
-      'wantsperiodical_lasttime' => array(
-        'description' => 'Last time cron runs alert wants periodical, as a Unix timestamp.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'wantsperiodical_onlyusers' => array(
-        'description' => 'Users to send alert wants periodical.',
-        'type' => 'blob',
-        'not null' => TRUE,
-        'serialize' => TRUE,
-      ),
-      'created' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'The time that the alerts for this exchange were created, as a Unix timestamp.',
-      ),
-    ),
-    'primary key' => array('id'),
-  );
+  $schema = ces_offerswants_schema();
   db_create_table('ces_alerts', $schema['ces_alerts']);
 }
 /**
@@ -505,6 +380,69 @@ function ces_offerswants_update_7102() {
   $addition = array('ces_offerswants' => 'CesOfferswantsMailSystem');
   variable_set('mail_system', array_merge($current, $addition));
 }
+/**
+ * Implements hook_update_N().
+ */
+function ces_offerswants_update_7103() {
+  // Create user_alerts table
+  $schema = ces_offerswants_schema();
+  db_create_table('ces_user_alerts', $schema['ces_user_alerts']);
+  // Populate new table.
+  $alerts = db_select('ces_alerts', 'a')
+    ->fields('a')
+    ->execute()
+    ->fetchAll();
+  foreach($alerts as $alert) {
+    // Get all exchange active user ids.
+    $query = db_query("SELECT user.uid from {user} u
+      LEFT JOIN {ces_accountuser} au ON u.uid = au.user
+      LEFT JOIN {ces_account} a ON au.account = a.id
+      WHERE a.exchange = :exchange
+      AND u.status = 1",
+      array(':exchange' => $alert->exchange));
+    $users = $query->fetchCol();
+    // Get the array of subscribed users for each alert.
+    // The expired list is the complementary.
+    $expired_noalertusers = explode(',', unserialize($alert->expired_noalertusers));
+    $expired_users = array_diff($users, $expired_noalertusers);
+    // Others are direct.
+    $newoffer_users = explode(',', unserialize($alert->newoffer_onlyusers));
+    $newwant_users = explode(',', unserialize($alert->newwant_onlyusers));
+    $offersperiodical_users = explode(',', unserialize($alert->offersperiodical_onlyusers));
+    $wantsperiodical_users = explode(',', unserialize($alert->wantsperiodical_onlyusers));
+
+    // Create table record for each user:
+    foreach($users as $user) {
+      db_insert('ces_user_alerts')
+        ->fields(array(
+          'user' => $user,
+          'alert' => $alert->id,
+          'expired' => in_array($user, $expired_users),
+          'newoffer' => in_array($user, $newoffer_users),
+          'newwant' => in_array($user, $newwant_users),
+          'offersperiodical' => in_array($user, $offersperiodical_users),
+          'wantsperiodical' => in_array($user, $wantsperiodical_users),
+        ))
+        ->execute();
+    }
+  }
+  /**
+   * Remove Mail System override.
+   */
+  function ces_offerswants_update_7104() {
+    $current = variable_get('mail_system', array('default-system' => 'DefaultMailSystem'));
+    unset($current['ces_offerswants']);
+    variable_set('mail_system', $current);
+  }
+
+  // Delete old table columns
+  db_drop_field('ces_alerts', 'expired_noalertusers');
+  db_drop_field('ces_alerts', 'newoffer_onlyusers');
+  db_drop_field('ces_alerts', 'newwant_onlyusers');
+  db_drop_field('ces_alerts', 'offersperiodical_onlyusers');
+  db_drop_field('ces_alerts', 'wantsperiodical_onlyusers');
+}
+
 /**
  * Implements hook_install().
  */

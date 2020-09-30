@@ -392,8 +392,7 @@ function ces_message_send_notify($action, $params, $recipient = array(), $sender
     ces_message_save($notify);
 
     if ($mail) {
-      $sender    = user_load(1);
-      drupal_mail('ces_message', 'ces_message' . ' ' . $action, $user_recipient->mail, $language, $params, $sender->mail, TRUE);
+      drupal_mail('ces_message', 'ces_message ' . $action, $user_recipient->mail, $language, $params);
     }
 
   }

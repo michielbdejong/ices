@@ -1209,7 +1209,7 @@ function ces_alerts_form($form, &$form_state) {
       4 => t('Once every two months'),
     ),
     '#default_value' => isset($alert->offersperiodical_status) ? $alert->offersperiodical_status : 0,
-    '#description' => t('With the frequency you select, the system will send an email to all users of the exchange with a list of last updated offers. When you enable this email alert, the first mailing will be done today (next time cron runs), the second will be in the period of time you selected, and so on. By default, this is disabled for all exchange users, but they can enable it in their profiles.'),
+    '#description' => t('With the frequency you select, the system will send an email to all users of the exchange with a list of last updated offers. When you enable this email alert he first mailing will be done after the specified period counting from now. By default, this is enabled for all exchange users, but they can disable it in their profiles.'),
   );
   $form['wantsperiodical'] = array(
     '#type' => 'fieldset',
@@ -1227,7 +1227,7 @@ function ces_alerts_form($form, &$form_state) {
       4 => t('Once every two months'),
     ),
     '#default_value' => isset($alert->wantsperiodical_status) ? $alert->wantsperiodical_status : 0,
-    '#description' => t('With the frequency you select, the system will send an email to all users of the exchange with a list of last updated wants. When you enable this email alert, the first mailing will be done today (next time cron runs), the second will be in the period of time you selected, and so on. By default, this is disabled for all exchange users, but they can enable it in their profiles.'),
+    '#description' => t('With the frequency you select, the system will send an email to all users of the exchange with a list of last updated wants. When you enable this email alert he first mailing will be done after the specified period counting from now. By default, this is enabled for all exchange users, but they can disable it in their profiles.'),
   );
   $form['submit'] = array(
     '#type' => 'submit',
@@ -1242,17 +1242,13 @@ function ces_alerts_form_submit($form, &$form_state) {
   $exchange = ces_bank_get_current_exchange();
   $alerts = db_query("SELECT * FROM {ces_alerts} WHERE exchange = :exchange",
     array(':exchange' => $exchange['id']));
-  $new_alerts = FALSE;
-  if ($alerts->rowCount() == 0) {
-    // A new row for this exchange needs to be created in db.
-    $new_alerts = TRUE;
-  }
-  else {
+  // Is this the first time we set up alerts for this exchange?
+  $new_alerts = ($alerts->rowCount() == 0);
+  if (!$new_alerts) {
     // The row for this exchange needs to be updated.
-    foreach ($alerts as $row) {
-      $alert = $row;
-    }
+    $alert = $alerts->fetch();
   }
+
   $fields = array(
     'expired_status' => $form_state['values']['expired_status'],
     'newoffer_status' => $form_state['values']['newoffer_status'],
@@ -1260,19 +1256,12 @@ function ces_alerts_form_submit($form, &$form_state) {
     'offersperiodical_status' => $form_state['values']['offersperiodical_status'],
     'wantsperiodical_status' => $form_state['values']['wantsperiodical_status'],
   );
+
   if ($new_alerts) {
     $fields['exchange'] = $exchange['id'];
-    // Init no sending users list with anonymous(0) and admin(1).
-    $anonymous_and_admin = serialize('0,1');
-    // Init only sending users list with exchange admin.
-    $exchange_admin = serialize($exchange['admin']);
-    $fields['expired_noalertusers'] = $anonymous_and_admin;
-    $fields['newoffer_onlyusers'] = $exchange_admin;
-    $fields['newwant_onlyusers'] = $exchange_admin;
-    $fields['offersperiodical_onlyusers'] = $exchange_admin;
-    $fields['wantsperiodical_onlyusers'] = $exchange_admin;
     $fields['created'] = REQUEST_TIME;
   }
+
   if ($new_alerts || ($alert->expired_status == 0 && $fields['expired_status'] == 1)) {
     $fields['expired_lasttime'] = REQUEST_TIME;
   }
@@ -1283,67 +1272,13 @@ function ces_alerts_form_submit($form, &$form_state) {
     $fields['newwant_lasttime'] = REQUEST_TIME;
   }
   if ($new_alerts || ($alert->offersperiodical_status == 0 && $fields['offersperiodical_status'] > 0)) {
-    // Prepare first mailing for today.
-    switch ($fields['offersperiodical_status']) {
-      case '0':
-        // New alert but disabled.
-        $fields['offersperiodical_lasttime'] = REQUEST_TIME;
-        break;
-
-      case '1':
-        // One week ago.
-        $fields['offersperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 7;
-        break;
-
-      case '2':
-        // Two weeks ago.
-        $fields['offersperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 14;
-        break;
-
-      case '3':
-        // One month ago.
-        $fields['offersperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 30;
-        break;
-
-      case '4':
-        // Two months ago.
-        $fields['offersperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 60;
-        break;
-
-    }
+    $fields['offersperiodical_status'] = REQUEST_TIME;
   }
   if ($new_alerts || ($alert->wantsperiodical_status == 0 && $fields['wantsperiodical_status'] > 0)) {
-    // Prepare first mailing for today.
-    switch ($fields['wantsperiodical_status']) {
-      case '0':
-        // New alert but disabled.
-        $fields['wantsperiodical_lasttime'] = REQUEST_TIME;
-        break;
-
-      case '1':
-        // One week ago.
-        $fields['wantsperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 7;
-        break;
-
-      case '2':
-        // Two weeks ago.
-        $fields['wantsperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 14;
-        break;
-
-      case '3':
-        // One month ago.
-        $fields['wantsperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 30;
-        break;
-
-      case '4':
-        // Two months ago.
-        $fields['wantsperiodical_lasttime'] = REQUEST_TIME - 3600 * 24 * 60;
-        break;
-
-    }
+    $fields['wantsperiodical_lasttime'] = REQUEST_TIME;
   }
   if ($new_alerts) {
-    $id = db_insert('ces_alerts')
+    db_insert('ces_alerts')
       ->fields($fields)
       ->execute();
     drupal_set_message(t('The email alerts for exchange :excode have been created.',
@@ -1351,7 +1286,7 @@ function ces_alerts_form_submit($form, &$form_state) {
     );
   }
   else {
-    $updated = db_update('ces_alerts')
+    db_update('ces_alerts')
       ->fields($fields)
       ->condition('exchange', $exchange['id'])
       ->execute();
@@ -1359,16 +1294,234 @@ function ces_alerts_form_submit($form, &$form_state) {
       array(':excode' => $exchange['code'])));
   }
 }
+function _ces_offerswants_send_expired_alerts($alerts, $nowtime) {
+  $queue = DrupalQueue::get('ces_offerswants_send_emails');
+  $exchange = ces_bank_get_exchange($alerts->exchange);
+  $expireds = db_query("
+    SELECT ow.id, ow.title, ow.type, ow.user
+    FROM {ces_offerwant} ow
+    LEFT JOIN {ces_accountuser} au ON ow.user = au.user
+    LEFT JOIN {ces_account} a ON au.account = a.id
+    LEFT JOIN {ces_user_alerts} ua ON ua.user = ow.user
+    WHERE a.exchange = :exchange
+    AND ua.alert = :alertid
+    AND ua.expired = 1
+    AND ow.state = 1
+    AND ow.expire > :lasttime
+    AND ow.expire <= :nowtime
+    GROUP BY ow.id",
+    array(
+      ':exchange' => $alerts->exchange,
+      ':lasttime' => $alerts->expired_lasttime,
+      ':nowtime' => $nowtime,
+      ':alertid' => $alerts->id,
+    )
+  );
+  foreach ($expireds as $ow) {
+    $data = array(
+      'alert' => 'expired',
+      'params' => array(
+        'exchange' => $exchange,
+        'offer' => $ow,
+      ),
+      'recipient' => array($ow->user),
+      'sender_id' => $exchange['admin'],
+    );
+    $queue->createItem($data);
+  }
+}
+/**
+ * Compute the dynamic part of the newoffer alert message.
+ */
+function _ces_offerswants_newoffer_html($alerts, $nowtime) {
+  global $base_url;
+
+  $newoffers = db_query("
+    SELECT ow.id, ow.title
+    FROM {ces_offerwant} ow
+    LEFT JOIN {ces_accountuser} au ON ow.user = au.user
+    LEFT JOIN {ces_account} a ON au.account = a.id
+    WHERE a.exchange = :exchange
+    AND ua.alert = :alertid
+    AND ow.state = 1
+    AND ow.type = 'offer'
+    AND ow.created > :lasttime
+    AND ow.created < :nowtime
+    GROUP BY ow.id",
+    array(
+      ':exchange' => $alerts->exchange,
+      ':lasttime' => $alerts->newoffer_lasttime,
+      ':nowtime' => $nowtime,
+    )
+  );
+  if ($newoffers->rowCount() > 0) {
+    $attachment = '<p>';
+    foreach ($newoffers as $newo) {
+      $attachment .= '<br /><a href="' . $base_url . '/ces/bank/account/myoffers/' . $newo->id . '/view">' .
+        $newo->title . '</a>';
+    }
+    $attachment .= '</p>';
+    return $attachment;
+  }
+  else {
+    return FALSE;
+  }
+}
+/**
+ * Compute the dynamic part of the newwant alert message.
+ */
+function _ces_offerswants_newwant_html($alerts, $nowtime) {
+  global $base_url;
+  $newwants = db_query("
+    SELECT ow.id, ow.title
+    FROM {ces_offerwant} ow
+    LEFT JOIN {ces_accountuser} au ON ow.user = au.user
+    LEFT JOIN {ces_account} a ON au.account = a.id
+    WHERE a.exchange = :exchange
+    AND ow.state = 1
+    AND ow.type = 'want'
+    AND ow.created > :lasttime
+    AND ow.created < :nowtime
+    GROUP BY ow.id",
+    array(
+      ':exchange' => $alerts->exchange,
+      ':lasttime' => $alerts->newwant_lasttime,
+      ':nowtime' => $nowtime,
+    )
+  );
+  if ($newwants->rowCount() > 0) {
+    $attachment = '<p>';
+    foreach ($newwants as $neww) {
+      $attachment .= '<br /><a href="' . $base_url . '/ces/bank/account/mywants/' . $neww->id . '/view">' .
+      $neww->title . '</a>';
+    }
+    $attachment .= '</p>';
+    return $attachment;
+  }
+  else {
+    return FALSE;
+  }
+}
+/**
+ * Compute the dynamic part of the offersperiodical alert message.
+ */
+function _ces_offerswants_offersperiodical_html($alerts) {
+  global $base_url;
+  $last_offers = db_query("
+    SELECT ow.id, ow.title, ow.body, r.ces_offer_rate_value
+    FROM {ces_offerwant} ow
+    LEFT JOIN {ces_accountuser} au ON ow.user = au.user
+    LEFT JOIN {ces_account} a ON au.account = a.id
+    LEFT JOIN {field_data_ces_offer_rate} r ON ow.id = r.entity_id
+    WHERE a.exchange = :exchange
+    AND ow.state = 1
+    AND ow.type = 'offer'
+    GROUP BY ow.id
+    ORDER BY ow.modified DESC
+    LIMIT 20",
+    array(
+      ':exchange' => $alerts->exchange,
+    )
+  );
+  if ($last_offers->rowCount() > 0) {
+    $attachment = '<table style="width:100%;border:0;border-spacing:1px;border-collapse:separate;"><tbody>';
+    foreach ($last_offers as $lasto) {
+      $attachment .= '<tr style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
+      $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
+      $attachment .= '<a href="' . $base_url . '/ces/bank/account/myoffers/' . $lasto->id . '/view">' .
+        $lasto->title . '</a></td>';
+      $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
+      $attachment .= trim(preg_replace('/\s+/', ' ', $lasto->body)) . '</td><td>' . $lasto->ces_offer_rate_value . '</td></tr>';
+    }
+    $attachment .= '</tbody></table>';
+    return $attachment;
+  }
+  else {
+    return FALSE;
+  }
+}
+/**
+ * Compute the dynamic part of the wantsperiodical alert message.
+ */
+function _ces_offerswants_wantsperiodical_html($alerts) {
+  global $base_url;
+  $last_wants = db_query("
+    SELECT ow.id, ow.title, ow.body
+    FROM {ces_offerwant} ow
+    LEFT JOIN {ces_accountuser} au ON ow.user = au.user
+    LEFT JOIN {ces_account} a ON au.account = a.id
+    WHERE a.exchange = :exchange
+    AND ow.state = 1
+    AND ow.type = 'want'
+    GROUP BY ow.id
+    ORDER BY ow.modified DESC
+    LIMIT 20",
+    array(
+      ':exchange' => $alerts->exchange,
+    )
+  );
+  if ($last_wants->rowCount() > 0) {
+    $attachment = '<table style="width:100%;border:0;border-spacing:1px;border-collapse:separate;"><tbody>';
+    foreach ($last_wants as $lastw) {
+      $attachment .= '<tr style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
+      $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
+      $attachment .= '<a href="' . $base_url . '/ces/bank/account/mywants/' . $lastw->id . '/view">' .
+      $lastw->title . '</a></td>';
+      $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
+      $attachment .= trim(preg_replace('/\s+/', ' ', $lastw->body)) . '</td></tr>';
+    }
+    $attachment .= '</tbody></table>';
+    return $attachment;
+  }
+  else {
+    return FALSE;
+  }
+}
+/***
+ * Send an alert to all users subscribed to this type of alert defined in
+ * $alerts object. The dynamic content of the alert is the $attachment value.
+ */
+function _ces_offerswants_send_alert($type, $alerts, $attachment) {
+  $queue = DrupalQueue::get('ces_offerswants_send_emails');
+  $exchange = ces_bank_get_exchange($alerts->exchange);
+
+  // Get all subscribed active users.
+  $query = db_select('ces_user_alerts', 'ua')
+    ->fields('ua', array('user'))
+    ->condition('ua.alert', $alerts->id)
+    ->condition($type, 1);
+  $query->innerJoin('users', 'u', 'ua.user = u.uid');
+  $users = $query->condition('u.status', '1') // Active users only!
+    ->execute()
+    ->fetchCol();
+  $data = array(
+    'alert' => $type,
+    'params' => array(
+      'exchange' => $exchange,
+      'attachment' => $attachment,
+    ),
+    'recipient' => array(),
+  );
+  foreach ($users as $user) {
+    $data['recipient'][] = $user;
+    if (count($data['recipient']) == 10) {
+      $queue->createItem($data);
+      $data['recipient'] = array();
+    }
+  }
+  if (count($data['recipient'])) {
+    $queue->createItem($data);
+  }
+}
 /**
  * Implements hook_cron().
  */
 function ces_offerswants_cron() {
   $all_exchanges_alerts = db_query('SELECT * FROM {ces_alerts}');
-  $queue = DrupalQueue::get('ces_offerswants_send_emails');
   $nowtime = time();
-  global $base_url;
+
   foreach ($all_exchanges_alerts as $alerts) {
-    $exchange = ces_bank_get_exchange($alerts->exchange);
+
     $alerts_done = array();
     $frequency = array(
       0,
@@ -1380,141 +1533,24 @@ function ces_offerswants_cron() {
 
     // Expired alert: sends message and email with ces_message_send_notify.
     if ($alerts->expired_status == 1) {
-      $expireds = db_query("
-        SELECT ow.id, ow.title, ow.type, ow.user
-        FROM {ces_offerwant} ow
-        LEFT JOIN {ces_accountuser} au ON ow.user = au.user
-        LEFT JOIN {ces_account} a ON au.account = a.id
-        WHERE a.exchange = :exchange
-        AND ow.state = 1
-        AND ow.expire > :lasttime
-        AND ow.expire < :nowtime
-        GROUP BY ow.id",
-        array(
-          ':exchange' => $alerts->exchange,
-          ':lasttime' => $alerts->expired_lasttime,
-          ':nowtime' => $nowtime,
-        )
-      );
-      foreach ($expireds as $ow) {
-        $data = array(
-          'alert' => 'expired',
-          'params' => array(
-            'exchange' => $exchange,
-            'offer' => $ow,
-          ),
-          'recipient' => array($ow->user),
-          'sender_id' => $exchange['admin'],
-        );
-        $queue->createItem($data);
-      }
+      _ces_offerswants_send_expired_alerts($alerts, $nowtime);
       $alerts_done['expired_lasttime'] = $nowtime;
     }
 
     // Newoffer alert mailing.
     if ($alerts->newoffer_status == 1) {
-      $newoffers = db_query("
-        SELECT ow.id, ow.title
-        FROM {ces_offerwant} ow
-        LEFT JOIN {ces_accountuser} au ON ow.user = au.user
-        LEFT JOIN {ces_account} a ON au.account = a.id
-        WHERE a.exchange = :exchange
-        AND ow.state = 1
-        AND ow.type = 'offer'
-        AND ow.created > :lasttime
-        AND ow.created < :nowtime
-        GROUP BY ow.id",
-        array(
-          ':exchange' => $alerts->exchange,
-          ':lasttime' => $alerts->newoffer_lasttime,
-          ':nowtime' => $nowtime,
-        )
-      );
-      if ($newoffers->rowCount() > 0) {
-        $attachment = '<p>';
-        foreach ($newoffers as $newo) {
-          $attachment .= '<br /><a href="' . $base_url . '/ces/bank/account/myoffers/' . $newo->id . '/view">' .
-            $newo->title . '</a>';
-        }
-        $attachment .= '</p>';
-        $data = array(
-          'alert' => 'newoffer',
-          'params' => array(
-            'exchange' => $exchange,
-            'attachment' => $attachment,
-          ),
-          'recipient' => array(),
-        );
-        $series = 0;
-        $users_onlysend = explode(',', unserialize($alerts->newoffer_onlyusers));
-        foreach ($users_onlysend as $user) {
-          $data['recipient'][] = $user;
-          $series++;
-          if ($series == 50) {
-            // Send a serie of 50 users to queue cron.
-            $queue->createItem($data);
-            $series = 0;
-            $data['recipient'] = array();
-          }
-        }
-        if ($series > 0) {
-          // Send last serie of users (minor than 50) to queue cron.
-          $queue->createItem($data);
-        }
+      $attachment = _ces_offerswants_newoffer_html($alerts, $nowtime);
+      if ($attachment) {
+        _ces_offerswants_send_alert('newoffer', $alerts, $attachment);
       }
       $alerts_done['newoffer_lasttime'] = $nowtime;
     }
 
     // Newwant alert mailing.
     if ($alerts->newwant_status == 1) {
-      $newwants = db_query("
-        SELECT ow.id, ow.title
-        FROM {ces_offerwant} ow
-        LEFT JOIN {ces_accountuser} au ON ow.user = au.user
-        LEFT JOIN {ces_account} a ON au.account = a.id
-        WHERE a.exchange = :exchange
-        AND ow.state = 1
-        AND ow.type = 'want'
-        AND ow.created > :lasttime
-        AND ow.created < :nowtime
-        GROUP BY ow.id",
-        array(
-          ':exchange' => $alerts->exchange,
-          ':lasttime' => $alerts->newwant_lasttime,
-          ':nowtime' => $nowtime,
-        )
-      );
-      if ($newwants->rowCount() > 0) {
-        $attachment = '<p>';
-        foreach ($newwants as $neww) {
-          $attachment .= '<br /><a href="' . $base_url . '/ces/bank/account/mywants/' . $neww->id . '/view">' .
-            $neww->title . '</a>';
-        }
-        $attachment .= '</p>';
-        $data = array(
-          'alert' => 'newwant',
-          'params' => array(
-            'exchange' => $exchange,
-            'attachment' => $attachment,
-          ),
-          'recipient' => array(),
-        );
-        $series = 0;
-        $users_onlysend = explode(',', unserialize($alerts->newwant_onlyusers));
-        foreach ($users_onlysend as $user) {
-          $data['recipient'][] = $user;
-          $series++;
-          if ($series == 50) {
-            // Send a serie of 50 users to queue cron.
-            $queue->createItem($data);
-            $series = 0;
-            $data['recipient'] = array();
-          }
-        }
-        if ($series > 0) {
-          // Send last serie of users (minor than 50) to queue cron.
-          $queue->createItem($data);
-        }
+      $attachment = _ces_offerswants_newwant_html($alerts, $nowtime);
+      if ($attachment) {
+        _ces_offerswants_send_alert('newwant', $alerts, $attachment);
       }
       $alerts_done['newwant_lasttime'] = $nowtime;
     }
@@ -1522,57 +1558,10 @@ function ces_offerswants_cron() {
     // Offers periodical alert mailing.
     if ($alerts->offersperiodical_status > 0 &&
       (intval($alerts->offersperiodical_lasttime) + $frequency[$alerts->offersperiodical_status]) < $nowtime) {
-      $last_offers = db_query("
-        SELECT ow.id, ow.title, ow.body, r.ces_offer_rate_value
-        FROM {ces_offerwant} ow
-        LEFT JOIN {ces_accountuser} au ON ow.user = au.user
-        LEFT JOIN {ces_account} a ON au.account = a.id
-        LEFT JOIN {field_data_ces_offer_rate} r ON ow.id = r.entity_id
-        WHERE a.exchange = :exchange
-        AND ow.state = 1
-        AND ow.type = 'offer'
-        GROUP BY ow.id
-        ORDER BY ow.modified DESC
-        LIMIT 20",
-        array(
-          ':exchange' => $alerts->exchange,
-        )
-      );
-      if ($last_offers->rowCount() > 0) {
-        $attachment = '<table style="width:100%;border:0;border-spacing:1px;border-collapse:separate;"><tbody>';
-        foreach ($last_offers as $lasto) {
-          $attachment .= '<tr style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
-          $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
-          $attachment .= '<a href="' . $base_url . '/ces/bank/account/myoffers/' . $lasto->id . '/view">' .
-            $lasto->title . '</a></td>';
-          $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
-          $attachment .= trim(preg_replace('/\s+/', ' ', $lasto->body)) . '</td><td>' . $lasto->ces_offer_rate_value . '</td></tr>';
-        }
-        $attachment .= '</tbody></table>';
-        $data = array(
-          'alert' => 'offersperiodical',
-          'params' => array(
-            'exchange' => $exchange,
-            'attachment' => $attachment,
-          ),
-          'recipient' => array(),
-        );
-        $series = 0;
-        $users_onlysend = explode(',', unserialize($alerts->offersperiodical_onlyusers));
-        foreach ($users_onlysend as $user) {
-          $data['recipient'][] = $user;
-          $series++;
-          if ($series == 50) {
-            // Send a serie of 50 users to queue cron.
-            $queue->createItem($data);
-            $series = 0;
-            $data['recipient'] = array();
-          }
-        }
-        if ($series > 0) {
-          // Send last serie of users (minor than 50) to queue cron.
-          $queue->createItem($data);
-        }
+
+      $attachment = _ces_offerswants_offersperiodical_html($alerts);
+      if ($attachment) {
+        _ces_offerswants_send_alert('offersperiodical', $alerts, $attachment);
       }
       $alerts_done['offersperiodical_lasttime'] = $nowtime;
     }
@@ -1580,56 +1569,9 @@ function ces_offerswants_cron() {
     // Wants periodical alert mailing.
     if ($alerts->wantsperiodical_status > 0 &&
       (intval($alerts->wantsperiodical_lasttime) + $frequency[$alerts->wantsperiodical_status]) < $nowtime) {
-      $last_wants = db_query("
-        SELECT ow.id, ow.title, ow.body
-        FROM {ces_offerwant} ow
-        LEFT JOIN {ces_accountuser} au ON ow.user = au.user
-        LEFT JOIN {ces_account} a ON au.account = a.id
-        WHERE a.exchange = :exchange
-        AND ow.state = 1
-        AND ow.type = 'want'
-        GROUP BY ow.id
-        ORDER BY ow.modified DESC
-        LIMIT 20",
-        array(
-          ':exchange' => $alerts->exchange,
-        )
-      );
-      if ($last_wants->rowCount() > 0) {
-        $attachment = '<table style="width:100%;border:0;border-spacing:1px;border-collapse:separate;"><tbody>';
-        foreach ($last_wants as $lastw) {
-          $attachment .= '<tr style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
-          $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
-          $attachment .= '<a href="' . $base_url . '/ces/bank/account/mywants/' . $lastw->id . '/view">' .
-            $lastw->title . '</a></td>';
-          $attachment .= '<td style="background-color:#EEEEEE;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:8pt">';
-          $attachment .= trim(preg_replace('/\s+/', ' ', $lastw->body)) . '</td></tr>';
-        }
-        $attachment .= '</tbody></table>';
-        $data = array(
-          'alert' => 'wantsperiodical',
-          'params' => array(
-            'exchange' => $exchange,
-            'attachment' => $attachment,
-          ),
-          'recipient' => array(),
-        );
-        $series = 0;
-        $users_onlysend = explode(',', unserialize($alerts->wantsperiodical_onlyusers));
-        foreach ($users_onlysend as $user) {
-          $data['recipient'][] = $user;
-          $series++;
-          if ($series == 50) {
-            // Send a serie of 50 users to queue cron.
-            $queue->createItem($data);
-            $series = 0;
-            $data['recipient'] = array();
-          }
-        }
-        if ($series > 0) {
-          // Send last serie of users (minor than 50) to queue cron.
-          $queue->createItem($data);
-        }
+      $attachment = _ces_offerswants_wantsperiodical_html($alerts);
+      if ($attachment) {
+        _ces_offerswants_send_alert('wantsperiodical', $alerts, $attachment);
       }
       $alerts_done['wantsperiodical_lasttime'] = $nowtime;
     }
@@ -1638,7 +1580,7 @@ function ces_offerswants_cron() {
     if (count($alerts_done) > 0) {
       $updated = db_update('ces_alerts')
         ->fields($alerts_done)
-        ->condition('exchange', $exchange['id'])
+        ->condition('exchange', $alerts->exchange)
         ->execute();
     }
   }
@@ -1649,7 +1591,7 @@ function ces_offerswants_cron() {
 function ces_offerswants_cron_queue_info() {
   $queues['ces_offerswants_send_emails'] = array(
     'worker callback' => 'ces_offerswants_send_alert_email',
-    'time' => 60,
+    'time' => 20,
   );
   return $queues;
 }
@@ -1695,8 +1637,7 @@ function ces_offerswants_queue_send_alert_email($action, $params, $recipient = a
       $user_recipient = user_load(intval($user_recipient_id));
       $language_recipient = user_preferred_language($user_recipient);
       $language = $language_recipient->language;
-      $from_admin = user_load(intval($params['exchange']['admin']));
-      drupal_mail('ces_offerswants', $action, $user_recipient->mail, $language, $params, $from_admin->mail, TRUE);
+      drupal_mail('ces_offerswants', $action, $user_recipient->mail, $language, $params);
     }
   }
 }
@@ -2401,6 +2342,15 @@ function ces_offerswants_user_view($account, $view_mode, $langcode) {
   }
   $account->content['wants'] = $wants;
 }
+function ces_offerswants_user_alerts_defaults() {
+  return (object) array(
+    'expired' => 1,
+    'newoffer' => 0,
+    'newwant' => 0,
+    'offersperiodical' => 1,
+    'wantsperiodical' => 1,
+  );
+}
 /**
  * Implements hook_form_alter().
  */
@@ -2546,39 +2496,47 @@ function ces_offerswants_form_alter(&$form, &$form_state, $form_id) {
               '#title' => check_plain(t('Email alerts for') . ' ' . $exchange['name']),
               '#collapsible' => FALSE,
             );
+
+            // Get user subscriptions.
+            $subscriptions = db_select('ces_user_alerts', 'ua')
+            ->fields('ua')
+            ->condition('user', $user_edit->uid)
+            ->condition('alert', $alert->id)
+            ->execute()
+            ->fetch();
+            if (!$subscriptions) {
+              $subscriptions = ces_offerswants_user_alerts_defaults();
+            }
+
             if ($alert->expired_status == 1) {
-              $expired_noalertusers = explode(',', unserialize($alert->expired_noalertusers));
               $form['alerts_' . $alert->exchange]['alert_expired' . $alert->exchange] = array(
                 '#type' => 'checkbox',
                 '#title' => t('Offer/want expired alert.'),
-                '#default_value' => in_array($user_edit->uid, $expired_noalertusers) ? 0 : 1,
+                '#default_value' => $subscriptions->expired,
                 '#description' => t('The system will send you a message when your offers/wants expired.'),
               );
             }
             if ($alert->newoffer_status == 1) {
-              $newoffer_onlyusers = explode(',', unserialize($alert->newoffer_onlyusers));
               $form['alerts_' . $alert->exchange]['alert_newoffer' . $alert->exchange] = array(
                 '#type' => 'checkbox',
                 '#title' => t('New offer alert.'),
-                '#default_value' => in_array($user_edit->uid, $newoffer_onlyusers) ? 1 : 0,
+                '#default_value' => $subscriptions->newoffer,
                 '#description' => t('The system will send you an email when a new offer is created in your exchange.'),
               );
             }
             if ($alert->newwant_status == 1) {
-              $newwant_onlyusers = explode(',', unserialize($alert->newwant_onlyusers));
               $form['alerts_' . $alert->exchange]['alert_newwant' . $alert->exchange] = array(
                 '#type' => 'checkbox',
                 '#title' => check_plain(t('New want alert.')),
-                '#default_value' => in_array($user_edit->uid, $newwant_onlyusers) ? 1 : 0,
+                '#default_value' => $subscriptions->newwant,
                 '#description' => check_plain(t('The system will send you an email when a new want is created in your exchange.')),
               );
             }
             if ($alert->offersperiodical_status > 0) {
-              $offersperiodical_onlyusers = explode(',', unserialize($alert->offersperiodical_onlyusers));
               $form['alerts_' . $alert->exchange]['alert_offersperiodical' . $alert->exchange] = array(
                 '#type' => 'checkbox',
                 '#title' => check_plain(t('Offers periodical alert.')),
-                '#default_value' => in_array($user_edit->uid, $offersperiodical_onlyusers) ? 1 : 0,
+                '#default_value' => $subscriptions->offersperiodical,
                 '#description' => check_plain(t('The system will send you an email') .
                   ' ' .
                   $periodicity[$alert->offersperiodical_status] .
@@ -2588,11 +2546,10 @@ function ces_offerswants_form_alter(&$form, &$form_state, $form_id) {
               );
             }
             if ($alert->wantsperiodical_status > 0) {
-              $wantsperiodical_onlyusers = explode(',', unserialize($alert->wantsperiodical_onlyusers));
               $form['alerts_' . $alert->exchange]['alert_wantsperiodical' . $alert->exchange] = array(
                 '#type' => 'checkbox',
                 '#title' => t('Wants periodical alert.'),
-                '#default_value' => in_array($user_edit->uid, $wantsperiodical_onlyusers) ? 1 : 0,
+                '#default_value' => $subscriptions->wantsperiodical,
                 '#description' => check_plain(
                   t('The system will send you an email') .
                   ' ' .
@@ -2631,91 +2588,18 @@ function ces_offerswants_alerts_profile_submit($form, &$form_state) {
         foreach ($alerts as $row) {
           $alert = $row;
         }
-        $fields = array();
+        // Note that form_state values are only defined if these lists are enabled for this exchange.
+        $subscriptions['expired'] = $form_state['values']['alert_expired' . $exchange] ?? 0;
+        $subscriptions['newoffer'] = $form_state['values']['alert_newoffer' . $exchange] ?? 0;
+        $subscriptions['newwant'] = $form_state['values']['alert_newwant' . $exchange] ?? 0;
+        $subscriptions['offersperiodical'] = $form_state['values']['alert_offersperiodical' . $exchange] ?? 0;
+        $subscriptions['wantsperiodical'] = $form_state['values']['alert_wantsperiodical' . $exchange] ?? 0;
 
-        // Offer/want expired alert.
-        if (isset($form_state['values']['alert_expired' . $exchange])) {
-          $expired_noalertusers = explode(',', unserialize($alert->expired_noalertusers));
-          if ($form_state['values']['alert_expired' . $exchange] == 0) {
-            if (!in_array($user_edit->uid, $expired_noalertusers)) {
-              $expired_noalertusers[] = $user_edit->uid;
-              $fields['expired_noalertusers'] = serialize(implode(',', $expired_noalertusers));
-            }
-          }
-          elseif (in_array($user_edit->uid, $expired_noalertusers)) {
-            $expired_noalertusers = array_merge(array_diff($expired_noalertusers, array($user_edit->uid)));
-            $fields['expired_noalertusers'] = serialize(implode(',', $expired_noalertusers));
-          }
-        }
-
-        // New offer alert.
-        if (isset($form_state['values']['alert_newoffer' . $exchange])) {
-          $newoffer_onlyusers = explode(',', unserialize($alert->newoffer_onlyusers));
-          if ($form_state['values']['alert_newoffer' . $exchange] == 1) {
-            if (!in_array($user_edit->uid, $newoffer_onlyusers)) {
-              $newoffer_onlyusers[] = $user_edit->uid;
-              $fields['newoffer_onlyusers'] = serialize(implode(',', $newoffer_onlyusers));
-            }
-          }
-          elseif (in_array($user_edit->uid, $newoffer_onlyusers)) {
-            $newoffer_onlyusers = array_merge(array_diff($newoffer_onlyusers, array($user_edit->uid)));
-            $fields['newoffer_onlyusers'] = serialize(implode(',', $newoffer_onlyusers));
-          }
-        }
-
-        // New want alert.
-        if (isset($form_state['values']['alert_newwant' . $exchange])) {
-          $newwant_onlyusers = explode(',', unserialize($alert->newwant_onlyusers));
-          if ($form_state['values']['alert_newwant' . $exchange] == 1) {
-            if (!in_array($user_edit->uid, $newwant_onlyusers)) {
-              $newwant_onlyusers[] = $user_edit->uid;
-              $fields['newwant_onlyusers'] = serialize(implode(',', $newwant_onlyusers));
-            }
-          }
-          elseif (in_array($user_edit->uid, $newwant_onlyusers)) {
-            $newwant_onlyusers = array_merge(array_diff($newwant_onlyusers, array($user_edit->uid)));
-            $fields['newwant_onlyusers'] = serialize(implode(',', $newwant_onlyusers));
-          }
-        }
-
-        // Offers periodical alert.
-        if (isset($form_state['values']['alert_offersperiodical' . $exchange])) {
-          $offersperiodical_onlyusers = explode(',', unserialize($alert->offersperiodical_onlyusers));
-          if ($form_state['values']['alert_offersperiodical' . $exchange] == 1) {
-            if (!in_array($user_edit->uid, $offersperiodical_onlyusers)) {
-              $offersperiodical_onlyusers[] = $user_edit->uid;
-              $fields['offersperiodical_onlyusers'] = serialize(implode(',', $offersperiodical_onlyusers));
-            }
-          }
-          elseif (in_array($user_edit->uid, $offersperiodical_onlyusers)) {
-            $offersperiodical_onlyusers = array_merge(array_diff($offersperiodical_onlyusers, array($user_edit->uid)));
-            $fields['offersperiodical_onlyusers'] = serialize(implode(',', $offersperiodical_onlyusers));
-          }
-        }
-
-        // Offers periodical alert.
-        if (isset($form_state['values']['alert_wantsperiodical' . $exchange])) {
-          $wantsperiodical_onlyusers = explode(',', unserialize($alert->wantsperiodical_onlyusers));
-          if ($form_state['values']['alert_wantsperiodical' . $exchange] == 1) {
-            if (!in_array($user_edit->uid, $wantsperiodical_onlyusers)) {
-              $wantsperiodical_onlyusers[] = $user_edit->uid;
-              $fields['wantsperiodical_onlyusers'] = serialize(implode(',', $wantsperiodical_onlyusers));
-            }
-          }
-          elseif (in_array($user_edit->uid, $wantsperiodical_onlyusers)) {
-            $wantsperiodical_onlyusers = array_merge(array_diff($wantsperiodical_onlyusers, array($user_edit->uid)));
-            $fields['wantsperiodical_onlyusers'] = serialize(implode(',', $wantsperiodical_onlyusers));
-          }
-        }
-
-        // Save values in db.
-        if (!empty($fields)) {
-          $updated = db_update('ces_alerts')
-            ->fields($fields)
-            ->condition('exchange', $exchange)
-            ->execute();
-          drupal_set_message(t('The email alerts configuration has been updated.'));
-        }
+        db_merge('ces_user_alerts')
+          ->key(array('user' => $user_edit->uid, 'alert' => $alert->id))
+          ->fields($subscriptions)
+          ->execute();
+        drupal_set_message(t('The email alerts configuration has been updated.'));
       }
     }
   }
@@ -3101,6 +2985,16 @@ function ces_offerswants_image_style_delete($style) {
     variable_set('ces_offerswants_image_style_name', $style['name']);
   }
 }
+
+/**
+ * Implemnents hook_user_delete()
+ */
+function ces_offerswants_user_delete($user) {
+  db_delete('ces_user_alerts')
+    ->condition('user', $user->uid)
+    ->execute();
+}
+
 /**
  * @}
  */

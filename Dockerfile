@@ -5,11 +5,11 @@ FROM ubuntu:bionic as integralces-demo
 ENV TZ Europe/Madrid
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update && apt install -y \
+RUN apt-get update && apt-get install -y \
   git curl unzip \
   apache2 \
   mysql-server \
-  php libapache2-mod-php php-cli php-mbstring php-mysql php-gd php-curl php-ssh2 php-xml php-xdebug
+  php libapache2-mod-php php-cli php-mbstring php-mysql php-gd php-curl php-ssh2 php-xml php-imap php-xdebug
 
 # Configure apache: enable mod_rewrite and change port from 80 to 2029.
 # We ned to change the port so fomr inise the container the url localhost:2029 is accessible 
@@ -44,13 +44,17 @@ COPY . sites/all/modules/ices
 # Download theme
 RUN git clone --branch 7.x-1.x https://git.drupalcode.org/sandbox/esteve-1866046.git sites/all/themes/greences
 
+# download libraries.
+RUN git clone --branch master --depth 1 https://github.com/bshaffer/oauth2-server-php.git sites/all/libraries/oauth2-server-php && \
+  git clone --branch master  --depth 1 https://github.com/neomerx/json-api.git sites/all/libraries/json-api && \
+
 # Install modules and theme
 RUN service mysql start && sleep 2 && \
   drush dl -y services && \
   drush en -y \
   oauth2_server services image views \
   token libraries services_views \
-  cors login_emailusername  && \
+  cors login_emailusername smtp bounce && \
   drush en -y ices ces_bank ces_blog ces_interop ces_message ces_offerswants ces_qr ces_rest ces_statistics ces_summaryblock ces_user ces_komunitin \
   greences && \
   drush vset theme_default greences && \
@@ -59,9 +63,7 @@ RUN service mysql start && sleep 2 && \
   drush ev "variable_set('cors_domains', array('*'=>'<mirror>|GET,POST,OPTIONS|Content-Type,Authorization|true'));" && \
   service mysql stop
 
-# download libraries.
-RUN git clone --branch master https://github.com/bshaffer/oauth2-server-php.git sites/all/libraries/oauth2-server-php && \
-  git clone --branch master https://github.com/neomerx/json-api.git sites/all/libraries/json-api
+
 
 EXPOSE 2029
 
