@@ -381,7 +381,7 @@ function ces_offerswants_update_7102() {
   variable_set('mail_system', array_merge($current, $addition));
 }
 /**
- * Implements hook_update_N().
+ * Refactor alerts.
  */
 function ces_offerswants_update_7103() {
   // Create user_alerts table
@@ -394,7 +394,7 @@ function ces_offerswants_update_7103() {
     ->fetchAll();
   foreach($alerts as $alert) {
     // Get all exchange active user ids.
-    $query = db_query("SELECT user.uid from {user} u
+    $query = db_query("SELECT DISTINCT u.uid from {users} u
       LEFT JOIN {ces_accountuser} au ON u.uid = au.user
       LEFT JOIN {ces_account} a ON au.account = a.id
       WHERE a.exchange = :exchange
@@ -417,22 +417,14 @@ function ces_offerswants_update_7103() {
         ->fields(array(
           'user' => $user,
           'alert' => $alert->id,
-          'expired' => in_array($user, $expired_users),
-          'newoffer' => in_array($user, $newoffer_users),
-          'newwant' => in_array($user, $newwant_users),
-          'offersperiodical' => in_array($user, $offersperiodical_users),
-          'wantsperiodical' => in_array($user, $wantsperiodical_users),
+          'expired' => in_array($user, $expired_users) ? 1 : 0,
+          'newoffer' => in_array($user, $newoffer_users) ? 1 : 0,
+          'newwant' => in_array($user, $newwant_users) ? 1 : 0,
+          'offersperiodical' => in_array($user, $offersperiodical_users) ? 1 : 0,
+          'wantsperiodical' => in_array($user, $wantsperiodical_users) ? 1 : 0,
         ))
         ->execute();
     }
-  }
-  /**
-   * Remove Mail System override.
-   */
-  function ces_offerswants_update_7104() {
-    $current = variable_get('mail_system', array('default-system' => 'DefaultMailSystem'));
-    unset($current['ces_offerswants']);
-    variable_set('mail_system', $current);
   }
 
   // Delete old table columns
@@ -441,6 +433,16 @@ function ces_offerswants_update_7103() {
   db_drop_field('ces_alerts', 'newwant_onlyusers');
   db_drop_field('ces_alerts', 'offersperiodical_onlyusers');
   db_drop_field('ces_alerts', 'wantsperiodical_onlyusers');
+}
+
+/**
+ * Remove Mail System override.
+ */
+function ces_offerswants_update_7104()
+{
+  $current = variable_get('mail_system', array('default-system' => 'DefaultMailSystem'));
+  unset($current['ces_offerswants']);
+  variable_set('mail_system', $current);
 }
 
 /**
