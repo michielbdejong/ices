@@ -160,6 +160,7 @@ function ces_komunitin_api_get_endpoints() {
         'operations' => array('read')
       ),
       'accounts' => array(
+        'operations' => array('read'),
         '%' => array(
           'operations' => array('read')
         )

@@ -226,7 +226,12 @@ class IcesSerializer {
       unset($conditions['or']);
     }
     foreach ($conditions as $key => $value) {
-      $query->condition('t.' . $key, $value);
+      if (is_array($value)) {
+        $query->condition('t.' .$key, $value, 'IN');
+      }
+      else {
+        $query->condition('t.' . $key, $value);
+      }
     }
     if ($order != NULL) {
       $query->orderBy($order, $order_type);

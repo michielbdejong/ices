@@ -265,3 +265,38 @@ function ces_komunitin_api_accounting_currency_read($exchange) {
   // Allow all authorized users to see currency information.
   return new Currency($exchange);
 }
+
+
+function ces_komunitin_api_accounting_accounts_load_collection($exchange, $filters, $sorts) {
+  $bank = new CesBank();
+  $conditions = [];
+
+  // Set implicit exchange filter field.
+  $conditions['exchange'] = $exchange['id'];
+
+  // Only active accounts by default.
+  $conditions['state'] = 1;
+
+  // Only regular accounts (skip virtual ones!)
+  $conditions['kind'] = [0,1,2,3,4];
+
+  // Apply filters.
+  foreach ($filters as $field => $value) {
+    // Fix names.
+    if ($field == 'id') {
+      $field = 'uuid';
+    }
+    // $value is an array if the query parameter had several comma-separated values,
+    // which is correctly interpreted as en IN clause.
+    $conditions[$field] = $value;
+  }
+  return $bank->getAllAccounts($conditions);
+}
+
+function ces_komunitin_api_accounting_accounts_read_collection($exchange, array $accounts) {
+  $result = [];
+  foreach($accounts as $account) {
+    $result[] = new Account($account, $exchange);
+  }
+  return $result;
+}
