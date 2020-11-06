@@ -17,6 +17,10 @@ class Transfer {
   */
   public $payee;
   /**
+   * @var Currency
+   */
+  public $currency;
+  /**
   * @var integer
   */
   public $amount;
@@ -101,6 +105,9 @@ class Transfer {
     // Payee
     $payee = $bank->getTransactionToAccount($transaction);
     $this->payee = new Account($payee, $exchange);
+
+    // Currency
+    $this->currency = new Currency($exchange);
   }
 
   private function encodeDate($timestamp) {
@@ -148,6 +155,11 @@ class TransferSchema extends BaseSchema {
       ],
       'payee' => [
         self::RELATIONSHIP_DATA => $transfer->payee,
+        self::RELATIONSHIP_LINKS_SELF => false,
+        self::RELATIONSHIP_LINKS_RELATED => false
+      ],
+      'currency' =>  [
+        self::RELATIONSHIP_DATA => $transfer->currency,
         self::RELATIONSHIP_LINKS_SELF => false,
         self::RELATIONSHIP_LINKS_RELATED => false
       ]

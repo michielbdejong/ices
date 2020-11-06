@@ -59,10 +59,13 @@ class CesKomunitinestCase extends CesBankTestCase
     $hora1 = $this->getAccount($token, 'HORA', 'HORA0001');
     $hora2 = $this->getAccount($token, 'HORA', 'HORA0002');
 
+    //TODO Get currency.
+    $hora = $this->getCurrency($token, 'HORA');
+
     // Perform payment
     $transaction1 = $this->doKomunitinTransfer($token, 'HORA', $hora1->data->id, $hora2->data->id, 400, 'First komunitin transaction');
     // Get transaction
-    $transaction1 = $this->getKomunitinTransfer($token, 'HORA', $transaction1->data->id, 200, $transaction1);
+    $transaction1 = $this->getKomunitinTransfer($token, 'HORA', $transaction1->data->id, TRUE, TRUE, 200, $transaction1);
     // Check duplicated id.
     $this->doKomunitinTransfer($token, 'HORA', $hora1->data->id, $hora2->data->id, 100, 'Duplicated id transaction', 409, $transaction1->data->id);
     // Perform charge.
@@ -91,7 +94,7 @@ class CesKomunitinestCase extends CesBankTestCase
     $token = $this->authorize($account2['account']['mail'], $account2['account']['pass_raw']);
 
     // Check access error (API returns 404 on read access forbidden).
-    $this->getKomunitinTransfer($token, 'HORA', $transaction1->data->id, 404);
+    $this->getKomunitinTransfer($token, 'HORA', $transaction1->data->id, FALSE, FALSE, 404);
     $this->deleteKomunitinTransfer($token, 'HORA', $transaction1->data->id, 404);
     // List other account transactions: empty list as user has no access to them.
     $this->listTransfers($token, 'HORA', $hora1->data->id, 200, array());
@@ -114,6 +117,27 @@ class CesKomunitinestCase extends CesBankTestCase
     $data = json_decode($result->data);
     $this->assertEqual($data->data->type, 'accounts');
     $this->assertEqual($data->data->attributes->code, $account_code);
+    return $data;
+  }
+
+  /**
+   * Get a komunitin currency given its code.
+   */
+  protected function getCurrency($token, $exchange_id, $status = 200) {
+    $url = url('ces/api/accounting/' . $exchange_id . '/currency', array('absolute' => TRUE));
+    $options = array(
+      'method' => 'GET',
+      'headers' => array(
+        'Authorization' => 'Bearer ' . $token,
+      ),
+    );
+    $result = drupal_http_request($url, $options);
+    $this->assertEqual($result->code, $status, format_string('Status code should be @status but is @code', array('@status' => $status, '@code' => $result->code)));
+    $this->assertEqual($result->headers['content-type'], "application/vnd.api+json");
+    $data = json_decode($result->data);
+    $this->assertEqual($data->data->type, 'currencies');
+    $this->assertEqual($data->data->attributes->code, $exchange_id);
+    $this->assertEqual($data->data->attributes->codeType, "CEN");
     return $data;
   }
 
@@ -177,14 +201,31 @@ class CesKomunitinestCase extends CesBankTestCase
    *
    * @return The decoded object in data response.
    */
-  protected function getKomunitinTransfer($token, $exchange_id, $id, $status = 200, $transfer = NULL)
+  protected function getKomunitinTransfer($token, $exchange_id, $id, $includeAccounts = FALSE, $includeCurrency = FALSE, $status = 200, $transfer = NULL)
   {
-    $url = url('ces/api/accounting/' . $exchange_id . '/transfers/' . $id, array('absolute' => TRUE));
-    $options = array(
-      'headers' => array(
+    $includes = [];
+    if ($includeAccounts) {
+      $includes[] = "payer";
+      $includes[] = "payee";
+    }
+    if ($includeCurrency) {
+      $includes[] = "currency";
+    }
+    $query = [];
+    if (!empty($includes)) {
+      $query['include'] = implode(",", $includes);
+    }
+
+    $url = url('ces/api/accounting/' . $exchange_id . '/transfers/' . $id, [
+      'absolute' => TRUE,
+      'query' => $query
+    ]);
+
+    $options = [
+      'headers' => [
         'Authorization' => 'Bearer ' . $token
-      )
-    );
+      ]
+    ];
     $result = drupal_http_request($url, $options);
     $this->verbose(highlight_string('<?php ' . var_export($result, TRUE), TRUE));
     $this->assertEqual($result->code, $status, 'Get transfer status code.');
@@ -195,6 +236,15 @@ class CesKomunitinestCase extends CesBankTestCase
       $this->assertEqual($transfer->data->attributes->state, $response->data->attributes->state);
       $this->assertEqual($transfer->data->relationships->payer->data->id, $response->data->relationships->payer->data->id);
       $this->assertEqual($transfer->data->relationships->payee->data->id, $response->data->relationships->payee->data->id);
+      $this->assertEqual($transfer->data->relationships->currency->data->id, $response->data->relationships->currency->data->id);
+      // Check includes:
+      if ($includeAccounts) {
+        $this->assertEqual($response->included[0]->id, $response->data->relationships->payer->data->id);
+        $this->assertEqual($response->included[1]->id, $response->data->relationships->payee->data->id);
+      }
+      if ($includeCurrency) {
+        $this->assertEqual($response->included[2]->id, $response->data->relationships->currency->data->id);
+      }
       $this->assertEqual($transfer->data->attributes->amount, $response->data->attributes->amount);
       $this->assertEqual($transfer->data->attributes->meta, $response->data->attributes->meta);
     }

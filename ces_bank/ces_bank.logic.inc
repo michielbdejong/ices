@@ -1557,6 +1557,14 @@ class CesBankExchange extends IcesDBObject {
    */
   public $id;
   /**
+   * Id as a Komunitin currency (accounting protocol).
+   */
+  public $uuid_currency;
+  /**
+   * Id as a Komunitin group (social api).
+   */
+  public $uuid_group;
+  /**
    * Code.
    */
   public $code;
@@ -1620,6 +1628,18 @@ class CesBankExchange extends IcesDBObject {
   const DEFAULT_EXCHANGE_ID = 1;
   const STATE_INACTIVE = 0;
   const STATE_ACTIVE = 1;
+
+  public function __construct($record) {
+    parent::__construct($record);
+    // Create uuids if not set on construct.
+    if (empty($this->uuid_currency)) {
+      $this->uuid_currency = $this->uuid();
+    }
+    if (empty($this->uuid_group)) {
+      $this->uuid_group = $this->uuid();
+    }
+  }
+
   /**
    * Loads record.
    */

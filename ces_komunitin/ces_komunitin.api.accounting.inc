@@ -260,3 +260,8 @@ function ces_komunitin_api_accounting_transfers_read_collection($exchange, array
   }
   return $result;
 }
+
+function ces_komunitin_api_accounting_currency_read($exchange) {
+  // Allow all authorized users to see currency information.
+  return new Currency($exchange);
+}

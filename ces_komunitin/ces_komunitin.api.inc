@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/ces_komunitin.api.accounting.inc';
 
 require_once dirname(__FILE__) . '/includes/JsonApiRequest.php';
 require_once dirname(__FILE__) . '/includes/KomunitinApiError.php';
+require_once dirname(__FILE__) . '/includes/Currency.php';
 require_once dirname(__FILE__) . '/includes/Account.php';
 require_once dirname(__FILE__) . '/includes/Transfer.php';
 
@@ -48,7 +49,7 @@ function ces_komunitin_api() {
     }
 
     // Check if endpoint is defined.
-    $type = ($path[2] === 'currency') ? 'currencies' : $path[2];
+    $type = $path[2];
     $endpoints = ces_komunitin_api_get_endpoints();
     if (!isset($endpoints[$api][$type])) {
       ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
@@ -82,7 +83,7 @@ function ces_komunitin_api() {
     $operation = $methods[$request->method];
 
     // Differentiate getting single resource from getting multiple resources.
-    if ($operation == 'read' && $resource_id === null) {
+    if ($operation == 'read' && $resource_id === null && isset($endpoint['%'])) {
       $operation = 'read_collection';
     }
 
@@ -123,11 +124,17 @@ function ces_komunitin_api() {
       $content = '';
     }
     else {
+      $includes = [];
+      foreach ($request->includes as $path => $include) {
+        $includes[] = $path;
+      }
       $content = Encoder::instance(array(
+        Currency::class => CurrencySchema::class,
+        Account::class => AccountSchema::class,
         Transfer::class => TransferSchema::class,
-        Account:: class => AccountSchema::class
       ))
         ->withUrlPrefix(_ces_komunitin_api_get_base_url() . '/' . $api . '/' . $exchange_code)
+        ->withIncludedPaths($includes)
         ->withEncodeOptions(JSON_PRETTY_PRINT)
         ->encodeData($result);
       $status = $operation == 'create' ? 201 : 200;
@@ -149,15 +156,18 @@ function ces_komunitin_api_call_function($operation, $api, $type, $params = []) 
 function ces_komunitin_api_get_endpoints() {
   return array(
     'accounting' => array(
+      'currency' => array(
+        'operations' => array('read')
+      ),
+      'accounts' => array(
+        '%' => array(
+          'operations' => array('read')
+        )
+      ),
       'transfers' => array(
         'operations' => array('read', 'create'),
         '%' => array(
           'operations' => array('read', 'delete')
-        )
-        ),
-      'accounts' => array(
-        '%' => array(
-          'operations' => array('read')
         )
       )
     )

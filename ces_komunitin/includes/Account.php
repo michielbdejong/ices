@@ -13,7 +13,7 @@ class Account {
   public $debitLimit;
 
   // Relatinships
-  //public $currency;
+  public $currency;
 
   function __construct($account, $exchange) {
     // Identifier.
@@ -23,10 +23,13 @@ class Account {
     // Balance
     $decimals = $exchange['currencyscale'];
     $this->balance = round(pow(10, $decimals) * $account['balance']);
-    // Limits
+
+    // Limits. We need to retrieve the info since it doesn't come with account record.
+    $bank = new CesBank();
+    $limitchain = $bank->getLimitChain($account['limitchain']);
     $this->creditLimit = - 1;
     $this->debitLimit = -1;
-    foreach($account['limits'] as $limit) {
+    foreach($limitchain['limits'] as $limit) {
       if ($limit['block']) { // Don't take in count soft limits.
         if ($limit['classname'] == 'CesBankAbsoluteDebitLimit') {
           $this->debitLimit = max($this->debitLimit, $limit['value']);
@@ -35,6 +38,7 @@ class Account {
         }
       }
     }
+    $this->currency = new Currency($exchange);
   }
 }
 class AccountSchema extends BaseSchema {
@@ -65,7 +69,13 @@ class AccountSchema extends BaseSchema {
   public function getRelationships($account, ContextInterface $context): iterable
   {
     assert($account instanceof Account);
-    return [];
+    return [
+      'currency' =>  [
+        self::RELATIONSHIP_DATA => $account->currency,
+        self::RELATIONSHIP_LINKS_SELF => false,
+        self::RELATIONSHIP_LINKS_RELATED => false
+      ]
+    ];
   }
 
   /**
