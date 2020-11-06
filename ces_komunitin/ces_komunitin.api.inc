@@ -47,10 +47,9 @@ function ces_komunitin_api() {
       ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
     }
 
-    // Endpoint
+    // Check if endpoint is defined.
     $type = ($path[2] === 'currency') ? 'currencies' : $path[2];
     $endpoints = ces_komunitin_api_get_endpoints();
-
     if (!isset($endpoints[$api][$type])) {
       ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
     }
@@ -71,6 +70,7 @@ function ces_komunitin_api() {
     else {
       $resource_id = null;
     }
+    // Check if method (GET, POST, PATCH, DELETE) is allowed on this endpoint.
     if (!isset($methods[$request->method]) || array_search($methods[$request->method], $endpoint['operations']) === FALSE) {
       $operations = $endpoint['operations'];
       array_keys(array_filter($methods, function($operation) use ($operations) {
@@ -81,6 +81,11 @@ function ces_komunitin_api() {
     }
     $operation = $methods[$request->method];
 
+    // Differentiate getting single resource from getting multiple resources.
+    if ($operation == 'read' && $resource_id === null) {
+      $operation = 'read_collection';
+    }
+
     // Prepare parameters.
     $parameters = [$exchange];
 
@@ -88,6 +93,12 @@ function ces_komunitin_api() {
     if ($resource_id) {
       $record = ces_komunitin_api_call_function('load', $api, $type, [$exchange, $resource_id]);
       $parameters[] = $record;
+    }
+
+    // Load collection of resources.
+    if ($operation == 'read_collection') {
+      $records = ces_komunitin_api_call_function('load_collection', $api, $type, [$exchange, $request->filters, $request->sorts]);
+      $parameters[] = $records;
     }
 
     // Read request body if needed.
@@ -139,7 +150,7 @@ function ces_komunitin_api_get_endpoints() {
   return array(
     'accounting' => array(
       'transfers' => array(
-        'operations' => array('create'),
+        'operations' => array('read', 'create'),
         '%' => array(
           'operations' => array('read', 'delete')
         )

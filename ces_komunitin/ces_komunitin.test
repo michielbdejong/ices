@@ -78,6 +78,9 @@ class CesKomunitinestCase extends CesBankTestCase
     // Check access error.
     $this->doKomunitinTransfer($token, 'HORA', $hora0->data->id, $hora2->data->id, 100, 'Forbidden transaction', 403);
 
+    // List all own account transfers.
+    $this->listTransfers($token, 'HORA', $hora1->data->id, 200, array($transaction2, $transaction1));
+
     // Delete transaction2 (OK/No content)
     $this->deleteKomunitinTransfer($token, 'HORA', $transaction1->data->id, 204);
     // Delete again (not found)
@@ -90,6 +93,8 @@ class CesKomunitinestCase extends CesBankTestCase
     // Check access error (API returns 404 on read access forbidden).
     $this->getKomunitinTransfer($token, 'HORA', $transaction1->data->id, 404);
     $this->deleteKomunitinTransfer($token, 'HORA', $transaction1->data->id, 404);
+    // List other account transactions: empty list as user has no access to them.
+    $this->listTransfers($token, 'HORA', $hora1->data->id, 200, array());
   }
   /**
    * Get a komunitin account object given its code.
@@ -210,6 +215,36 @@ class CesKomunitinestCase extends CesBankTestCase
     $result = drupal_http_request($url, $options);
     $this->verbose(highlight_string('<?php ' . var_export($result, TRUE), TRUE));
     $this->assertEqual($result->code, $status, format_string('Status code should be @status but is @code', array('@status' => $status, '@code' => $result->code)));
+  }
+
+  /**
+   * Test GET /transfers?filter[account]=XXX&sort=-updated
+   */
+  protected function listTransfers($token, $exchange_id, $account, $status = 200, $transactions = null) {
+    $url = url('ces/api/accounting/' . $exchange_id . '/transfers', array(
+      'absolute' => TRUE,
+      'query' => array(
+        'filter[account]' =>$account,
+        'sort' => '-updated'
+      ))
+    );
+    $options = array(
+      'headers' => array(
+        'Authorization' => 'Bearer ' . $token
+      )
+    );
+    $result = drupal_http_request($url, $options);
+    $this->verbose(highlight_string('<?php ' . var_export($result, TRUE), TRUE));
+    $this->assertEqual($result->code, $status, format_string('Status code should be @status but is @code', array('@status' => $status, '@code' => $result->code)));
+    $response = json_decode($result->data);
+    if ($transactions !== null) {
+      $this->assertEqual(count($response->data), count($transactions), 'Incorrect number of transactions');
+      $i = 0;
+      foreach($transactions as $transaction) {
+        $this->assertEqual($response->data[$i]->id, $transaction->data->id, 'Found unexpected transaction in list.');
+        $i++;
+      }
+    }
   }
 
   /**

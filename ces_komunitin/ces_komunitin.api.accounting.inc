@@ -164,6 +164,9 @@ function ces_komunitin_api_accounting_transfers_delete($exchange, array $transac
   }
 }
 
+/**
+ * Load ces_bank account record.
+ */
 function ces_komunitin_api_accounting_accounts_load($exchange, $code) {
   try {
     // This function may either return FALSE or throw exception.
@@ -188,4 +191,72 @@ function ces_komunitin_api_accounting_accounts_read($exchange, array $account)
   // Allow all authorized users to see basic account information: id, code,
   // balance, credit/debit limits for all accounts in all exchange groups.
   return new Account($account, $exchange);
+}
+
+/**
+ * Load a collection of transfers.
+ *
+ * @param $exchange The exchange record.
+ * @param $fields The field JSONApi parameters
+ * @param $filters The filter JSONApi parameter
+ * @param $sorts The sort JSONApi parameter
+ *
+ * @return array of transaction records.
+ *
+ */
+function ces_komunitin_api_accounting_transfers_load_collection($exchange, $filters, $sorts) {
+  try {
+    $bank = new CesBank();
+
+    // Compute conditions field.
+    $conditions = [];
+    foreach ($filters as $field => $condition) {
+      if ($field === 'account') {
+        if(count($condition) !== 1) {
+          ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED, "Only one account is supported in filtering.");
+        }
+        $uuid = $condition[0];
+        $account = $bank->getAccountByUuid($uuid);
+        if ($account === FALSE) {
+          ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND, "Account not found.");
+        }
+        $conditions['account'] = $account['id'];
+      }
+      else {
+        ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED, "Filtering other than 'filter[account]' is not supported.");
+      }
+    }
+
+    // Compute order fields.
+    $order_field = 'created';
+    $order_type = 'ASC';
+    foreach ($sorts as $field => $isAsc) {
+      if ($field === 'updated') {
+        $order_field = 'modified';
+        $order_type = $isAsc ? 'ASC' : 'DESC';
+      }
+      else {
+        ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED, "Ordering field other than 'updated' is not supported.");
+      }
+    }
+
+    // Run getTransactions() funtion.
+    $records = $bank->getTransactions($conditions, $order_field, $order_type);
+    return $records;
+
+  } catch (Exception $e) {
+    // No acceptable reasons for an exception.
+    ces_komunitin_api_send_error(KomunitinApiError::INTERNAL_SERVER_ERROR, $e->getMessage());
+  }
+}
+
+function ces_komunitin_api_accounting_transfers_read_collection($exchange, array $transactions) {
+  $result = [];
+  foreach($transactions as $transaction) {
+    // Discard transactions without view access
+    if (ces_transaction_access('view', $transaction)) {
+      $result[] = new Transfer($transaction, $exchange);
+    }
+  }
+  return $result;
 }
