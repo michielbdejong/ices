@@ -398,7 +398,7 @@ function ces_offerswants_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 300,
   );
-  $menu['ces/bank/exchange/offercomment/%/view'] = array(
+  $menu['ces/bank/exchange/offercomment/%ces_offerwant/view'] = array(
     'title' => 'Offer comments and ratings',
     'description' => 'View offer with comments and ratings',
     'page callback' => 'ces_offercomment_page',
