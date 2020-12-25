@@ -403,7 +403,8 @@ function ces_offerswants_menu() {
     'description' => 'View offer with comments and ratings',
     'page callback' => 'ces_offercomment_page',
     'page arguments' => array(4),
-    'access callback' => TRUE,
+    'access callback' => 'ces_offerwant_access',
+    'access arguments' => array('view', 4),
   );
   $menu['ces/admin/alerts'] = array(
     'title' => 'Email alerts',
@@ -955,21 +956,28 @@ function ces_offerwant_access($operation, $offerwant = NULL, $account = NULL) {
     global $user;
     $account = $user;
   }
-  // Check is user integralces?
-  if ($operation == 'add') {
-    if (!ces_bank_get_current_account()) {
+  $bankaccount = ces_bank_get_current_account($account);
+  // Handle empty offerwant
+  if (empty($offerwant)) {
+    // Handle 'add' operation. Any user with an active account can add offers into
+    // its exchange group.
+    if ($operation == 'add') {
+      return !empty($bankaccount) && ($bankaccount['state'] == CesBankLocalAccount::STATE_ACTIVE);
+    }
+    // Deny access to empty $offerwant parameter besides 'add'.
+    else {
       return FALSE;
     }
-    else {
-      return TRUE;
-    }
   }
-  if ($offerwant->user == $account->uid) {
+  // All users (but anonymous user) have all permissions on their own offers and wants.
+  if (($account->uid != 0) && ($offerwant->user == $account->uid)) {
     return TRUE;
   }
-  if ($operation == 'view' && $offerwant->state == 1) {
-    return TRUE;
+  // Hidden offers/wants need at least 'edit' permission level.
+  if ($offerwant->state == 0 && ($operation == 'view' || $operation == 'use')) {
+    $operation = 'edit';
   }
+  // Assimilate other's offers/wants permissions to exchange account's permissions
   $category = ces_category_load($offerwant->category);
   return ces_bank_access($operation, 'exchange accounts', $category->exchange);
 }
