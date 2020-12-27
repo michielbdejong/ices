@@ -2741,21 +2741,12 @@ function ces_offerswants_user_register_submit($form, &$form_state) {
 /**
  * Implements hook_page().
  */
-function ces_offercomment_page($offerid) {
+function ces_offercomment_page($offer) {
   drupal_add_css(drupal_get_path('module', 'ces_offerswants') . '/css/ces_offerswants.css', array('group' => CSS_DEFAULT, 'type' => 'file'));
   $page = array();
-  // Build entity query.
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'ces_offerwant');
-  $query->entityCondition('bundle', 'offer');
-  $query->propertyCondition('id', $offerid);
-  $result = $query->execute();
-
-  if (isset($result['ces_offerwant']) && count($result['ces_offerwant']) > 0) {
-    $offerids = array_keys($result['ces_offerwant']);
-    $offers = ces_offerwant_load_multiple($offerids);
-    $page[] = _ces_offerwants_render_list($offers);
-
+  if (!empty($offer)) {
+    $page[] = _ces_offerwants_render_list([$offer]);
+    $offerid = $offer->id;
     $query2 = new EntityFieldQuery();
     $query2->entityCondition('entity_type', 'ces_offercomment');
     $query2->propertyCondition('oid', $offerid);
@@ -2790,11 +2781,9 @@ function ces_offercomment_page($offerid) {
     $page[] = drupal_get_form('ces_offercomment_add_form', $offerid);
   }
   else {
-    $t_there = t('There is no offer with @offerid id number.', array('@offerid' => $offerid));
-    $text = array(
-      '#markup' => $t_there,
+    $page[] = array(
+      '#markup' => t('Offer or need not found.'),
     );
-    $page[] = $text;
   }
   return $page;
 }
