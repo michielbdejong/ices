@@ -1501,10 +1501,9 @@ class CesBank {
     $account_from_name = $transaction->getFromAccountName();
     $account_to_name = $transaction->getToAccountName();
     $details = $transaction->getLog($transaction->getState());
+
     $params = array(
       'transaction' => array(
-        'id' => $transaction->getId(),
-        'amount' => $transaction->getAmount(),
         'concept' => $transaction->getConcept(),
         'fromaccount' => $account_from_name,
         'toaccount' => $account_to_name,
@@ -1512,20 +1511,44 @@ class CesBank {
         'user' => $transaction->getUser(),
       ),
     );
+
+    // In case of interexchange transactions, there are two id's: the transaction
+    // in the buyer account and the transaction in the seller account. It is
+    // important then to give the correct id in the notifications since otherwise
+    // the link does not work properly. Also the amount is different depending on
+    // the point of view.
+    $params_from = $params;
+    $params_to = $params;
+    if ($transaction instanceof CesBankInterExchangeTransaction) {
+      $transaction_from = $transaction->getVirtualTransactionFrom();
+      $params_from['transaction']['id'] = $transaction_from->getId();
+      $params_from['transaction']['amount'] = $transaction_from->getAmount();
+
+      $transaction_to = $transaction->getVirtualTransactionTo();
+      $params_to['transaction']['id'] = $transaction_to->getId();
+      $params_to['transaction']['amount'] = $transaction_to->getAmount();
+    }
+    else {
+      $params_from['transaction']['id'] = $transaction->getId();
+      $params_from['transaction']['amount'] = $transaction->getAmount();
+
+      $params_to['transaction']['id'] = $transaction->getId();
+      $params_to['transaction']['amount'] = $transaction->getAmount();
+    }
     switch ($transaction->getState()) {
       case CesBankTransactionInterface::STATE_COMMITTED:
-        $this->notifyTransactionAccount('account_debited', $account_from_name, $params);
-        $this->notifyTransactionAccount('account_credited', $account_to_name, $params);
+        $this->notifyTransactionAccount('account_debited', $account_from_name, $params_from);
+        $this->notifyTransactionAccount('account_credited', $account_to_name, $params_to);
         break;
 
       case CesBankTransactionInterface::STATE_REJECTED:
-        $this->notifyTransactionAccount('account_debit_rejected', $account_from_name, $params);
-        $this->notifyTransactionAccount('account_credit_rejected', $account_to_name, $params);
+        $this->notifyTransactionAccount('account_debit_rejected', $account_from_name, $params_from);
+        $this->notifyTransactionAccount('account_credit_rejected', $account_to_name, $params_to);
         break;
 
       case CesBankTransactionInterface::STATE_TRIGGERED:
-        $this->notifyTransactionAccount('account_debit_pending', $account_from_name, $params);
-        $this->notifyTransactionAccount('account_credit_pending', $account_to_name, $params);
+        $this->notifyTransactionAccount('account_debit_pending', $account_from_name, $params_from);
+        $this->notifyTransactionAccount('account_credit_pending', $account_to_name, $params_to);
         break;
     }
   }
@@ -3219,7 +3242,7 @@ class CesBankInterExchangeTransaction extends CesBankDecoratedTransaction {
   /**
    * The virtual transaction in buyer's exchange.
    */
-  protected function getVirtualTransactionFrom() {
+  public function getVirtualTransactionFrom() {
     if ($this->side == CesBankInterExchangeTransaction::$FROM) {
       $t = $this->getParent();
       return $t;
@@ -3232,7 +3255,7 @@ class CesBankInterExchangeTransaction extends CesBankDecoratedTransaction {
   /**
    * The virtual transaction in seller's exchange.
    */
-  protected function getVirtualTransactionTo() {
+  public function getVirtualTransactionTo() {
     if ($this->side == CesBankInterExchangeTransaction::$TO) {
       $t = $this->getParent();
       return $t;
