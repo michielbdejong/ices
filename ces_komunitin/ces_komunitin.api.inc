@@ -1,18 +1,31 @@
 <?php
 require_once dirname(__FILE__) . '/ces_komunitin.api.accounting.inc';
+require_once dirname(__FILE__) . '/ces_komunitin.api.social.inc';
 
 require_once dirname(__FILE__) . '/includes/JsonApiRequest.php';
 require_once dirname(__FILE__) . '/includes/KomunitinApiError.php';
+
+// Accounting API objects
 require_once dirname(__FILE__) . '/includes/Currency.php';
 require_once dirname(__FILE__) . '/includes/Account.php';
 require_once dirname(__FILE__) . '/includes/Transfer.php';
+
+// Social API objects
+require_once dirname(__FILE__) . '/includes/Group.php';
+require_once dirname(__FILE__) . '/includes/Contact.php';
+require_once dirname(__FILE__) . '/includes/Member.php';
+require_once dirname(__FILE__) . '/includes/Offer.php';
+require_once dirname(__FILE__) . '/includes/Need.php';
+require_once dirname(__FILE__) . '/includes/Category.php';
+require_once dirname(__FILE__) . '/includes/User.php';
+
 
 use Neomerx\JsonApi\Encoder\Encoder;
 
 function _ces_komunitin_api_get_base_path() {
   return 'ces/api';
 }
-function _ces_komunitin_api_get_base_url() {
+function ces_komunitin_api_get_base_url() {
   global $base_url;
   return $base_url . '/' . _ces_komunitin_api_get_base_path();
 }
@@ -23,38 +36,59 @@ function ces_komunitin_api() {
   global $user;
   try {
     $request = new JsonApiRequest(_ces_komunitin_api_get_base_path());
-
-    // Api namespace (social, accounting).
     $path = explode('/', $request->path);
-    $api = $path[0];
-    _ces_komunitin_api_verify_api($api);
+    $api = reset($path);
 
-    // Authorization.
+    // Log in with the token.
     $token = oauth2_server_check_access('komunitin', 'komunitin_' . $api);
     if ($token instanceof OAuth2\Response) {
-      $error_code = $token->getStatusCode() == 403 ?
-        KomunitinApiError::FORBIDDEN : KomunitinApiError::UNAUTHORIZED;
-      ces_komunitin_api_send_error($error_code);
-    }
-    else {
+      // Unauthenticated request, check if it is to a public endpoint and quick return otherwise.
+      if (!($request->method == 'GET' && ces_komunitin_api_is_public_endpoint($path))) {
+        $error_code = $token->getStatusCode() == 403 ?
+          KomunitinApiError::FORBIDDEN : KomunitinApiError::UNAUTHORIZED;
+        ces_komunitin_api_send_error($error_code);
+      }
+    } else {
       // Login user identified by Authorization header token.
       $user = user_load($token['user_id']);
     }
 
-    // Exchange
-    $exchange_code = $path[1];
-    $exchange = ces_bank_get_exchange_by_name($exchange_code);
-    if (!$exchange) {
-      ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
-    }
-
-    // Check if endpoint is defined.
-    $type = $path[2];
+    // Parse request.
     $endpoints = ces_komunitin_api_get_endpoints();
-    if (!isset($endpoints[$api][$type])) {
+    // Api namespace (social, accounting).
+    if (!isset($endpoints[$api])) {
       ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
     }
-    $endpoint = $endpoints[$api][$type];
+    else {
+      $endpoints = $endpoints[$api];
+    }
+    $code = next($path);
+    // TODO: better $endpoints structure would simplify that.
+    if ($api == 'social' && ($code == 'groups' || $code == 'users')) {
+      // This is an exception: usually this path element should be the group or
+      // currency code.
+      $endpoint = $endpoints[$code];
+      $type = $code;
+      $code = FALSE;
+      $exchange = FALSE;
+    }
+    else {
+      // load exchange.
+      $exchange = ces_bank_get_exchange_by_name($code);
+      if (!$exchange) {
+        ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+      }
+      // Check if endpoint is defined.
+      $type = next($path);
+      // Single group endpoint doesn't have type
+      if ($type === FALSE) {
+        $type = 'groups';
+      }
+      if (!isset($endpoints[$type])) {
+        ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+      }
+      $endpoint = $endpoints[$type];
+    }
 
     // Method
     $methods = array(
@@ -64,12 +98,21 @@ function ces_komunitin_api() {
       'DELETE' => 'delete'
     );
 
-    if (isset($path[3])) {
-      $endpoint = $endpoint['%'];
-      $resource_id = $path[3];
-    }
-    else {
-      $resource_id = null;
+    $resource_id = next($path);
+    if ($resource_id !== FALSE) {
+      // This case is just for /users/me
+      if (isset($endpoint[$resource_id])) {
+        $endpoint = $endpoint[$resource_id];
+        // Not need to load resource.
+        $resource_id = FALSE;
+      }
+      // This is the general case.
+      else if (isset($endpoint['%'])) {
+        $endpoint = $endpoint['%'];
+      }
+      else {
+        ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+      }
     }
     // Check if method (GET, POST, PATCH, DELETE) is allowed on this endpoint.
     if (!isset($methods[$request->method]) || array_search($methods[$request->method], $endpoint['operations']) === FALSE) {
@@ -83,12 +126,16 @@ function ces_komunitin_api() {
     $operation = $methods[$request->method];
 
     // Differentiate getting single resource from getting multiple resources.
-    if ($operation == 'read' && $resource_id === null && isset($endpoint['%'])) {
+    if ($operation == 'read' && (($resource_id === FALSE && $type != 'groups')
+      || ($exchange === FALSE && $type == 'groups')) && isset($endpoint['%'])) {
       $operation = 'read_collection';
     }
 
     // Prepare parameters.
-    $parameters = [$exchange];
+    $parameters = [];
+    if ($exchange) {
+      $parameters[] = $exchange;
+    }
 
     // Load resource if it exists.
     if ($resource_id) {
@@ -128,15 +175,25 @@ function ces_komunitin_api() {
       foreach ($request->includes as $path => $include) {
         $includes[] = $path;
       }
-      $content = Encoder::instance(array(
+      $urlprefix = ces_komunitin_api_get_base_url() . '/' . $api;
+
+      $encoder = Encoder::instance(array(
         Currency::class => CurrencySchema::class,
         Account::class => AccountSchema::class,
         Transfer::class => TransferSchema::class,
+        Group::class => GroupSchema::class,
+        Contact::class => ContactSchema::class,
+        Member::class => MemberSchema::class,
+        Offer::class => OfferSchema::class,
+        Need::class => NeedSchema::class,
+        Category::class => CategorySchema::class,
+        User::class => UserSchema::class
       ))
-        ->withUrlPrefix(_ces_komunitin_api_get_base_url() . '/' . $api . '/' . $exchange_code)
+        ->withUrlPrefix($urlprefix)
         ->withIncludedPaths($includes)
-        ->withEncodeOptions(JSON_PRETTY_PRINT)
-        ->encodeData($result);
+        ->withEncodeOptions(JSON_PRETTY_PRINT);
+
+      $content = $encoder->encodeData($result);
       $status = $operation == 'create' ? 201 : 200;
     }
     // Send response
@@ -151,10 +208,10 @@ function ces_komunitin_api_call_function($operation, $api, $type, $params = []) 
   return call_user_func_array($name, $params);
 }
 /**
- * Return implemented endpoints.
+ * Return all implemented endpoints.
  */
 function ces_komunitin_api_get_endpoints() {
-  return array(
+  $endpoints = array(
     'accounting' => array(
       'currency' => array(
         'operations' => array('read')
@@ -171,15 +228,69 @@ function ces_komunitin_api_get_endpoints() {
           'operations' => array('read', 'delete')
         )
       )
+    ),
+    'social' => array(
+      'groups' => array(
+        'operations' => array('read'),
+        '%' => array(
+          'operations' => array('read')
+        )
+      ),
+      'users' => array(
+        'me' => array(
+          'operations' => array('read')
+        )
+      ),
+      'members' => array(
+        'operations' => array('read'),
+        '%' => array(
+          'operations' => array('read')
+        )
+      ),
+      'needs' => array(
+        'operations' => array('read'),
+        '%' => array(
+          'operations' => array('read')
+        )
+      ),
+      'offers' => array(
+        'operations' => array('read'),
+        '%' => array(
+          'operations' => array('read')
+        )
+      )
     )
   );
+  return $endpoints;
+}
+function ces_komunitin_get_public_paths() {
+  return [
+    'social/groups',
+    'social/%',
+  ];
+}
+/**
+ * Check if path is one of the available endpoints for unauthorized users.
+ * Public endpoints are:
+ *
+ */
+function ces_komunitin_api_is_public_endpoint($path) {
+  $public = ces_komunitin_get_public_paths();
+  foreach ($public as $candidate) {
+    $items = explode('/', $candidate);
+    if (count($path) == count($items)) {
+      $match = TRUE;
+      foreach ($items as $i => $item) {
+        if ($item != $path[$i] && $item != '%') {
+          $match = FALSE;
+        }
+      }
+      if ($match) return TRUE;
+    }
+  }
+  return FALSE;
 }
 
-function _ces_komunitin_api_verify_api($api) {
-  if ($api != 'accounting') {
-    ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED);
-  }
-}
 
 /**
  * Send a JSON API error object.

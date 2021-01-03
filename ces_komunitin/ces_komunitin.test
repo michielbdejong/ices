@@ -43,8 +43,9 @@ class CesKomunitinestCase extends CesBankTestCase
   {
     $this->createExchanges();
     $this->createAccounts();
-    // Now we are ready to test opentransact.
-    $this->doAccountingApi();
+    // Now we are ready to test the Komunitin API.
+    // $this->doAccountingApi();
+    $this->doSocialApi();
   }
 
   /**
@@ -107,17 +108,8 @@ class CesKomunitinestCase extends CesBankTestCase
   /**
    * Get a komunitin account object given its code.
    */
-  protected function getAccount($token, $exchange_id, $account_code, $status = 200)
-  {
-    $url = url('ces/api/accounting/' . $exchange_id . '/accounts/' . $account_code, array('absolute' => TRUE));
-    $options = array(
-      'method' => 'GET',
-      'headers' => array(
-        'Authorization' => 'Bearer ' . $token,
-      ),
-    );
-    $result = drupal_http_request($url, $options);
-    $this->assertEqual($result->code, $status, format_string('Status code should be @status but is @code', array('@status' => $status, '@code' => $result->code)));
+  protected function getAccount($token, $exchange_id, $account_code, $status = 200) {
+    $result = $this->request('ces/api/accounting/' . $exchange_id . '/accounts/' . $account_code, $token, [], [], $status);
     $this->assertEqual($result->headers['content-type'], "application/vnd.api+json");
     $data = json_decode($result->data);
     $this->assertEqual($data->data->type, 'accounts');
@@ -129,15 +121,7 @@ class CesKomunitinestCase extends CesBankTestCase
    * Get a komunitin currency given its code.
    */
   protected function getCurrency($token, $exchange_id, $status = 200) {
-    $url = url('ces/api/accounting/' . $exchange_id . '/currency', array('absolute' => TRUE));
-    $options = array(
-      'method' => 'GET',
-      'headers' => array(
-        'Authorization' => 'Bearer ' . $token,
-      ),
-    );
-    $result = drupal_http_request($url, $options);
-    $this->assertEqual($result->code, $status, format_string('Status code should be @status but is @code', array('@status' => $status, '@code' => $result->code)));
+    $result = $this->request('ces/api/accounting/' . $exchange_id . '/currency', $token, [], [], $status);
     $this->assertEqual($result->headers['content-type'], "application/vnd.api+json");
     $data = json_decode($result->data);
     $this->assertEqual($data->data->type, 'currencies');
@@ -153,7 +137,6 @@ class CesKomunitinestCase extends CesBankTestCase
    */
   protected function doKomunitinTransfer($token, $exchange_id, $payer_id, $payee_id, $amount, $meta, $status = 201, $id = NULL)
   {
-    $url = url('ces/api/accounting/' . $exchange_id . '/transfers', array('absolute' => TRUE));
     if ($id === NULL) {
       $id = $this->uuid();
     }
@@ -182,17 +165,12 @@ class CesKomunitinestCase extends CesBankTestCase
         )
       ),
     ));
-    $options = array(
+
+    $result = $this->request('ces/api/accounting/' . $exchange_id . '/transfers', $token, [], [
       'method' => 'POST',
       'data' => $data,
-      'headers' => array(
-        'Authorization' => 'Bearer ' . $token,
-        'Content-Type' => 'application/vnd.api+json',
-      ),
-    );
-    $result = drupal_http_request($url, $options);
-    $this->verbose(highlight_string('<?php ' . var_export($result, TRUE), TRUE));
-    $this->assertEqual($result->code, $status, format_string('Status code should be @status but is @code', array('@status' => $status, '@code' => $result->code)));
+      'headers' => ['Content-Type' => 'application/vnd.api+json']
+    ], $status);
     $this->assertEqual($result->headers['content-type'], "application/vnd.api+json");
     $data = json_decode($result->data);
     if ($status == 201) {
@@ -220,20 +198,8 @@ class CesKomunitinestCase extends CesBankTestCase
     if (!empty($includes)) {
       $query['include'] = implode(",", $includes);
     }
+    $result = $this->request('ces/api/accounting/' . $exchange_id . '/transfers/' . $id, $token, ['query' => $query], $status);
 
-    $url = url('ces/api/accounting/' . $exchange_id . '/transfers/' . $id, [
-      'absolute' => TRUE,
-      'query' => $query
-    ]);
-
-    $options = [
-      'headers' => [
-        'Authorization' => 'Bearer ' . $token
-      ]
-    ];
-    $result = drupal_http_request($url, $options);
-    $this->verbose(highlight_string('<?php ' . var_export($result, TRUE), TRUE));
-    $this->assertEqual($result->code, $status, 'Get transfer status code.');
     $this->assertEqual($result->headers['content-type'], "application/vnd.api+json");
     $response = json_decode($result->data);
     if ($transfer != NULL) {
@@ -258,39 +224,21 @@ class CesKomunitinestCase extends CesBankTestCase
   /**
    * Test DELETE /transfers/id
    */
-  protected function deleteKomunitinTransfer($token, $exchange_id, $id, $status = 204)
-  {
-    $url = url('ces/api/accounting/' . $exchange_id . '/transfers/' . $id, array('absolute' => TRUE));
-    $options = array(
-      'method' => 'DELETE',
-      'headers' => array(
-        'Authorization' => 'Bearer ' . $token
-      )
-    );
-    $result = drupal_http_request($url, $options);
-    $this->verbose(highlight_string('<?php ' . var_export($result, TRUE), TRUE));
-    $this->assertEqual($result->code, $status, format_string('Status code should be @status but is @code', array('@status' => $status, '@code' => $result->code)));
+  protected function deleteKomunitinTransfer($token, $exchange_id, $id, $status = 204) {
+    $this->request('ces/api/accounting/' . $exchange_id . '/transfers/' . $id, $token, [], [
+      'method' => 'DELETE'
+    ], $status);
   }
 
   /**
    * Test GET /transfers?filter[account]=XXX&sort=-updated
    */
   protected function listTransfers($token, $exchange_id, $account, $status = 200, $transactions = null) {
-    $url = url('ces/api/accounting/' . $exchange_id . '/transfers', array(
-      'absolute' => TRUE,
-      'query' => array(
+    $result = $this->request("ces/api/accounting/$exchange_id/transfers", $token,
+      ['query' => [
         'filter[account]' =>$account,
         'sort' => '-updated'
-      ))
-    );
-    $options = array(
-      'headers' => array(
-        'Authorization' => 'Bearer ' . $token
-      )
-    );
-    $result = drupal_http_request($url, $options);
-    $this->verbose(highlight_string('<?php ' . var_export($result, TRUE), TRUE));
-    $this->assertEqual($result->code, $status, format_string('Status code should be @status but is @code', array('@status' => $status, '@code' => $result->code)));
+      ]], [], $status);
     $response = json_decode($result->data);
     if ($transactions !== null) {
       $this->assertEqual(count($response->data), count($transactions), 'Incorrect number of transactions');
@@ -307,18 +255,7 @@ class CesKomunitinestCase extends CesBankTestCase
     if ($ids !== null) {
       $query['filter[id]'] = implode(',', $ids);
     }
-    $url = url('ces/api/accounting/' . $exchange_id . '/accounts', array(
-      'absolute' => TRUE,
-      'query' => $query
-    ));
-    $options = array(
-      'headers' => array(
-        'Authorization' => 'Bearer ' . $token
-      )
-    );
-    $result = drupal_http_request($url, $options);
-    $this->verbose(highlight_string('<?php ' . var_export($result, TRUE), TRUE));
-    $this->assertEqual($result->code, $status, format_string('Status code should be @status but is @code', array('@status' => $status, '@code' => $result->code)));
+    $result = $this->request("ces/api/accounting/$exchange_id/accounts", $token, ['query' => $query], [], $status);
     $response = json_decode($result->data);
 
     if ($ids !== null) {
@@ -329,6 +266,140 @@ class CesKomunitinestCase extends CesBankTestCase
     }
   }
 
+  /**
+   * Test the social API.
+   */
+  protected function doSocialApi()
+  {
+    // Unauthenticated
+
+    // Get single group
+    $hora = $this->getGroup(false, 'HORA');
+    $bcna = $this->getGroup(false, 'BCNA');
+    $this->getGroup(false, 'XYZT', 404); // Group not found
+
+    // Get list of groups.
+    $this->listGroups(false, null, [0,0], 200, [$hora->data->id, $bcna->data->id]);
+
+    // Authenticate as HORA0001
+    $account = $this->account11;
+    $token = $this->authorize($account['account']['mail'], $account['account']['pass_raw']);
+
+    // Get the /me endpoint.
+    $me = $this->getUsersMe($token);
+
+    // Get single member.
+    $account12 = $this->getMember($token, 'HORA', 'account12');
+    $adminhora = $this->getMember($token, 'HORA', 'adminhora');
+
+    // Get all exchange members.
+    $members = $this->listMembers($token, 'HORA', 200, [$adminhora->data->id, $me->included[0]->id, $account12->data->id]);
+
+
+
+    // List offers
+    // List needs
+    // List accounts
+    // Get account offers
+    // Get account needs
+    // Publish offer
+    // Publish need
+
+  }
+  protected function getGroup($token, $code, $status = 200) {
+    $result = $this->request("ces/api/social/$code", $token, ['query' => ['include' => 'contacts']], [], $status);
+    $response = json_decode($result->data);
+
+    // Check group code.
+    if ($status == 200) {
+      //check type
+      $this->assertEqual($response->data->type, 'groups');
+      // check group code
+      $this->assertEqual($response->data->attributes->code, $code);
+      // check currency link
+      $this->assertEqual($response->data->relationships->currency->links->related, url('ces/api/accounting/' . $code . '/currency', ['absolute' => TRUE]));
+      // check contact id.
+      $this->assertEqual($response->data->relationships->contacts->data[0]->id, $response->included[0]->id);
+    }
+    return $response;
+  }
+  protected function listGroups($token, $search = null, $position = [0,0], $status = 200, $ids = null) {
+    $query = [];
+    $query['include'] = 'contacts';
+    if ($position) {
+      $query['geo-position'] = implode(",", $position);
+      $query['sort'] = 'location';
+    }
+    if ($search) {
+      $query['filter[serch]'] = $search;
+    }
+    $result = $this->request('ces/api/social/groups', $token, ['query' => $query], [], $status);
+    $response = json_decode($result->data);
+
+    if ($status == 200) {
+      if ($ids !== null) {
+        $i = 0;
+        foreach ($ids as $id) {
+          $this->assertEqual($response->data[$i++]->id, $id);
+        }
+      }
+      // There's one contact per group
+      $this->assertEqual(count($response->included), count($response->data));
+    }
+  }
+
+  protected function getUsersMe($token, $status = 200) {
+    $result = $this->request('ces/api/social/users/me', $token, ['query' => ['include' => 'members,members.group,members.contacts']], [], $status);
+    if ($status == 200) {
+      $response = json_decode($result->data);
+      $user = $response->data;
+      $member = $response->included[0];
+      $group = $response->included[1];
+      $mail = $response->included[2];
+      $phone = $response->included[3];
+
+      // assert user-member link.
+      $this->assertEqual($member->type, 'members');
+      $this->assertEqual($member->id, $user->relationships->members->data[0]->id);
+
+      // assert member-group link.
+      $this->assertEqual($group->type, 'groups');
+      $this->assertEqual($group->id, $member->relationships->group->data->id);
+
+      $this->assertEqual($mail->type, 'contacts');
+      $this->assertEqual($mail->attributes->type, 'email');
+
+      $this->assertEqual($phone->type, 'contacts');
+      $this->assertEqual($phone->attributes->type, 'phone');
+    }
+    return $response;
+
+  }
+  protected function getMember($token, $groupCode, $code, $status = 200) {
+    $result = $this->request("ces/api/social/$groupCode/members/$code", $token, ['query' => ['include' => 'contacts']], [], $status);
+    if ($status == 200) {
+      $response = json_decode($result->data);
+      $this->assertEqual($response->data->attributes->code, $code);
+      // two contact objects (email & phone)
+      $this->assertEqual(count($response->included), 2);
+      $this->assertEqual(count($response->data->relationships->contacts->data), 2);
+      return $response;
+    }
+  }
+  protected function listMembers($token, $groupCode, $status = 200, $ids = null) {
+    $result = $this->request("ces/api/social/$groupCode/members", $token, ['query' => ['include' => 'contacts']], [], $status);
+    if ($status == 200) {
+      $response = json_decode($result->data);
+      if ($ids != null) {
+        $i = 0;
+        foreach($ids as $id) {
+          $this->assertEqual($response->data[$i++]->id, $id);
+        }
+      }
+      // two contacts per member.
+      $this->assertEqual(count($response->data) * 2, count($response->included));
+    }
+  }
   /**
    * Call to the token endpoint with credentials from given user.
    *
@@ -341,7 +412,7 @@ class CesKomunitinestCase extends CesBankTestCase
       'username' => $mail,
       'password' => $password,
       'client_id' => 'komunitin-app',
-      'scope' => 'komunitin_accounting'
+      'scope' => 'komunitin_accounting komunitin_social'
     );
 
     $options = array(
@@ -372,4 +443,20 @@ class CesKomunitinestCase extends CesBankTestCase
     $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
   }
+
+  protected function request($url, $token, $url_options = [], $request_options = [], $status = 200) {
+    $url_options = array_merge(['absolute' => TRUE], $url_options);
+    $url = url($url, $url_options);
+    if ($token) {
+      $request_options = array_merge_recursive(['headers' => ['Authorization' => 'Bearer ' . $token]], $request_options);
+    }
+    $result = drupal_http_request($url, $request_options);
+
+    $this->verbose(highlight_string('<?php ' . var_export($result, TRUE), TRUE));
+    $this->assertEqual($result->code, $status, format_string('Status code should be @status but is @code', array('@status' => $status, '@code' => $result->code)));
+
+    return $result;
+  }
+
+
 }

@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__) . '/SchemaUtils.php';
 
 use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
 use Neomerx\JsonApi\Schema\BaseSchema;
@@ -85,8 +86,8 @@ class Transfer {
     $this->id = $transaction['uuid'];
 
     // Tempos
-    $this->created = $this->encodeDate($transaction['created']);
-    $this->updated = $this->encodeDate($transaction['modified']);
+    $this->created = SchemaUtils::encodeDate($transaction['created']);
+    $this->updated = SchemaUtils::encodeDate($transaction['modified']);
 
     // State
     $this->state = self::$states[$bank->getTransactionState($transaction)];
@@ -110,9 +111,6 @@ class Transfer {
     $this->currency = new Currency($exchange);
   }
 
-  private function encodeDate($timestamp) {
-    return DateTime::createFromFormat('U', $timestamp)->format(DateTime::ATOM);
-  }
 }
 
 class TransferSchema extends BaseSchema {
@@ -166,5 +164,8 @@ class TransferSchema extends BaseSchema {
     ];
   }
 
-
+  protected function getSelfSubUrl($resource): string
+  {
+    return $resource->currency->code . '/' .$this->getResourcesSubUrl() . '/' . $resource->id;;
+  }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Check access and load a transaction ces_bank record. Send error on failure.
+ * Ñoad a transaction ces_bank record. Send error on failure.
  *
  * @return array transaction record.
  */
@@ -20,7 +20,7 @@ function ces_komunitin_api_accounting_transfers_load($exchange, $id) {
 }
 
 /**
- * Read a transaction.
+ * CHeck access and read a transaction.
  *
  * @return Transfer
  */

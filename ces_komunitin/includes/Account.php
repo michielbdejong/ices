@@ -85,7 +85,7 @@ class AccountSchema extends BaseSchema {
    */
   protected function getSelfSubUrl($resource): string
   {
-    return $this->getResourcesSubUrl() . '/' . $resource->code;
+    return $resource->currency->code . '/' . $this->getResourcesSubUrl() . '/' . $resource->code;
   }
 
 }
