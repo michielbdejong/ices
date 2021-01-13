@@ -75,11 +75,6 @@ function ces_bank_schema() {
         'length' => '36',
         'not null' => TRUE
       ),
-      'uuid_group' => array(
-        'type' => 'varchar',
-        'length' => '36',
-        'not null' => TRUE
-      ),
       'code' => array(
         'description' => '4 letter id for the exchange',
         'type' => 'varchar',
@@ -212,7 +207,6 @@ function ces_bank_schema() {
     'primary key' => array('id'),
     'unique keys' => array(
       'code' => array('code'),
-      'ces_exchange_unique_uuid_group' => array('uuid_group'),
       'ces_exchange_unique_uuid_currency' => array('uuid_currency'),
 
     ),
@@ -644,8 +638,6 @@ function ces_bank_update_7102() {
 function ces_bank_update_7103() {
   // uuid as a komunitin currency.
   _add_uuid_field('ces_exchange', 'uuid_currency', TRUE);
-  // uuid as a komunitin group.
-  _add_uuid_field('ces_exchange', 'uuid_group', TRUE);
 }
 
 /** @} */

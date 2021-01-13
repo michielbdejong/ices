@@ -1,10 +1,17 @@
 <?php
 require_once dirname(__FILE__) . '/../ces_bank/ces_bank.test';
+// Needed for the ces_komunitin_api_social_get_uuid function
+require_once dirname(__FILE__) . '/ces_komunitin.api.social.inc';
 /**
  * Komunitin test.
  */
 class CesKomunitinestCase extends CesBankTestCase
 {
+  public $categories;
+  public $offers;
+  public $wants;
+
+
 
   public function setUp()
   {
@@ -44,7 +51,8 @@ class CesKomunitinestCase extends CesBankTestCase
     $this->createExchanges();
     $this->createAccounts();
     // Now we are ready to test the Komunitin API.
-    // $this->doAccountingApi();
+    //$this->doAccountingApi();
+    $this->createSocialData();
     $this->doSocialApi();
   }
 
@@ -258,12 +266,102 @@ class CesKomunitinestCase extends CesBankTestCase
     $result = $this->request("ces/api/accounting/$exchange_id/accounts", $token, ['query' => $query], [], $status);
     $response = json_decode($result->data);
 
-    if ($ids !== null) {
-      $i = 0;
-      foreach ($ids as $id) {
-        $this->assertEqual($response->data[$i++]->id, $id);
-      }
-    }
+    $this->assertIds($response, $ids);
+  }
+
+  protected function createSocialData() {
+    $this->categories = [];
+    $this->offers = [];
+    $this->wants = [];
+
+    // 1. Create a couple of categories:
+    $this->drupalLogin($this->admin1);
+    $exchange = ces_bank_get_exchange_by_name($this->exchange1['code']);
+    $this->categories[] = ces_category_save((object)[
+      'title' => 'Food',
+      'code' => 'food',
+      'description' => 'Your medicine',
+      'parent' => null,
+      'exchange' => $exchange['id'],
+      'context' => 3, //Valid for both offers and needs.
+    ]);
+    $this->categories[] = ces_category_save((object)[
+      'title' => 'Hygiene',
+      'code' => 'hygiene',
+      'description' => 'Stuff to keep things clean',
+      'parent' => null,
+      'exchange' => $exchange['id'],
+      'context' => 3, //Valid for both offers and needs.
+    ]);
+    // 2. Create two offers from account11.
+    $user1 = $this->accountUser($this->account11);
+    $this->drupalLogin($user1);
+    $user1 = user_load_by_name($user1->name);
+    $obj = (object)[
+      'type' => 'offer',
+      'title' => 'Cheese',
+      'code' => 'cheese',
+      'body' => 'Cheese from the best cow milk.',
+      'category' => $this->categories[0]->id,
+      'ces_offerwant_rate' => [LANGUAGE_NONE => ['2.5']],
+      'expire' => REQUEST_TIME + 60 * 60 * 24 * 365,
+      'created' => REQUEST_TIME,
+      'modified' => REQUEST_TIME,
+      'user' => $user1->uid,
+      'keywords' => '',
+      'state' => 1,
+    ];
+    $this->offers[] = ces_offerwant_save($obj);
+    $obj = (object)[
+      'type' => 'offer',
+      'title' => 'Natural soap',
+      'code' => 'natural-soap',
+      'body' => 'Best soap for your skin.',
+      'category' => $this->categories[1]->id,
+      'ces_offerwant_rate' => [LANGUAGE_NONE => ['3hour/kg']],
+      'expire' => REQUEST_TIME + 60 * 60 * 24 * 365,
+      'created' => REQUEST_TIME,
+      'modified' => REQUEST_TIME,
+      'user' => $user1->uid,
+      'keywords' => '',
+      'state' => 1,
+    ];
+    $this->offers[] = ces_offerwant_save($obj);
+    // 3. Create a want from account11.
+    $obj = (object)[
+      'type' => 'want',
+      'title' => 'Milk',
+      'code' => 'milk',
+      'body' => 'I need ecologic milk to make my delicious cheeses.',
+      'category' => $this->categories[0]->id,
+      'expire' => REQUEST_TIME + 60 * 60 * 24 * 14,
+      'created' => REQUEST_TIME,
+      'modified' => REQUEST_TIME,
+      'user' => $user1->uid,
+      'keywords' => '',
+      'state' => 1,
+    ];
+    $this->wants[] = ces_offerwant_save($obj);
+    // 4. Create an offer from account12
+    $user2 = $this->accountUser($this->account12);
+    $this->drupalLogin($user2);
+    $user2 = user_load_by_name($user2->name);
+
+    $obj = (object)[
+      'type' => 'offer',
+      'title' => 'Potatoes',
+      'code' => 'potatoes',
+      'body' => 'Potatoes from the high lands.',
+      'category' => $this->categories[0]->id,
+      'ces_offerwant_rate' => [LANGUAGE_NONE => ['0.5']],
+      'expire' => REQUEST_TIME + 60 * 60 * 24 * 365,
+      'created' => REQUEST_TIME,
+      'modified' => REQUEST_TIME,
+      'user' => $user2->uid,
+      'keywords' => '',
+      'state' => 1,
+    ];
+    $this->offers[] = ces_offerwant_save($obj);
   }
 
   /**
@@ -295,13 +393,27 @@ class CesKomunitinestCase extends CesBankTestCase
     // Get all exchange members.
     $members = $this->listMembers($token, 'HORA', 200, [$adminhora->data->id, $me->included[0]->id, $account12->data->id]);
 
+    // Get single offer.
+    $offer = $this->getOffer($token, 'HORA', 'potatoes');
+    // List group offers
+    $uuids = array_map(function ($offer) {
+      return ces_komunitin_api_social_get_uuid(ResourceTypes::OFFER, $offer->id);
+    }, $this->offers);
+    $offers = $this->listOffers($token, 'HORA', 200, $uuids);
+    // List account offers
 
+    // Get single need.
+    $need = $this->getNeed($token, 'HORA', 'milk');
+    // List group needs
+    $uuids = array_map(function ($want) {
+      return ces_komunitin_api_social_get_uuid(ResourceTypes::NEED, $want->id);
+    }, $this->wants);
+    $needs = $this->listNeeds($token, 'HORA', 200, $uuids);
+    // List account needs
 
-    // List offers
-    // List needs
     // List accounts
-    // Get account offers
-    // Get account needs
+
+
     // Publish offer
     // Publish need
 
@@ -337,12 +449,7 @@ class CesKomunitinestCase extends CesBankTestCase
     $response = json_decode($result->data);
 
     if ($status == 200) {
-      if ($ids !== null) {
-        $i = 0;
-        foreach ($ids as $id) {
-          $this->assertEqual($response->data[$i++]->id, $id);
-        }
-      }
+      $this->assertIds($response, $ids);
       // There's one contact per group
       $this->assertEqual(count($response->included), count($response->data));
     }
@@ -390,14 +497,53 @@ class CesKomunitinestCase extends CesBankTestCase
     $result = $this->request("ces/api/social/$groupCode/members", $token, ['query' => ['include' => 'contacts']], [], $status);
     if ($status == 200) {
       $response = json_decode($result->data);
-      if ($ids != null) {
-        $i = 0;
-        foreach($ids as $id) {
-          $this->assertEqual($response->data[$i++]->id, $id);
-        }
-      }
+      $this->assertIds($response, $ids);
       // two contacts per member.
       $this->assertEqual(count($response->data) * 2, count($response->included));
+    }
+  }
+  protected function getOffer($token, $groupCode, $code, $status = 200) {
+    return $this->getOfferNeed('offers', $token, $groupCode, $code, $status);
+  }
+  protected function getNeed($token, $groupCode, $code, $status = 200) {
+    return $this->getOfferNeed('needs', $token, $groupCode, $code, $status);
+  }
+  protected function getOfferNeed($type, $token, $groupCode, $code, $status = 200) {
+    $result = $this->request("ces/api/social/$groupCode/$type/$code", $token, ['query' => ['include' => 'category,member,member.contacts']], [], $status);
+    if ($status == 200) {
+      $response = json_decode($result->data);
+      // Assert correct code.
+      $this->assertEqual($response->data->attributes->code, $code);
+      // Assert existence of included objects.
+      $this->assertEqual($response->included[0]->type, 'categories');
+      $this->assertEqual($response->included[1]->type, 'members');
+      $this->assertEqual($response->included[2]->type, 'contacts');
+      return $response;
+    }
+  }
+  protected function listOffers($token, $groupCode, $status = 200, $ids) {
+    $this->listOffersNeeds('offers', $token, $groupCode, $status, $ids);
+  }
+  protected function listNeeds($token, $groupCode, $status = 200, $ids)
+  {
+    $this->listOffersNeeds('needs', $token, $groupCode, $status, $ids);
+  }
+  private function listOffersNeeds($type, $token, $groupCode, $status = 200, $ids) {
+    $result = $this->request("ces/api/social/$groupCode/$type", $token, ['query' => ['include' => 'category,member,member.contacts']], [], $status);
+    if ($status == 200) {
+      $response = json_decode($result->data);
+      $this->assertIds($response, $ids);
+    }
+  }
+  /**
+   * HElper functin to assert the ids of a returned object collection.
+  */
+  private function assertIds($response, $ids = null) {
+    if ($ids != null) {
+      $i = 0;
+      foreach ($ids as $id) {
+        $this->assertEqual($response->data[$i++]->id, $id);
+      }
     }
   }
   /**
@@ -460,3 +606,4 @@ class CesKomunitinestCase extends CesBankTestCase
 
 
 }
+

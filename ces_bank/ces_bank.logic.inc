@@ -42,6 +42,7 @@ class CesBank {
       $this->updateObject('CesBankExchange', $record);
       // Create new default category from exchange.
       $category = (object) array(
+        'code' => $record['code'],
         'title' => 'general',
         'parent' => 0,
         'description' => 'General category',

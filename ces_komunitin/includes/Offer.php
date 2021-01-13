@@ -1,36 +1,34 @@
 <?php
+require_once dirname(__FILE__) . '/Need.php';
 
 use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
-use Neomerx\JsonApi\Schema\BaseSchema;
 
-class Offer {
-  public $id;
+class Offer extends Need {
+  // Attributes in offers
+  public $name;
+  public $price;
 
-  // Attributes
-  public $code;
+  public function __construct($resource, $exchange) {
+    parent::__construct($resource, $exchange);
+    $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::OFFER, $resource->id);
+    $this->name = $resource->title;
+    $this->price = $resource->ces_offer_rate[LANGUAGE_NONE][0]['safe_value'];
+  }
 }
 
-class OfferSchema extends BaseSchema {
+class OfferSchema extends NeedSchema {
 
   public function getType(): string {
     return 'offers';
   }
 
-  public function getId($offer): ?string {
-    assert($offer instanceof Offer);
-    return (string) $offer->id;
-  }
-
   public function getAttributes($offer, ContextInterface $context): iterable {
     assert($offer instanceof Offer);
-    $attributes = [
-      'code' => $offer->code,
-    ];
+    $attributes = parent::getAttributes($offer, $context);
+    $attributes['name'] = $offer->name;
+    $attributes['price'] = $offer->price;
+
     return $attributes;
   }
 
-  public function getRelationships($offer, ContextInterface $context): iterable {
-    assert($offer instanceof Offer);
-    return [];
-  }
 }

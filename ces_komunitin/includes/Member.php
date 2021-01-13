@@ -3,6 +3,9 @@
 use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
 use Neomerx\JsonApi\Schema\BaseSchema;
 use Neomerx\JsonApi\Schema\Identifier;
+use Neomerx\JsonApi\Schema\Link;
+use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
+
 
 class Member {
   const TYPE_PERSONAL = 'personal';
@@ -29,6 +32,7 @@ class Member {
   public $group;
   public $contacts;
   public $account_id;
+  public $account_code;
 
   public function __construct($user, $exchange) {
     $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $user->uid);
@@ -93,6 +97,7 @@ class Member {
 
     // Relationships
     $this->account_id = $account['uuid'];
+    $this->account_code = $account['name'];
     $this->group = new Group($exchange);
     $this->contacts = [];
     // email
@@ -143,7 +148,10 @@ class MemberSchema extends BaseSchema {
       'account' => [
         self::RELATIONSHIP_DATA => new Identifier($member->account_id, 'accounts'),
         self::RELATIONSHIP_LINKS_SELF => false,
-        self::RELATIONSHIP_LINKS_RELATED => true
+        // Override default related link
+        self::RELATIONSHIP_LINKS => [
+          LinkInterface::RELATED => new Link(false, ces_komunitin_api_get_base_url() . '/accounting/' . $member->group->code . '/accounts/' . $member->account_code, false)
+        ]
       ],
       'contacts' => [
         self::RELATIONSHIP_DATA => $member->contacts,

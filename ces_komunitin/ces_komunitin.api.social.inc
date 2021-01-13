@@ -8,6 +8,7 @@ class ResourceTypes {
   const MEMBER = "member";
   const NEED = "need";
   const OFFER = "offer";
+  const CATEGORY = "category";
 
   const ALL_TYPES = [self::GROUP, self::EMAIL, self::PHONE, self::MEMBER, self::NEED, self::OFFER];
 }
@@ -137,9 +138,104 @@ function ces_komunitin_api_social_members_read_collection($exchange, array $user
 }
 
 function ces_komunitin_api_social_needs_load($exchange, $code) {
+  $need = _ces_komunitin_api_social_offerneeds_load($code, 'need');
+  return $need;
+}
+function ces_komunitin_api_social_needs_load_collection($exchange, $filters, $sorts) {
+  return _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filters, $sorts, 'need');
+}
 
+function ces_komunitin_api_social_needs_read($exchange, $need) {
+  if (ces_offerwant_access('view', $need)) {
+    return new Need($need, $exchange);
+  }
+  else {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+}
+function ces_komunitin_api_social_needs_read_collection($exchange, $needs)
+{
+  // General access check.
+  if (ces_bank_access('view', 'exchange details', $exchange['id'])) {
+    $result = [];
+    foreach ($needs as $need) {
+      // Resource by resource access check.
+      if (ces_offerwant_access('view', $need)) {
+        $result[] = new Need($need, $exchange);
+      }
+    }
+    return $result;
+  }
+  else {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+}
+
+function ces_komunitin_api_social_offers_read($exchange, $offer){
+  if (ces_offerwant_access('view', $offer)) {
+    return new Offer($offer, $exchange);
+  }
+  else {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+}
+
+function ces_komunitin_api_social_offers_read_collection($exchange, $offers) {
+  // General access check.
+  if (ces_bank_access('view', 'exchange details', $exchange['id'])) {
+    $result = [];
+    foreach ($offers as $offer) {
+      // Resource by resource access check.
+      if (ces_offerwant_access('view', $offer)) {
+        $result[] = new Offer($offer, $exchange);
+      }
+    }
+    return $result;
+  } else {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
 }
 
 function ces_komunitin_api_social_offers_load($exchange, $code) {
+  $offer = _ces_komunitin_api_social_offerneeds_load($code, 'offer');
+  return $offer;
+}
+
+function ces_komunitin_api_social_offers_load_collection($exchange, $filters, $sorts) {
+  return _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filters, $sorts, 'offer');
+}
+
+function _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filters, $sorts, $type) {
+  $type = ($type == 'offer') ? 'offer' : 'want';
+
+  // Get list of category ids in exchange.
+  $categories = ces_offerswants_get_categories_ids($type, $exchange['id']);
+
+  // Get the list of object ids.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'ces_offerwant');
+  $query->entityCondition('bundle', $type);
+  $query->propertyCondition('category', $categories, 'IN');
+  // Active objects and not expired.
+  $query->propertyCondition('state', 1);
+  $query->propertyCondition('expire', REQUEST_TIME, '>');
+  $result = $query->execute();
+  // Load full entities.
+  if (isset($result['ces_offerwant'])) {
+    $ids = array_keys($result['ces_offerwant']);
+    $offers = ces_offerwant_load_multiple($ids);
+    return $offers;
+  } else {
+    ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+  }
+}
+
+function _ces_komunitin_api_social_offerneeds_load($code, $type = 'offer') {
+  $type = ($type == 'offer') ? 'offer' : 'want';
+  $offers = ces_offerwant_load_multiple([], ['code' => $code, 'type' => $type]);
+  if (!$offers) {
+    ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+  }
+  return reset($offers);
 }
 

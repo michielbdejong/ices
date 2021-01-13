@@ -1869,6 +1869,11 @@ class CesOffersWantsEntityController extends DrupalDefaultEntityController {
   public function save($offerwant) {
     if (!isset($offerwant->id)) {
       // Insert.
+      if (!isset($offerwant->code)) {
+        $offerwant->code = $offerwant->title;
+      }
+      $offerwant->code = ces_offerswants_get_free_code($offerwant->code, 'ces_offerwant');
+
       drupal_write_record('ces_offerwant', $offerwant);
       field_attach_insert('ces_offerwant', $offerwant);
       module_invoke_all('entity_insert', $offerwant, 'ces_offerwant');
@@ -1901,6 +1906,10 @@ class CesOffersWantsCategoryEntityController extends DrupalDefaultEntityControll
   public function save($category) {
     if (!isset($category->id)) {
       // Insert.
+      if (!isset($category->code)) {
+        $category->code = $category->title;
+      }
+      $category->code = ces_offerswants_get_free_code($category->code, 'ces_category');
       drupal_write_record('ces_category', $category);
       field_attach_insert('ces_category', $category);
       module_invoke_all('entity_insert', $category, 'ces_category');
@@ -2990,6 +2999,55 @@ function ces_offerswants_user_delete($user) {
   db_delete('ces_user_alerts')
     ->condition('user', $user->uid)
     ->execute();
+}
+
+function ces_offerswants_slugify($text)
+{
+  // replace non letter or digits by -
+  $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+
+  // transliterate
+  $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+
+  // remove unwanted characters
+  $text = preg_replace('~[^-\w]+~', '', $text);
+
+  // trim
+  $text = trim($text, '-');
+
+  // remove duplicate -
+  $text = preg_replace('~-+~', '-', $text);
+
+  // lowercase
+  $text = strtolower($text);
+
+  if (empty($text)) {
+    return 'n-a';
+  }
+
+  return $text;
+}
+
+function _ces_offerswants_code_exists($code, $table) {
+  return db_select($table, 't')
+    ->fields('t', array('id'))
+    ->condition('code', $code)
+    ->countQuery()
+    ->execute()
+    ->fetchField();
+}
+
+
+function ces_offerswants_get_free_code($text, $table) {
+  $slug = ces_offerswants_slugify($text);
+  if (_ces_offerswants_code_exists($slug, $table)) {
+    $n = 2;
+    while(_ces_offerswants_code_exists($slug . '-' . $n, $table)) {
+      $n++;
+    }
+    $slug = $slug . '-' . $n;
+  }
+  return $slug;
 }
 
 /**

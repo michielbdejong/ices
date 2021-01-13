@@ -93,8 +93,17 @@ function ces_offerswants_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'code' => array(
+        // The komunitin offer/need code or slug.
+        'type' => 'varchar',
+        'length' => 200,
+        'not null' => TRUE,
+      )
     ),
     'primary key' => array('id'),
+    'unique keys' => array(
+      'code' => array('code'),
+    ),
   );
   $schema['ces_category'] = array(
     'description' => 'Table for offers and wants categories.',
@@ -136,6 +145,12 @@ function ces_offerswants_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'code' => array(
+        // The komunitin offer/need code or slug.
+        'type' => 'varchar',
+        'length' => 200,
+        'not null' => TRUE,
+      )
     ),
     'primary key' => array('id'),
     'foreign keys' => array(
@@ -143,6 +158,9 @@ function ces_offerswants_schema() {
         'table' => 'ces_category',
         'columns' => array('parent' => 'id'),
       ),
+    ),
+    'unique keys' => array(
+      'code' => array('code'),
     ),
   );
   $schema['ces_offercomment'] = array(
@@ -438,11 +456,56 @@ function ces_offerswants_update_7103() {
 /**
  * Remove Mail System override.
  */
-function ces_offerswants_update_7104()
-{
+function ces_offerswants_update_7104() {
   $current = variable_get('mail_system', array('default-system' => 'DefaultMailSystem'));
   unset($current['ces_offerswants']);
   variable_set('mail_system', $current);
+}
+
+/**
+ * Add code to offers and needs.
+ */
+function ces_offerswants_update_7105() {
+  _ces_offerswants_add_code_field('ces_offerwant');
+}
+
+/**
+ * Add code to categories.
+ */
+function ces_offerswants_update_7106() {
+  _ces_offerswants_add_code_field('ces_category');
+}
+
+function _ces_offerswants_add_code_field($table) {
+  // 1. Add new DB field code.
+  $schema = ces_offerswants_schema();
+  $spec = $schema[$table]['fields']['code'];
+  $spec['initial'] = '';
+  db_add_field($table, 'code', $spec);
+  // 2. Populate the field.
+  $rows = db_select($table, 'o')
+    ->fields('o', ['id', 'title'])
+    ->execute();
+  //in-memory hash of slugs just to check uniqueness
+  $slugs = [];
+  foreach ($rows as $row) {
+    $slug = ces_offerswants_slugify($row->title);
+    if (isset($slugs[$slug])) {
+      $n = 2;
+      while (isset($slugs[$slug . '-' . $n])) {
+        $n++;
+      }
+      $slug = $slug . '-' . $n;
+    }
+    // got a unique slug: update db.
+    $slugs[$slug] = TRUE;
+    db_update($table)
+      ->condition('id', $row->id)
+      ->fields(['code' => $slug])
+      ->execute();
+  }
+  // 3. Add unique key.
+  db_add_unique_key($table, $table . '_unique_code', array('code'));
 }
 
 /**
