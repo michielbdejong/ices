@@ -45,22 +45,26 @@ function ces_komunitin_api_social_get_uuid($type, $id) {
 
 function ces_komunitin_api_social_get_id($uuid) {
   // Recover type.
-  $type = substr($uuid, 0, 8) . substr($uuid, 9, 4);
-  $type = trim(hex2bin($type));
-  foreach (ResourceTypes::ALL_TYPES as $item) {
-    if (substr($item, strlen($type)) == $type) { //item.startswith(type).
-      $type = $item;
+  try {
+    $type = substr($uuid, 0, 8) . substr($uuid, 9, 4);
+    $type = trim(hex2bin($type));
+    foreach (ResourceTypes::ALL_TYPES as $item) {
+      if (substr($item, strlen($type)) == $type) { //item.startswith(type).
+        $type = $item;
+      }
     }
+    // recover id
+    $id = substr($uuid, -12);
+    $id = hexdec($id);
+
+    $result = new StdClass();
+    $result->type = $type;
+    $result->id = $id;
+
+    return $result;
+  } catch (Exception $e) {
+    return FALSE;
   }
-  // recover id
-  $id = substr($uuid, -12);
-  $id = hexdec($id);
-
-  $result = new StdClass();
-  $result->type = $type;
-  $result->id = $id;
-
-  return $result;
 }
 
 function ces_komunitin_api_social_groups_read($exchange) {
@@ -208,17 +212,39 @@ function ces_komunitin_api_social_offers_load_collection($exchange, $filters, $s
 function _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filters, $sorts, $type) {
   $type = ($type == 'offer') ? 'offer' : 'want';
 
-  // Get list of category ids in exchange.
-  $categories = ces_offerswants_get_categories_ids($type, $exchange['id']);
 
   // Get the list of object ids.
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'ces_offerwant');
   $query->entityCondition('bundle', $type);
+
+  // Filter by exchange.
+  $categories = ces_offerswants_get_categories_ids($type, $exchange['id']);
   $query->propertyCondition('category', $categories, 'IN');
+
   // Active objects and not expired.
   $query->propertyCondition('state', 1);
   $query->propertyCondition('expire', REQUEST_TIME, '>');
+
+  // Apply API filtering.
+  foreach($filters as $field => $values) {
+    if ($field == 'member') {
+      if (count($values) !== 1) {
+        ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED, "Only one member filtering is supported.");
+        return;
+      }
+      $value = reset($values);
+      $obj = ces_komunitin_api_social_get_id($value);
+      if ($obj->type == 'member' && $obj->id) {
+        $query->propertyCondition('user', $obj->id);
+      } else {
+        ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Member not found.");
+      }
+    } else {
+      ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED, "Filtering other than 'filter[member]' is not supported.");
+    }
+  }
+
   $result = $query->execute();
   // Load full entities.
   if (isset($result['ces_offerwant'])) {

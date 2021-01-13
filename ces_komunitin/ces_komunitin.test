@@ -399,24 +399,19 @@ class CesKomunitinestCase extends CesBankTestCase
     $uuids = array_map(function ($offer) {
       return ces_komunitin_api_social_get_uuid(ResourceTypes::OFFER, $offer->id);
     }, $this->offers);
-    $offers = $this->listOffers($token, 'HORA', 200, $uuids);
+    $offers = $this->listOffers($token, 'HORA', [], 200, $uuids);
     // List account offers
-
+    $account1_offers = $this->listOffers($token, 'HORA', ['member' => $me->included[0]->id], 200, [$uuids[0], $uuids[1]]);
+    $account2_offers = $this->listOffers($token, 'HORA', ['member' => $account12->data->id], 200, [$uuids[2]]);
     // Get single need.
     $need = $this->getNeed($token, 'HORA', 'milk');
     // List group needs
     $uuids = array_map(function ($want) {
       return ces_komunitin_api_social_get_uuid(ResourceTypes::NEED, $want->id);
     }, $this->wants);
-    $needs = $this->listNeeds($token, 'HORA', 200, $uuids);
+    $needs = $this->listNeeds($token, 'HORA', [], 200, $uuids);
     // List account needs
-
-    // List accounts
-
-
-    // Publish offer
-    // Publish need
-
+    $account1_needs = $this->listNeeds($token, 'HORA', ['member' => $me->included[0]->id], 200, [$uuids[0]]);
   }
   protected function getGroup($token, $code, $status = 200) {
     $result = $this->request("ces/api/social/$code", $token, ['query' => ['include' => 'contacts']], [], $status);
@@ -521,19 +516,25 @@ class CesKomunitinestCase extends CesBankTestCase
       return $response;
     }
   }
-  protected function listOffers($token, $groupCode, $status = 200, $ids) {
-    $this->listOffersNeeds('offers', $token, $groupCode, $status, $ids);
+  protected function listOffers($token, $groupCode, $filters, $status = 200, $ids) {
+    return $this->listOffersNeeds('offers', $token, $groupCode, $filters, $status, $ids);
   }
-  protected function listNeeds($token, $groupCode, $status = 200, $ids)
+  protected function listNeeds($token, $groupCode, $filters, $status = 200, $ids)
   {
-    $this->listOffersNeeds('needs', $token, $groupCode, $status, $ids);
+    return $this->listOffersNeeds('needs', $token, $groupCode, $filters, $status, $ids);
   }
-  private function listOffersNeeds($type, $token, $groupCode, $status = 200, $ids) {
-    $result = $this->request("ces/api/social/$groupCode/$type", $token, ['query' => ['include' => 'category,member,member.contacts']], [], $status);
+  private function listOffersNeeds($type, $token, $groupCode, $filters = [], $status = 200, $ids) {
+    $urlargs = ['query' => ['include' => 'category,member,member.contacts']];
+    if (!empty($filters)) {
+      $urlargs['query']['filter'] = $filters;
+    }
+    $result = $this->request("ces/api/social/$groupCode/$type", $token, $urlargs, [], $status);
     if ($status == 200) {
       $response = json_decode($result->data);
       $this->assertIds($response, $ids);
+      return $response;
     }
+    return FALSE;
   }
   /**
    * HElper functin to assert the ids of a returned object collection.
