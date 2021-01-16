@@ -39,7 +39,8 @@ class Need {
 
     // Relationships
     $category = ces_category_load($resource->category);
-    $this->category = new Category($category, $exchange);
+    $group = new Group($exchange);
+    $this->category = new Category($category, $group);
     $user = user_load($resource->user);
     $this->member = new Member($user, $exchange);
   }

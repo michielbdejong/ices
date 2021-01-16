@@ -31,8 +31,7 @@ function ces_komunitin_api_accounting_transfers_read($exchange, array $transacti
     // exists or not.
     ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
   }
-
-  return new Transfer($transaction, $exchange);
+  return new Transfer($transaction, $exchange, new Currency($exchange));
 }
 
 /**
@@ -190,7 +189,7 @@ function ces_komunitin_api_accounting_accounts_read($exchange, array $account)
 {
   // Allow all authorized users to see basic account information: id, code,
   // balance, credit/debit limits for all accounts in all exchange groups.
-  return new Account($account, $exchange);
+  return new Account($account, new Currency($exchange));
 }
 
 /**
@@ -251,11 +250,12 @@ function ces_komunitin_api_accounting_transfers_load_collection($exchange, $filt
 }
 
 function ces_komunitin_api_accounting_transfers_read_collection($exchange, array $transactions) {
+  $currency = new Currency($exchange);
   $result = [];
   foreach($transactions as $transaction) {
     // Discard transactions without view access
     if (ces_transaction_access('view', $transaction)) {
-      $result[] = new Transfer($transaction, $exchange);
+      $result[] = new Transfer($transaction, $exchange, $currency);
     }
   }
   return $result;
@@ -295,8 +295,9 @@ function ces_komunitin_api_accounting_accounts_load_collection($exchange, $filte
 
 function ces_komunitin_api_accounting_accounts_read_collection($exchange, array $accounts) {
   $result = [];
+  $currency = new Currency($exchange);
   foreach($accounts as $account) {
-    $result[] = new Account($account, $exchange);
+    $result[] = new Account($account, $currency);
   }
   return $result;
 }

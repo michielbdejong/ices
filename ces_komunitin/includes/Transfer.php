@@ -81,7 +81,7 @@ class Transfer {
    *
    * @param array $transaction The ces_bank transaction record.
    */
-  function __construct($transaction, $exchange) {
+  function __construct($transaction, $exchange, Currency $currency) {
     $bank = new CesBank();
     $this->id = $transaction['uuid'];
 
@@ -93,7 +93,7 @@ class Transfer {
     $this->state = self::$states[$bank->getTransactionState($transaction)];
 
     // Amount
-    $decimals = $exchange['currencyscale'];
+    $decimals = $currency->decimals;
     $this->amount = round(pow(10, $decimals) * $bank->getTransactionAmount($transaction, $exchange));
 
     // Meta
@@ -101,14 +101,14 @@ class Transfer {
 
     // Payer
     $payer = $bank->getTransactionFromAccount($transaction);
-    $this->payer = new Account($payer, $exchange);
+    $this->payer = new Account($payer, $currency);
 
     // Payee
     $payee = $bank->getTransactionToAccount($transaction);
-    $this->payee = new Account($payee, $exchange);
+    $this->payee = new Account($payee, $currency);
 
     // Currency
-    $this->currency = new Currency($exchange);
+    $this->currency = $currency;
   }
 
 }

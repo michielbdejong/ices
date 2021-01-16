@@ -141,6 +141,23 @@ function ces_komunitin_api_social_members_read_collection($exchange, array $user
   }
 }
 
+function ces_komunitin_api_social_categories_load_collection($exchange, $filters, $sorts) {
+  // 3 means categories for both offers and wants.
+  return ces_offerswants_get_categories(3, $exchange['id']);
+}
+
+function ces_komunitin_api_social_categories_read_collection($exchange, $categories) {
+  if (ces_bank_access('view', 'exchange details', $exchange['id'])) {
+    $group = new Group($exchange);
+    $return = array_map(function ($category) use ($group) {
+      return new Category($category, $group);
+    }, $categories);
+    return $return;
+  } else {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+}
+
 function ces_komunitin_api_social_needs_load($exchange, $code) {
   $need = _ces_komunitin_api_social_offerneeds_load($code, 'need');
   return $need;
@@ -252,7 +269,7 @@ function _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filter
     $offers = ces_offerwant_load_multiple($ids);
     return $offers;
   } else {
-    ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+    return [];
   }
 }
 
@@ -263,5 +280,74 @@ function _ces_komunitin_api_social_offerneeds_load($code, $type = 'offer') {
     ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
   }
   return reset($offers);
+}
+
+function ces_komunitin_api_social_members_count($exchange) {
+  return db_select('ces_account')
+    ->fields(NULL, array('id'))
+    ->condition('exchange', $exchange['id'])
+    ->condition('kind', 4, '<')
+    ->condition('state', 1)
+    ->countQuery()
+    ->execute()
+    ->fetchField();
+}
+function ces_komunitin_api_social_needs_count($exchange) {
+  return _ces_komunitin_api_social_offersneeds_count($exchange, 'need');
+}
+function ces_komunitin_api_social_offers_count($exchange) {
+  return _ces_komunitin_api_social_offersneeds_count($exchange, 'offer');
+}
+function ces_komunitin_api_social_category_offers_count($category) {
+  return _ces_komunitin_api_social_category_offersneeds_count($category, 'offer');
+}
+function ces_komunitin_api_social_category_needs_count($category) {
+  return _ces_komunitin_api_social_category_offersneeds_count($category, 'need');
+}
+function ces_komunitin_api_social_user_needs_count($user) {
+  return _ces_komunitin_api_social_user_offersneeds_count($user, 'need');
+}
+function ces_komunitin_api_social_user_offers_count($user) {
+  return _ces_komunitin_api_social_user_offersneeds_count($user, 'offer');
+}
+function _ces_komunitin_api_social_category_offersneeds_count($category, $type) {
+  $type = $type == 'offer' ? 'offer' : 'want';
+  $count = db_select('ces_offerwant', 'o')
+    ->condition('o.category', $category->id)
+    ->condition('o.type', $type)
+    ->condition('o.state', 1)
+    ->condition('o.expire', REQUEST_TIME, '>')
+    ->countQuery()
+    ->execute()
+    ->fetchField();
+    return $count;
+}
+function _ces_komunitin_api_social_offersneeds_count($exchange, $type) {
+  $type = $type == 'offer' ? 'offer' : 'want';
+  $query = db_select('ces_offerwant', 'o');
+  $query->join('ces_category', 'c', 'o.category = c.id');
+  $count = $query->fields('o', array('id'))
+    ->condition('c.exchange', $exchange['id'])
+    ->condition('c.context', $type == 'offer' ? [1,3] : [1,2], 'IN')
+    ->condition('o.type', $type)
+    ->condition('o.state', 1)
+    ->condition('o.expire', REQUEST_TIME, '>')
+    ->countQuery()
+    ->execute()
+    ->fetchField();
+  return $count;
+}
+function _ces_komunitin_api_social_user_offersneeds_count($user, $type) {
+  $type = $type == 'offer' ? 'offer' : 'want';
+  $type = $type == 'offer' ? 'offer' : 'want';
+  $count = db_select('ces_offerwant', 'o')
+    ->condition('o.user', $user->uid)
+    ->condition('o.type', $type)
+    ->condition('o.state', 1)
+    ->condition('o.expire', REQUEST_TIME, '>')
+    ->countQuery()
+    ->execute()
+    ->fetchField();
+  return $count;
 }
 

@@ -18,8 +18,10 @@ class Category {
 
   // Relationships
   public $group;
+  public $offersCount;
+  public $needsCount;
 
-  public function __construct($category, $exchange) {
+  public function __construct($category, Group $group) {
     $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::CATEGORY, $category->id);
     $this->code = $category->code;
     $this->name = $category->title;
@@ -28,10 +30,13 @@ class Category {
     $this->icon = null;
     $this->access = 'group';
 
-    $this->group = new Group($exchange);
+    $this->group = $group;
 
     $this->created = $this->group->created;
     $this->updated = $this->created;
+
+    $this->offersCount = ces_komunitin_api_social_category_offers_count($category);
+    $this->needsCount = ces_komunitin_api_social_category_needs_count($category);
   }
 }
 
@@ -68,6 +73,16 @@ class CategorySchema extends BaseSchema {
         self::RELATIONSHIP_DATA => $category->group,
         self::RELATIONSHIP_LINKS_SELF => false,
         self::RELATIONSHIP_LINKS_RELATED => false
+      ],
+      'offers' => [
+        self::RELATIONSHIP_LINKS_SELF => false,
+        self::RELATIONSHIP_LINKS_RELATED => true,
+        self::RELATIONSHIP_META => ['count' => $category->offersCount]
+      ],
+      'needs' => [
+        self::RELATIONSHIP_LINKS_SELF => false,
+        self::RELATIONSHIP_LINKS_RELATED => true,
+        self::RELATIONSHIP_META => ['count' => $category->needsCount]
       ]
     ];
   }

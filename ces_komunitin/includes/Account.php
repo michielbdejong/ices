@@ -15,13 +15,13 @@ class Account {
   // Relatinships
   public $currency;
 
-  function __construct($account, $exchange) {
+  function __construct($account, Currency $currency) {
     // Identifier.
     $this->id = $account['uuid'];
     // Account number ABCD0123
     $this->code = $account['name'];
     // Balance
-    $decimals = $exchange['currencyscale'];
+    $decimals = $currency->decimals;
     $this->balance = round(pow(10, $decimals) * $account['balance']);
 
     // Limits. We need to retrieve the info since it doesn't come with account record.
@@ -38,7 +38,7 @@ class Account {
         }
       }
     }
-    $this->currency = new Currency($exchange);
+    $this->currency = $currency;
   }
 }
 class AccountSchema extends BaseSchema {

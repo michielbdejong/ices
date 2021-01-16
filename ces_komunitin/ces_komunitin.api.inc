@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . '/ces_komunitin.api.social.inc';
 
 require_once dirname(__FILE__) . '/includes/JsonApiRequest.php';
 require_once dirname(__FILE__) . '/includes/KomunitinApiError.php';
-
+require_once dirname(__FILE__) . '/includes/CustomFactory.php';
 // Accounting API objects
 require_once dirname(__FILE__) . '/includes/Currency.php';
 require_once dirname(__FILE__) . '/includes/Account.php';
@@ -18,9 +18,12 @@ require_once dirname(__FILE__) . '/includes/Offer.php';
 require_once dirname(__FILE__) . '/includes/Need.php';
 require_once dirname(__FILE__) . '/includes/Category.php';
 require_once dirname(__FILE__) . '/includes/User.php';
+require_once dirname(__FILE__) . '/includes/ExternalResources.php';
 
 
+use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 use Neomerx\JsonApi\Encoder\Encoder;
+use Neomerx\JsonApi\Schema\Link;
 
 function _ces_komunitin_api_get_base_path() {
   return 'ces/api';
@@ -126,8 +129,10 @@ function ces_komunitin_api() {
     $operation = $methods[$request->method];
 
     // Differentiate getting single resource from getting multiple resources.
-    if ($operation == 'read' && (($resource_id === FALSE && $type != 'groups')
-      || ($exchange === FALSE && $type == 'groups')) && isset($endpoint['%'])) {
+    $collection = ($operation == 'read' && (($resource_id === FALSE && $type != 'groups')
+      || ($exchange === FALSE && $type == 'groups')) && isset($endpoint['%']));
+
+    if ($collection) {
       $operation = 'read_collection';
     }
 
@@ -144,8 +149,16 @@ function ces_komunitin_api() {
     }
 
     // Load collection of resources.
-    if ($operation == 'read_collection') {
-      $records = ces_komunitin_api_call_function('load_collection', $api, $type, [$exchange, $request->filters, $request->sorts]);
+    if ($collection) {
+      // Pagination. We use the https://jsonapi.org/profiles/ethanresnick/cursor-pagination/ spec for pagination.
+      // However, we actually use the offset as a cursor. For perfornamce reasons we may change
+      // the cursor definition to something that allows us random access since the client uses it
+      // as an opaque string.
+
+      $pageSize = $request->pageSize;
+      $pageAfter = $request->pageAfter ?? 0;
+
+      $records = ces_komunitin_api_call_function('load_collection', $api, $type, [$exchange, $request->filters, $request->sorts, $pageAfter, $pageSize]);
       $parameters[] = $records;
     }
 
@@ -177,7 +190,7 @@ function ces_komunitin_api() {
       }
       $urlprefix = ces_komunitin_api_get_base_url() . '/' . $api;
 
-      $encoder = Encoder::instance(array(
+      $encoder = CustomFactory::newEncoder(array(
         Currency::class => CurrencySchema::class,
         Account::class => AccountSchema::class,
         Transfer::class => TransferSchema::class,
@@ -187,11 +200,20 @@ function ces_komunitin_api() {
         Offer::class => OfferSchema::class,
         Need::class => NeedSchema::class,
         Category::class => CategorySchema::class,
-        User::class => UserSchema::class
+        User::class => UserSchema::class,
+        ExternalAccount::class => ExternalAccountSchema::class,
+        ExternalCurrency::class => ExternalCurrencySchema::class,
       ))
         ->withUrlPrefix($urlprefix)
         ->withIncludedPaths($includes)
         ->withEncodeOptions(JSON_PRETTY_PRINT);
+
+      if ($collection) {
+        $next = (count($result) == $request->pageSize) ? new Link(false, $request->getNextUrl(), false) : null;
+        $encoder->withLinks([
+          LinkInterface::NEXT => $next
+        ]);
+      }
 
       $content = $encoder->encodeData($result);
       $status = $operation == 'create' ? 201 : 200;

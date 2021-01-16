@@ -34,6 +34,9 @@ class Member {
   public $account_id;
   public $account_code;
 
+  public $offersCount;
+  public $needsCount;
+
   public function __construct($user, $exchange) {
     $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $user->uid);
     // Use drupal username as komunitin user code.
@@ -105,6 +108,8 @@ class Member {
     if (ces_user_get_main_phone($user)) {
       $this->contacts[] = new Contact($user, Contact::TYPE_PHONE, $this->group->code);
     }
+    $this->offersCount = ces_komunitin_api_social_user_offers_count($user);
+    $this->needsCount = ces_komunitin_api_social_user_needs_count($user);
   }
 
 }
@@ -139,6 +144,9 @@ class MemberSchema extends BaseSchema {
 
   public function getRelationships($member, ContextInterface $context): iterable {
     assert($member instanceof Member);
+    $accountHref = ces_komunitin_api_get_base_url() . '/accounting/' . $member->group->code . '/accounts/' . $member->account_code;
+    $needsHref = ces_komunitin_api_get_base_url() . '/social/' . $member->group->code . '/needs?filter[member]=' . $member->id;
+    $offersHref = ces_komunitin_api_get_base_url() . '/social/' . $member->group->code . '/offers?filter[member]=' . $member->id;
     return [
       'group' => [
         self::RELATIONSHIP_DATA => $member->group,
@@ -146,18 +154,32 @@ class MemberSchema extends BaseSchema {
         self::RELATIONSHIP_LINKS_RELATED => false
       ],
       'account' => [
-        self::RELATIONSHIP_DATA => new Identifier($member->account_id, 'accounts'),
+        self::RELATIONSHIP_DATA => new ExternalAccount($member->account_id, 'accounts', $accountHref),
         self::RELATIONSHIP_LINKS_SELF => false,
         // Override default related link
         self::RELATIONSHIP_LINKS => [
-          LinkInterface::RELATED => new Link(false, ces_komunitin_api_get_base_url() . '/accounting/' . $member->group->code . '/accounts/' . $member->account_code, false)
-        ]
+          LinkInterface::RELATED => new Link(false, $accountHref, false)
+        ],
       ],
       'contacts' => [
         self::RELATIONSHIP_DATA => $member->contacts,
         self::RELATIONSHIP_LINKS_SELF => false,
         self::RELATIONSHIP_LINKS_RELATED => false
-      ]
+      ],
+      'needs' => [
+        self::RELATIONSHIP_LINKS_SELF => false,
+        self::RELATIONSHIP_LINKS => [
+          LinkInterface::RELATED => new Link(false, $needsHref, false)
+        ],
+        self::RELATIONSHIP_META => ['count' => $member->needsCount]
+      ],
+      'offers' => [
+        self::RELATIONSHIP_LINKS_SELF => false,
+        self::RELATIONSHIP_LINKS => [
+          LinkInterface::RELATED => new Link(false, $offersHref, false)
+        ],
+        self::RELATIONSHIP_META => ['count' => $member->offersCount]
+      ],
     ];
   }
 
