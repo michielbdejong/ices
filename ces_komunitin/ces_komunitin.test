@@ -387,8 +387,8 @@ class CesKomunitinestCase extends CesBankTestCase
     $me = $this->getUsersMe($token);
 
     // Get single member.
-    $account12 = $this->getMember($token, 'HORA', 'account12');
-    $adminhora = $this->getMember($token, 'HORA', 'adminhora');
+    $account12 = $this->getMember($token, 'HORA', 'HORA0002');
+    $adminhora = $this->getMember($token, 'HORA', 'HORA0000');
 
     // Get all exchange members.
     $members = $this->listMembers($token, 'HORA', 200, [$adminhora->data->id, $me->included[0]->id, $account12->data->id]);

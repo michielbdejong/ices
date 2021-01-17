@@ -16,7 +16,14 @@ class User {
 
   function __construct($user, $exchange) {
     $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::USER, $user->uid);
-    $this->members = [new Member($user, $exchange)];
+    $bank = new CesBank();
+    $accounts = $bank->getUserAccounts($user->uid);
+    $this->members = [];
+    $group = new Group($exchange);
+    foreach($accounts as $account) {
+      $account['user'] = $user;
+      $this->members[] = new Member($account, $group);
+    }
   }
 }
 

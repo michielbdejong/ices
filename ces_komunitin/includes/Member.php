@@ -37,32 +37,17 @@ class Member {
   public $offersCount;
   public $needsCount;
 
-  public function __construct($user, $exchange) {
-    $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $user->uid);
+  public function __construct($member, $group) {
+    $user = $member['user'];
+    $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $member['id']);
     // Use drupal username as komunitin user code.
-    $this->code = $user->name;
+    $this->code = $member['name'];
     // Only group memebrs can access member details.
     $this->access = "group";
     $this->name = ces_user_get_name($user);
 
-    $bank = new CesBank();
-    // member account
-    // Get the first account from the current exchange
-    $accounts = $bank->getUserAccounts($user->uid);
-    $account = FALSE;
-    foreach ($accounts as $candidate) {
-      if ($candidate['exchange'] == $exchange['id']) {
-        $account = $candidate;
-        break;
-      }
-    }
-    if (!$account) {
-      // Member has no account in this exchange. So we say that the member does
-      // not exist.
-      throw new Exception("Member doesn't have any account in this exchange group");
-    }
     // Member type.
-    switch($account['kind']) {
+    switch($member['kind']) {
       case CesBankLocalAccount::TYPE_INDIVIDUAL:
       case CesBankLocalAccount::TYPE_SHARED:
         $this->type = self::TYPE_PERSONAL;
@@ -80,14 +65,14 @@ class Member {
     $this->address = ces_user_get_full_address($user);
     // Get user town.
     $town = '';
-    $items = field_get_items('user', $account, 'ces_town');
+    $items = field_get_items('user', $user, 'ces_town');
     if (!empty($items)) {
       $item = reset($items);
       $town = $item['safe_value'];
     }
 
     $this->created = SchemaUtils::encodeDate($user->created);
-    $this->updated = SchemaUtils::encodeDate($account['modified']);
+    $this->updated = SchemaUtils::encodeDate($member['modified']);
 
 
     // There's no member description nor location.
@@ -99,17 +84,18 @@ class Member {
     ];
 
     // Relationships
-    $this->account_id = $account['uuid'];
-    $this->account_code = $account['name'];
-    $this->group = new Group($exchange);
+    $this->account_id = $member['uuid'];
+    $this->account_code = $member['name'];
+    $this->group = $group;
     $this->contacts = [];
     // email
     $this->contacts[] = new Contact($user, Contact::TYPE_EMAIL, $this->group->code);
     if (ces_user_get_main_phone($user)) {
       $this->contacts[] = new Contact($user, Contact::TYPE_PHONE, $this->group->code);
     }
-    $this->offersCount = ces_komunitin_api_social_user_offers_count($user);
-    $this->needsCount = ces_komunitin_api_social_user_needs_count($user);
+
+    $this->offersCount = ces_komunitin_api_social_account_offers_count($member['id'], $member['exchange']);
+    $this->needsCount = ces_komunitin_api_social_account_needs_count($member['id'], $member['exchange']);
   }
 
 }

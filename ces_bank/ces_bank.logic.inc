@@ -816,6 +816,7 @@ class CesBank {
     }
     return $accounts;
   }
+
   /**
    * Deletes an account.
    */

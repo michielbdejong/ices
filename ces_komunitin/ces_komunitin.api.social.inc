@@ -95,46 +95,55 @@ function ces_komunitin_api_social_users_read() {
   return new User($user, $exchange);
 }
 
+
 function ces_komunitin_api_social_members_load($exchange, $code) {
   // Code is the drupal user name.
-  $user = user_load_by_name($code);
-  return $user;
+  $bank = new CesBank();
+  $account = $bank->getAccountByName($code);
+  $uid = _ces_komunitin_api_social_account_user_id($account['id']);
+  $account['user'] = user_load($uid);
+  return $account;
 }
 function ces_komunitin_api_social_members_load_collection($exchange, $filters, $sorts) {
   // Get list of uids directly from database call.
-  $query = db_select('users', 'u')
-    ->fields('u', array('uid'));
-  $query->join('ces_accountuser', 'au', 'au.user = u.uid');
-  $query->join('ces_account', 'a', 'a.id = au.account');
-  $ids = $query->condition('a.exchange', $exchange['id'])
-    // discard blocked users.
-    ->condition('u.status', 1)
-    // discard inactive accounts (new, deleted).
+  $accounts = db_select('ces_account', 'a')
+    ->fields('a')
+    ->condition('a.exchange', $exchange['id'])
+    // discard inactive accounts (new, blocked or closed).
     ->condition('a.state', 1)
     // discard virtual accounts
     ->condition('a.kind', 5, '<')
-    ->distinct()
     ->execute()
-    ->fetchCol();
-  return user_load_multiple($ids);
+    ->fetchAll(PDO::FETCH_ASSOC);
+  $aids = array_map(function ($account) { return $account['id']; }, $accounts);
+  $uids = _ces_komunitin_api_social_account_user_id_multiple($aids);
+  $users = user_load_multiple($uids);
+  array_walk($accounts, function (&$value, $key) use ($users, $uids) {
+    $value['user'] = $users[$uids[$value['id']]];
+  }, $users);
+
+  return $accounts;
 }
 
-function ces_komunitin_api_social_members_read($exchange, $user) {
-  if (ces_bank_user_access('view', $user)) {
-    return new Member($user, $exchange);
+function ces_komunitin_api_social_members_read($exchange, $member) {
+  if (ces_bank_user_access('view', $member['user'])) {
+    return new Member($member, new Group($exchange));
   }
   else {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
   }
 }
 
-function ces_komunitin_api_social_members_read_collection($exchange, array $users) {
+function ces_komunitin_api_social_members_read_collection($exchange, array $members) {
   if (ces_bank_access('view', 'exchange accounts', $exchange['id'])) {
-    $members = [];
-    foreach ($users as $user) {
-      $members[] = ces_komunitin_api_social_members_read($exchange, $user);
+    $group = new Group($exchange);
+    $result = [];
+    foreach ($members as $member) {
+      if (ces_bank_user_access('view', $member['user'])) {
+        $result[] = new Member($member, $group);
+      }
     }
-    return $members;
+    return $result;
   }
   else {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
@@ -158,6 +167,99 @@ function ces_komunitin_api_social_categories_read_collection($exchange, $categor
   }
 }
 
+/*
+ * IntegralCES and Komunitin have slightly different architecture for users and
+ * accounts. IntegralCES has nxn relation between users and accounts, where offers
+ * and wants belong to users and transactions belong to members.
+ * Komunitin is simpler and defines a member with 1x1 relation to accounts. Thus
+ * in order to make the mapping between the two systems we do:
+ *
+ * 1) We define one Komunitin member for each IntegralCES account.
+ * 2) The IntegralCES user assigned to the Komunitin member is, among the users
+ * related to the account, the one with the first record in table ces_accountuser.
+ * 3) That means that a single IntegralCES user may be related to several members,
+ * and also, a user need not to have an assigned member.
+ * 4) For all objects (offers, needs) linked to an IntegralCES user, the related
+ * Komunitin member is the first account in terms of ces_accountuser such that
+ * the account is mapped to the user and the exchange of the account is the same
+ * as the exchange of the object. If no such member exists, then the objects are
+ * not linked to any Komunitin member.
+ */
+function _ces_komunitin_api_social_account_user_id($account_id) {
+  return db_select('ces_accountuser', 'au')
+    ->fields('au', ['id', 'user'])
+    ->condition('au.account', $account_id)
+    ->condition('au.privilege', 0)
+    ->orderBy('au.id')
+    ->range(0,1)
+    ->execute()
+    ->fetchField(1);
+}
+/**
+ * @see _ces_komunitin_api_social_account_user_id
+ * @return int|null
+ */
+function _ces_komunitin_api_social_user_account_id($uid, $exchangeid) {
+  $result = db_query('SELECT au.id, au.account, au.user
+    FROM {ces_accountuser} au
+    JOIN {ces_accountuser} au2 ON au.account = au2.account
+    JOIN {ces_account} a ON au2.account = a.id
+    WHERE a.exchange = :exchangeid
+    AND au2.user = :uid
+    AND au.privilege = 0
+    AND au2.privilege = 0',
+    [':uid' => $uid, ':exchangeid' => $exchangeid]
+  )->fetchAll();
+  //compute the user associated to each account.
+  $accounts = [];
+  foreach ($result as $row) {
+    if (!isset($accounts[$row->account]) || $accounts[$row->account]->id > $row->id) {
+      $accounts[$row->account] = $row;
+    }
+  }
+  // get the account that satisfies the criteria (if any).
+  $account = FALSE;
+  foreach ($accounts as $row) {
+    if ($row->user == $uid && ($account == FALSE || $account->id > $row->id)) {
+      $account = $row;
+    }
+  }
+  return $account ? $account->account : NULL;
+}
+/**
+ * Multiple version of _ces_komunitin_api_social_account_user_id. Returns an array
+ * indexed by $aids with $uid as value.
+ */
+function _ces_komunitin_api_social_account_user_id_multiple(array $aids) {
+  $result = db_query('SELECT id, user, account from {ces_accountuser}
+    WHERE account IN (:aids)
+    AND privilege = 0', [':aids' => $aids])
+  ->fetchAll();
+  $rows = [];
+  foreach($result as $row) {
+    if (!isset($rows[$row->account]) || $rows[$row->account]->id > $row->id) {
+      $rows[$row->account] = $row;
+    }
+  }
+  $uids = [];
+  foreach ($aids as $aid) {
+    $uids[$aid] = isset($rows[$aid]) ? $rows[$aid]->user : NULL;
+  }
+  return $uids;
+}
+
+
+function _ces_komunitin_api_social_user_member($uid, $exchangeid) {
+  $id = _ces_komunitin_api_social_user_account_id($uid, $exchangeid);
+  if ($id == NULL) return NULL;
+
+  $bank = new CesBank();
+  $account = $bank->getAccount($id);
+  $account['user'] = user_load($uid);
+  $account['uid'] = $uid;
+  return $account;
+}
+
 function ces_komunitin_api_social_needs_load($exchange, $code) {
   $need = _ces_komunitin_api_social_offerneeds_load($code, 'need');
   return $need;
@@ -168,7 +270,10 @@ function ces_komunitin_api_social_needs_load_collection($exchange, $filters, $so
 
 function ces_komunitin_api_social_needs_read($exchange, $need) {
   if (ces_offerwant_access('view', $need)) {
-    return new Need($need, $exchange);
+    $group = new Group($exchange);
+    $category = new Category(ces_category_load($need->category), $group);
+    $member = new Member(_ces_komunitin_api_social_user_member($need->user, $exchange['id']), $group);
+    return new Need($need, $member, $group, $category);
   }
   else {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
@@ -178,11 +283,14 @@ function ces_komunitin_api_social_needs_read_collection($exchange, $needs)
 {
   // General access check.
   if (ces_bank_access('view', 'exchange details', $exchange['id'])) {
+    $group = new Group($exchange);
     $result = [];
     foreach ($needs as $need) {
       // Resource by resource access check.
       if (ces_offerwant_access('view', $need)) {
-        $result[] = new Need($need, $exchange);
+        $category = new Category(ces_category_load($need->category), $group);
+        $member = new Member(_ces_komunitin_api_social_user_member($need->user, $exchange['id']), $group);
+        $result[] =  new Need($need, $member, $group, $category);
       }
     }
     return $result;
@@ -194,7 +302,10 @@ function ces_komunitin_api_social_needs_read_collection($exchange, $needs)
 
 function ces_komunitin_api_social_offers_read($exchange, $offer){
   if (ces_offerwant_access('view', $offer)) {
-    return new Offer($offer, $exchange);
+    $group = new Group($exchange);
+    $category = new Category(ces_category_load($offer->category), $group);
+    $member = new Member(_ces_komunitin_api_social_user_member($offer->user, $exchange['id']), $group);
+    return new Offer($offer, $member, $group, $category);
   }
   else {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
@@ -204,11 +315,14 @@ function ces_komunitin_api_social_offers_read($exchange, $offer){
 function ces_komunitin_api_social_offers_read_collection($exchange, $offers) {
   // General access check.
   if (ces_bank_access('view', 'exchange details', $exchange['id'])) {
+    $group = new Group($exchange);
     $result = [];
     foreach ($offers as $offer) {
       // Resource by resource access check.
       if (ces_offerwant_access('view', $offer)) {
-        $result[] = new Offer($offer, $exchange);
+        $category = new Category(ces_category_load($offer->category), $group);
+        $member = new Member(_ces_komunitin_api_social_user_member($offer->user, $exchange['id']), $group);
+        $result[] = new Offer($offer, $member, $group, $category);
       }
     }
     return $result;
@@ -253,7 +367,16 @@ function _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filter
       $value = reset($values);
       $obj = ces_komunitin_api_social_get_id($value);
       if ($obj->type == 'member' && $obj->id) {
-        $query->propertyCondition('user', $obj->id);
+        // Check whether this account is the default account for any user.
+        $uid = _ces_komunitin_api_social_account_user_id($obj->id);
+        $aid = _ces_komunitin_api_social_user_account_id($uid, $exchange['id']);
+        if ($aid == $obj->id) {
+          $query->propertyCondition('user', $uid);
+        } else {
+          // This member is related to an account that is not the default account
+          // for any user, so it doesn't have related resources.
+          return [];
+        }
       } else {
         ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Member not found.");
       }
@@ -304,15 +427,16 @@ function ces_komunitin_api_social_category_offers_count($category) {
 function ces_komunitin_api_social_category_needs_count($category) {
   return _ces_komunitin_api_social_category_offersneeds_count($category, 'need');
 }
-function ces_komunitin_api_social_user_needs_count($user) {
-  return _ces_komunitin_api_social_user_offersneeds_count($user, 'need');
+function ces_komunitin_api_social_account_needs_count($account_id, $exchange_id) {
+  return _ces_komunitin_api_social_account_offersneeds_count($account_id, $exchange_id, 'need');
 }
-function ces_komunitin_api_social_user_offers_count($user) {
-  return _ces_komunitin_api_social_user_offersneeds_count($user, 'offer');
+function ces_komunitin_api_social_account_offers_count($account_id, $exchange_id) {
+  return _ces_komunitin_api_social_account_offersneeds_count($account_id, $exchange_id, 'offer');
 }
 function _ces_komunitin_api_social_category_offersneeds_count($category, $type) {
   $type = $type == 'offer' ? 'offer' : 'want';
   $count = db_select('ces_offerwant', 'o')
+    ->fields('o', ['id'])
     ->condition('o.category', $category->id)
     ->condition('o.type', $type)
     ->condition('o.state', 1)
@@ -320,7 +444,7 @@ function _ces_komunitin_api_social_category_offersneeds_count($category, $type) 
     ->countQuery()
     ->execute()
     ->fetchField();
-    return $count;
+  return $count;
 }
 function _ces_komunitin_api_social_offersneeds_count($exchange, $type) {
   $type = $type == 'offer' ? 'offer' : 'want';
@@ -337,17 +461,26 @@ function _ces_komunitin_api_social_offersneeds_count($exchange, $type) {
     ->fetchField();
   return $count;
 }
-function _ces_komunitin_api_social_user_offersneeds_count($user, $type) {
+function _ces_komunitin_api_social_account_offersneeds_count($account_id, $exchange_id, $type) {
   $type = $type == 'offer' ? 'offer' : 'want';
-  $type = $type == 'offer' ? 'offer' : 'want';
-  $count = db_select('ces_offerwant', 'o')
-    ->condition('o.user', $user->uid)
+  $uid = _ces_komunitin_api_social_account_user_id($account_id);
+  $aid = _ces_komunitin_api_social_user_account_id($uid, $exchange_id);
+  if ($aid == $account_id) {
+    $query = db_select('ces_offerwant', 'o')
+      ->fields('o', ['id']);
+    $query->join('ces_category', 'c', 'o.category = c.id');
+    $count = $query
+    ->condition('c.exchange', $exchange_id)
+    ->condition('o.user', $uid)
     ->condition('o.type', $type)
     ->condition('o.state', 1)
     ->condition('o.expire', REQUEST_TIME, '>')
     ->countQuery()
     ->execute()
     ->fetchField();
-  return $count;
+    return $count;
+  } else {
+    return 0;
+  }
 }
 

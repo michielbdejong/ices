@@ -20,8 +20,8 @@ class Need {
   public $category;
   public $member;
 
-  public function __construct($resource, $exchange) {
-    $this->groupCode = $exchange['code'];
+  public function __construct($resource, Member $member, Group $group, Category $category) {
+    $this->groupCode = $group->code;
     $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::NEED, $resource->id);
     // Attributes
     $this->code = $resource->code;
@@ -38,11 +38,8 @@ class Need {
     $this->updated = SchemaUtils::encodeDate($resource->modified);
 
     // Relationships
-    $category = ces_category_load($resource->category);
-    $group = new Group($exchange);
-    $this->category = new Category($category, $group);
-    $user = user_load($resource->user);
-    $this->member = new Member($user, $exchange);
+    $this->category = $category;
+    $this->member = $member;
   }
 
 
