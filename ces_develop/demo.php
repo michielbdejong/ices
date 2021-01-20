@@ -147,6 +147,7 @@ $offers = array(array(
   'modified' => time(),
   'expire' => time() + 3600 * 24 * 365,
   'rate' => '0.2',
+  'image' => 'cow-milk.jpg'
   ),
   array(
     'type' => 'offer',
@@ -160,6 +161,7 @@ $offers = array(array(
     'modified' => time(),
     'expire' => time() + 3600 * 24 * 365,
     'rate' => '1h/hour',
+    'image' => 'bike-mechanic.jpg'
   ),
   array(
     'type' => 'offer',
@@ -173,11 +175,12 @@ $offers = array(array(
     'modified' => time(),
     'expire' => time() + 3600 * 24 * 365,
     'rate' => '0.40',
+    'image' => 'natural-soap.jpg'
   ),
   array(
     'type' => 'offer',
     'user' => $users['Gauss']->uid,
-    'title' => 'Cow\'s milk',
+    'title' => 'Sheep milk',
     'body' => 'Natural sheep\'s milk. Probably the best you\'ve ever tasted.',
     'category' => $categories[$net2['id']]['Food']->id,
     'keywords' => '',
@@ -186,6 +189,7 @@ $offers = array(array(
     'modified' => time(),
     'expire' => time() + 3600 * 24 * 365,
     'rate' => '2.5',
+    'image' => 'sheep-milk.jpg',
   ),
   array(
     'type' => 'offer',
@@ -199,6 +203,7 @@ $offers = array(array(
     'modified' => time(),
     'expire' => time() + 3600 * 24 * 365,
     'rate' => 'it depends',
+    'image' => 'car-mechanic.jpg',
   ),
   array(
     'type' => 'offer',
@@ -217,7 +222,21 @@ foreach ($offers as $offer) {
   $o = (object) $offer;
   $o->ces_offer_rate = array(LANGUAGE_NONE => array(array('value' => $offer['rate'])));
   unset($o->rate);
-  ces_offerwant_save($o);
+  $o = ces_offerwant_save($o);
+
+  // add picture.
+  if (!empty($offer['image'])) {
+    $data = file_get_contents(dirname(__FILE__) . '/assets/' . $offer['image']);
+    if ($data) {
+      $directory = file_default_scheme() . '://' . variable_get('ces_offerswants_picture_path', 'ces_offerswants_pictures');
+      file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+      $destination = file_stream_wrapper_uri_normalize($directory . '/picture-' . $o->id . '-' . REQUEST_TIME . '.jpg');
+      $file = file_save_data($data, $destination, FILE_EXISTS_REPLACE);
+      file_usage_add($file, 'ces_offerswants', 'ces_offerwant', $o->id);
+      $o->image = $file->fid;
+      ces_offerwant_save($o);
+    }
+  }
   $offers_demo[] = $o;
 }
 // Blog posts.

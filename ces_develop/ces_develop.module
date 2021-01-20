@@ -112,7 +112,17 @@ function ces_develop_register_user($name) {
     drupal_form_submit('user_register_form', $form_state);
   }
   // Activate user.
-  return user_load_by_name($name);
+  $user = user_load_by_name($name);
+
+  // Set image
+  $data = file_get_contents(dirname(__FILE__) . '/assets/' . $name . '.jpg');
+  if ($data) {
+    $file = file_save_data($data, 'public://' . $name . '.jpg', FILE_EXISTS_REPLACE);
+    $edit = [];
+    $edit['picture'] = $file;
+    user_save($user, $edit);
+  }
+  return $user;
 }
 /**
  * Create new bank account.

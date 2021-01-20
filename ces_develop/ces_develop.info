@@ -9,4 +9,4 @@ dependencies[] = ces_message
 dependencies[] = ces_komunitin
 dependencies[] = oauth2_server
 
-version = "7.x-1.18"
+version = "7.x-1.23"
