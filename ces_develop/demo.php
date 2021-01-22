@@ -129,7 +129,7 @@ foreach ($exchanges as $e) {
       'title' => $c,
       'description' => $c,
       'exchange' => $e['id'],
-      'context' => 1,
+      'context' => 3,
     );
     $categories[$e['id']][$c] = ces_category_save((object) $cat);
   }
@@ -217,11 +217,37 @@ $offers = array(array(
     'modified' => time(),
     'expire' => time() + 3600 * 24 * 365,
     'rate' => '6ECO each',
+  ),
+  array(
+    'type'=> 'want',
+    'user' => $users['Fermat']->uid,
+    'title' => 'Wider margin',
+    'body' => 'I have a proof of a remarkable theorem I\'d like to share with you. But this margin is too narrow, so I need a book with wider margin so I can write down the proof.',
+    'category' => $categories[$net2['id']]['Education']->id,
+    'keywords' => 'flt',
+    'state' => 1,
+    'created' => time(),
+    'modified' => time(),
+    'expire' => time() + 3600 * 24 * 15,
+  ),
+  array(
+    'type' => 'want',
+    'user' => $users['Gauss']->uid,
+    'title' => 'Writing assistant',
+    'body' => 'I have plenty of ideas but I don\'t like to write too much, so I need an assistant to write down the details of my ideas on Mathematics and Physics.',
+    'category' => $categories[$net1['id']]['Education']->id,
+    'keywords' => '',
+    'state' => 1,
+    'created' => time(),
+    'modified' => time(),
+    'expire' => time() + 3600 * 24 * 15,
   ));
 foreach ($offers as $offer) {
   $o = (object) $offer;
-  $o->ces_offer_rate = array(LANGUAGE_NONE => array(array('value' => $offer['rate'])));
-  unset($o->rate);
+  if (!empty($offer['rate'])) {
+    $o->ces_offer_rate = array(LANGUAGE_NONE => array(array('value' => $offer['rate'])));
+    unset($o->rate);
+  }
   $o = ces_offerwant_save($o);
 
   // add picture.
