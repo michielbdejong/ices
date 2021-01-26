@@ -2579,6 +2579,7 @@ function ces_bank_uploadtransactions_confirm_form($form, &$form_state) {
     '#type' => 'submit',
     '#value' => t('Confirm all transactions'),
     '#submit' => array('ces_bank_uploadtransactions_confirm_form_submit'),
+    '#limit_validation_errors' => array(),
   );
   return $form;
 }
