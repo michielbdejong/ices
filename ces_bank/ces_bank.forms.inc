@@ -1727,7 +1727,7 @@ function ces_bank_transaction_form($form, &$form_state, $op, $arg, $to_account_i
         '#type' => 'value',
         '#value' => $fromaccount['name'],
       );
-      $content_info = '<p>' . 
+      $content_info = '<p>' .
           '<b>' . t('Account') . ':</b> ' . $fromaccount['name'] .
           '</p>'.
           '<p>'.
@@ -2429,6 +2429,182 @@ function ces_bank_multipletransactions_confirm_form_submit($form, &$form_state) 
    . l(t('your account statement'), 'ces/bank/account/transaction') . '.');
   $form_state['redirect'] = 'ces/bank/account/sell';
 }
+function ces_bank_uploadtransactions_form($form, &$form_state) {
+  if (isset($form_state['values']['page']) && $form_state['values']['page'] == 'confirm') {
+    return ces_bank_uploadtransactions_confirm_form($form, $form_state);
+  }
+  $form = [];
+  $form['info'] = array(
+    '#markup' => '<p>' . t('Upload a CSV file with the following columns: SELLER, BUYER, CONCEPT, AMOUNT') . '</p>',
+  );
+  $form['file'] = array(
+    '#title' => t('Transactions CSV file'),
+    '#type'  => 'file',
+    '#description' => t('Comma separated value (CSV) file (export from any spreadsheet app) with exactly 4 columns in order: SELLER, BUYER, CONCEPT, AMOUNT. The AMOUNT column must not have the currency unit and it is specified in seller echange currency.'),
+  );
+  $form['#attributes']['enctype'] = 'multipart/form-data';
+  $form['header_line'] = array(
+    '#title' => t('First line contains headers'),
+    '#type' => 'checkbox',
+    '#description' => t('Check it to discard the first line of the file.'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Create transactions'),
+    '#weight' => 100,
+  );
+  return $form;
+}
+
+function ces_bank_uploadtransactions_form_validate($form, &$form_state) {
+  $file = file_save_upload('file', [
+    'file_validate_extensions' => ['csv CSV txt TXT'], // Validate extensions.
+    FILE_EXISTS_REPLACE], 'temporary://');
+  if ($file) {
+    $i = 1;
+    $handle = fopen($file->uri, 'r');
+    if ($form_state['values']['header_line']) {
+      $headers = fgetcsv($handle);
+      $i++;
+    }
+    $form_state['transactions'] = [];
+    $bank = new CesBank();
+    while ($line = fgetcsv($handle)) {
+      $toaccountname = $line[0];
+      $toaccount = $bank->getAccountByName($toaccountname);
+      if (!$toaccount || $toaccount['state'] != 1) {
+        form_set_error('file', t('Error in line @n. Invalid seller @a.', ['@n' => $i, '@a' => $toaccountname]));
+        continue;
+      }
+      $fromaccountname = $line[1];
+      $fromaccount = $bank->getAccountByName($fromaccountname);
+      if (!$fromaccount || $fromaccount['state'] != 1) {
+        form_set_error('file', t('Error in line @n. Invalid buyer @a.', ['@n' => $i, '@a' => $fromaccountname]));
+        continue;
+      }
+      $concept = trim($line[2]);
+      if (empty($concept)) {
+        form_set_error('file', t('Error in line @n. Concept can not be empty.', ['@n' => $i]));
+        continue;
+      }
+      $amount = $line['3'];
+      if (!is_numeric($amount) || $amount < 0.0) {
+        form_set_error('file' . $i, t('Error in line @n. Invalid amount "@a".', ['@n' => $i, '@a' => $amount]));
+        continue;
+      }
+      global $user;
+      $transaction = array(
+        'toaccount' => $toaccount['id'],
+        'fromaccount' => $fromaccount['id'],
+        'amount' => $amount,
+        'concept' => $concept,
+        'user' => $user->uid,
+      );
+      if (!ces_transaction_access('use', $transaction)) {
+        form_set_error('file', t("Error in line @n. You don't have permission to apply this transaction.", ['@n' => $i]));
+        continue;
+      }
+
+      $form_state['transactions'][] = $transaction;
+      $i++;
+    }
+  } else {
+    form_set_error('file', t("Could not upload file."));
+  }
+}
+
+function ces_bank_uploadtransactions_form_submit($form, &$form_state) {
+  $form_state['values']['page'] = 'confirm';
+  $form_state['rebuild'] = TRUE;
+}
+
+function ces_bank_uploadtransactions_confirm_form($form, &$form_state) {
+  $form = [];
+  $form['transaction_fieldset'] = array(
+    '#prefix' => '<table class="ces-table" style="margin:20px 0;"><thead><tr><th></th><th>' . t('Seller') . '</th><th>' . t('Buyer') . '</th><th>' . t('Concept') . '</th><th>' . t('Amount') . '</th></tr></thead><tbody>',
+    '#suffix' => '</tbody></table>',
+    '#type' => 'fieldset',
+    '#attributes' => array('class' => array('element-invisible')),
+  );
+  $bank = new CesBank();
+  $i = 1;
+  foreach($form_state['transactions'] as $transaction) {
+    $row = [];
+
+    $toaccount = $bank->getAccount($transaction['toaccount']);
+    $accuser = reset($toaccount['users']);
+    $username = ces_user_get_name(user_load($accuser['user']));
+    $row[] = [
+      '#type' => 'item',
+      '#prefix' => '<tr style="border-top:1px dotted #ccc;"><td style="padding: 5px 0;">' . $i . '</td><td>',
+      '#suffix' => '</td>',
+      '#markup' => $toaccount['name'] . ' - ' . $username,
+    ];
+
+    $fromaccount = $bank->getAccount($transaction['fromaccount']);
+    $accuser = reset($fromaccount['users']);
+    $username = ces_user_get_name(user_load($accuser['user']));
+    $row[] = [
+      '#type' => 'item',
+      '#prefix' => '<td>',
+      '#suffix' => '</td>',
+      '#markup' => $fromaccount['name'] . ' - ' . $username,
+    ];
+
+    $row[] = [
+      '#type' => 'item',
+      '#prefix' => '<td>',
+      '#suffix' => '</td>',
+      '#markup' => $transaction['concept'],
+    ];
+    $exchange = $bank->getExchange($toaccount['exchange']);
+    $amount = $bank->formatAmount($transaction['amount'], $exchange, TRUE);
+
+    $row[] = [
+      '#type' => 'item',
+      '#prefix' => '<td>',
+      '#suffix' => '</td></tr>',
+      '#markup' => $amount,
+    ];
+    $form['transaction_fieldset'][] = $row;
+    $i++;
+  }
+  $form['back'] = array(
+    '#type' => 'submit',
+    '#value' => t('Back'),
+    '#submit' => array('ces_bank_uploadtransactions_confirm_form_back'),
+    '#limit_validation_errors' => array(),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Confirm all transactions'),
+    '#submit' => array('ces_bank_uploadtransactions_confirm_form_submit'),
+  );
+  return $form;
+}
+
+function ces_bank_uploadtransactions_confirm_form_back($form, &$form_state) {
+  $form_state['values']['page'] = 'edit';
+  $form_state['rebuild'] = TRUE;
+}
+
+function ces_bank_uploadtransactions_confirm_form_submit($form, &$form_state) {
+  $bank = new CesBank();
+  foreach($form_state['transactions'] as $transaction) {
+    try {
+      $bank->createTransaction($transaction);
+      $result = $bank->applyTransaction($transaction['id']);
+      _ces_bank_set_transaction_message($result, $transaction);
+    }catch (Exception $e) {
+      drupal_set_message($e->getMEssage(), 'error');
+    }
+  }
+  drupal_set_message(t('All transactions have been properly registered. For more information, see') . ' '
+    . l(t('your account statement'), 'ces/bank/account/transaction') . '.');
+  $form_state['redirect'] = 'ces/bank/account/sell/upload';
+
+}
+
 /**
  * Form to delete a transaction permanently.
  */

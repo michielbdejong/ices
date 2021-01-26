@@ -390,6 +390,18 @@ function ces_bank_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 1,
   );
+  $menu['ces/bank/account/sell/upload'] = array(
+    'title' => 'Upload file',
+    'description' => 'Upload a file with the list of transactions to perform.',
+    'page callbank' => 'drupal_get_form',
+    'page arguments' => array('ces_bank_uploadtransactions_form'),
+    'file' => 'ces_bank.forms.inc',
+    'file path' => drupal_get_path('module', 'ces_bank'),
+    'access callback' => 'ces_bank_access',
+    'access arguments' => array('use', 'account seller', CES_BANK_CURRENT_ACCOUNT),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
   $menu['ces/bank/exchangeaccounts/autocomplete/%'] = array(
     'title' => 'Autocomplete for accounts in a exchange',
     'description' => 'Autocomplete for accounts in a exchange.',
