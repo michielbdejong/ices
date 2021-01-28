@@ -478,10 +478,12 @@ function ces_offerswants_update_7106() {
 
 function _ces_offerswants_add_code_field($table) {
   // 1. Add new DB field code.
-  $schema = ces_offerswants_schema();
-  $spec = $schema[$table]['fields']['code'];
-  $spec['initial'] = '';
-  db_add_field($table, 'code', $spec);
+  if (!db_field_exists($table, 'code')) {
+    $schema = ces_offerswants_schema();
+    $spec = $schema[$table]['fields']['code'];
+    $spec['initial'] = '';
+    db_add_field($table, 'code', $spec);
+  }
   // 2. Populate the field.
   $rows = db_select($table, 'o')
     ->fields('o', ['id', 'title'])
@@ -504,8 +506,11 @@ function _ces_offerswants_add_code_field($table) {
       ->fields(['code' => $slug])
       ->execute();
   }
-  // 3. Add unique key.
-  db_add_unique_key($table, $table . '_unique_code', array('code'));
+  // 3. Add index.
+  $index_name = $table . '_unique_code';
+  if (!db_index_exists($table, $index_name)) {
+    db_add_unique_key($table, $index_name, array('code'));
+  }
 }
 
 /**

@@ -3022,6 +3022,10 @@ function ces_offerswants_slugify($text)
   // lowercase
   $text = strtolower($text);
 
+  // max 120 chars long.
+  $text = substr($text, 0, 120);
+  $text  = trim($text, '-');
+
   if (empty($text)) {
     return 'n-a';
   }
