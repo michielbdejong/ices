@@ -256,7 +256,7 @@ class CesBank {
    */
   public function getAllExchanges(array $conditions = array('state' => 1)) {
     $s = new IcesSerializer('CesBankExchange');
-    $exchanges = $s->loadCollection($conditions);
+    $exchanges = $s->loadCollection($conditions, 'name');
     $records = array();
     $as = new IcesSerializer('CesBankLocalAccount');
     foreach ($exchanges as $exchange) {

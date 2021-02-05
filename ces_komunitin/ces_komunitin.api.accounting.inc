@@ -203,7 +203,7 @@ function ces_komunitin_api_accounting_accounts_read($exchange, array $account)
  * @return array of transaction records.
  *
  */
-function ces_komunitin_api_accounting_transfers_load_collection($exchange, $filters, $sorts) {
+function ces_komunitin_api_accounting_transfers_load_collection($exchange, $filters, $sorts, $pageAfter, $pageSize) {
   try {
     $bank = new CesBank();
 
@@ -230,14 +230,23 @@ function ces_komunitin_api_accounting_transfers_load_collection($exchange, $filt
     $order_field = 'created';
     $order_type = 'ASC';
     foreach ($sorts as $field => $isAsc) {
-      if ($field === 'updated') {
+      if ($field == 'updated') {
         $order_field = 'modified';
         $order_type = $isAsc ? 'ASC' : 'DESC';
       }
+      else if ($field == 'created') {
+        $order_field = 'created';
+        $order_type = $isAsc ? 'ASC' : 'DESC';
+
+      }
       else {
-        ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED, "Ordering field other than 'updated' is not supported.");
+        ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED, "Ordering field other than 'updated' or 'created' is not supported.");
       }
     }
+
+    // Pagination
+    $conditions['limit'] = $pageSize;
+    $conditions['offset'] = $pageAfter;
 
     // Run getTransactions() funtion.
     $records = $bank->getTransactions($conditions, $order_field, $order_type);
@@ -267,7 +276,7 @@ function ces_komunitin_api_accounting_currency_read($exchange) {
 }
 
 
-function ces_komunitin_api_accounting_accounts_load_collection($exchange, $filters, $sorts) {
+function ces_komunitin_api_accounting_accounts_load_collection($exchange, $filters, $sorts, $pageAfter, $pageSize) {
   $bank = new CesBank();
   $conditions = [];
 
@@ -290,6 +299,10 @@ function ces_komunitin_api_accounting_accounts_load_collection($exchange, $filte
     // which is correctly interpreted as en IN clause.
     $conditions[$field] = $value;
   }
+  // Pagination.
+  $conditions['limit'] = $pageSize;
+  $conditions['offset'] = $pageAfter;
+
   return $bank->getAllAccounts($conditions);
 }
 

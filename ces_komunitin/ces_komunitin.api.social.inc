@@ -71,11 +71,16 @@ function ces_komunitin_api_social_groups_read($exchange) {
   return new Group($exchange);
 }
 
-function ces_komunitin_api_social_groups_load_collection($exchange, $filters, $sorts) {
+function ces_komunitin_api_social_groups_load_collection($exchange, $filters, $sorts, $pageAfter, $pageSize) {
   $bank = new CesBank();
 
   // Only active excahnges.
   $conditions = array('state' => 1);
+
+  //Pagination
+  $conditions['offset'] = $pageAfter;
+  $conditions['limit'] = $pageSize;
+
   $exchanges = $bank->getAllExchanges($conditions);
   return $exchanges;
 }
@@ -104,15 +109,19 @@ function ces_komunitin_api_social_members_load($exchange, $code) {
   $account['user'] = user_load($uid);
   return $account;
 }
-function ces_komunitin_api_social_members_load_collection($exchange, $filters, $sorts) {
+function ces_komunitin_api_social_members_load_collection($exchange, $filters, $sorts, $pageAfter, $pageSize) {
   // Get list of uids directly from database call.
   $accounts = db_select('ces_account', 'a')
     ->fields('a')
     ->condition('a.exchange', $exchange['id'])
     // discard inactive accounts (new, blocked or closed).
     ->condition('a.state', 1)
-    // discard virtual accounts
+    // discard virtual accounts.
     ->condition('a.kind', 5, '<')
+    // Pagination.
+    ->range($pageAfter, $pageSize)
+    //default order
+    ->orderBy('a.name', 'ASC')
     ->execute()
     ->fetchAll(PDO::FETCH_ASSOC);
   $aids = array_map(function ($account) { return $account['id']; }, $accounts);
@@ -264,8 +273,8 @@ function ces_komunitin_api_social_needs_load($exchange, $code) {
   $need = _ces_komunitin_api_social_offerneeds_load($code, 'need');
   return $need;
 }
-function ces_komunitin_api_social_needs_load_collection($exchange, $filters, $sorts) {
-  return _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filters, $sorts, 'need');
+function ces_komunitin_api_social_needs_load_collection($exchange, $filters, $sorts, $pageAfter, $pageSize) {
+  return _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filters, $sorts, 'need', $pageAfter, $pageSize);
 }
 
 function ces_komunitin_api_social_needs_read($exchange, $need) {
@@ -336,13 +345,12 @@ function ces_komunitin_api_social_offers_load($exchange, $code) {
   return $offer;
 }
 
-function ces_komunitin_api_social_offers_load_collection($exchange, $filters, $sorts) {
-  return _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filters, $sorts, 'offer');
+function ces_komunitin_api_social_offers_load_collection($exchange, $filters, $sorts, $pageAfter, $pageSize) {
+  return _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filters, $sorts, 'offer', $pageAfter, $pageSize);
 }
 
-function _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filters, $sorts, $type) {
+function _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filters, $sorts, $type, $pageAfter, $pageSize) {
   $type = ($type == 'offer') ? 'offer' : 'want';
-
 
   // Get the list of object ids.
   $query = new EntityFieldQuery();
@@ -384,6 +392,11 @@ function _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filter
       ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED, "Filtering other than 'filter[member]' is not supported.");
     }
   }
+  // Default order by
+  $query->propertyOrderBy('modified', 'DESC');
+
+  // Pagination
+  $query->range($pageAfter, $pageSize);
 
   $result = $query->execute();
   // Load full entities.

@@ -399,19 +399,29 @@ class CesKomunitinestCase extends CesBankTestCase
     $uuids = array_map(function ($offer) {
       return ces_komunitin_api_social_get_uuid(ResourceTypes::OFFER, $offer->id);
     }, $this->offers);
-    $offers = $this->listOffers($token, 'HORA', [], 200, $uuids);
+    $offers = $this->listOffers($token, 'HORA', [], [], 200, $uuids);
     // List account offers
-    $account1_offers = $this->listOffers($token, 'HORA', ['member' => $me->included[0]->id], 200, [$uuids[0], $uuids[1]]);
-    $account2_offers = $this->listOffers($token, 'HORA', ['member' => $account12->data->id], 200, [$uuids[2]]);
+    $account1_offers = $this->listOffers($token, 'HORA', ['member' => $me->included[0]->id], [], 200, [$uuids[0], $uuids[1]]);
+    $account2_offers = $this->listOffers($token, 'HORA', ['member' => $account12->data->id], [], 200, [$uuids[2]]);
+    // Offers pagination
+    $result = $this->listOffers($token, 'HORA', [], ['after' => 0, 'size' => 2], 200, [$uuids[0], $uuids[1]]);
+    $next = $result->links->next;
+    $this->assert(strpos($next, rawurlencode('page[size]') . '=2') !== FALSE, 'Unexpected next link: ' . $next);
+    $this->assert(strpos($next, rawurlencode('page[after]') . '=2') !== FALSE, 'Unexpected next link' . $next);
+    $result = $this->listOffers($token, 'HORA', [], ['after' => 2, 'size' => 2], 200, [$uuids[2]]);
+    $next = $result->links->next;
+    $this->assertEqual($next, null);
+
     // Get single need.
     $need = $this->getNeed($token, 'HORA', 'milk');
     // List group needs
     $uuids = array_map(function ($want) {
       return ces_komunitin_api_social_get_uuid(ResourceTypes::NEED, $want->id);
     }, $this->wants);
-    $needs = $this->listNeeds($token, 'HORA', [], 200, $uuids);
+    $needs = $this->listNeeds($token, 'HORA', [], [], 200, $uuids);
     // List account needs
-    $account1_needs = $this->listNeeds($token, 'HORA', ['member' => $me->included[0]->id], 200, [$uuids[0]]);
+    $account1_needs = $this->listNeeds($token, 'HORA', ['member' => $me->included[0]->id], [], 200, [$uuids[0]]);
+
   }
   protected function getGroup($token, $code, $status = 200) {
     $result = $this->request("ces/api/social/$code", $token, ['query' => ['include' => 'contacts']], [], $status);
@@ -516,17 +526,20 @@ class CesKomunitinestCase extends CesBankTestCase
       return $response;
     }
   }
-  protected function listOffers($token, $groupCode, $filters, $status = 200, $ids) {
-    return $this->listOffersNeeds('offers', $token, $groupCode, $filters, $status, $ids);
+  protected function listOffers($token, $groupCode, $filters, $page, $status = 200, $ids) {
+    return $this->listOffersNeeds('offers', $token, $groupCode, $filters, $page, $status, $ids);
   }
-  protected function listNeeds($token, $groupCode, $filters, $status = 200, $ids)
+  protected function listNeeds($token, $groupCode, $filters, $page, $status = 200, $ids)
   {
-    return $this->listOffersNeeds('needs', $token, $groupCode, $filters, $status, $ids);
+    return $this->listOffersNeeds('needs', $token, $groupCode, $filters, $page, $status, $ids);
   }
-  private function listOffersNeeds($type, $token, $groupCode, $filters = [], $status = 200, $ids) {
+  private function listOffersNeeds($type, $token, $groupCode, $filters = [], $page = [], $status = 200, $ids) {
     $urlargs = ['query' => ['include' => 'category,member,member.contacts']];
     if (!empty($filters)) {
       $urlargs['query']['filter'] = $filters;
+    }
+    if (!empty($page)) {
+      $urlargs['query']['page'] = $page;
     }
     $result = $this->request("ces/api/social/$groupCode/$type", $token, $urlargs, [], $status);
     if ($status == 200) {

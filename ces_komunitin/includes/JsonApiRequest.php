@@ -36,10 +36,10 @@ class JsonApiRequest {
     $this->path = mb_substr($_GET['q'], mb_strlen($base_path . '/'));
 
     $parser = new BaseQueryParser($_GET);
-    $this->includes = $parser->getIncludes();
-    $this->fields = $parser->getFields();
-    $this->sorts = $parser->getSorts();
-    $this->filters = $this->getFilters();
+    $this->includes = array_map(iterator_to_array, iterator_to_array($parser->getIncludes()));
+    $this->fields = array_map(iterator_to_array, iterator_to_array($parser->getFields()));
+    $this->sorts = iterator_to_array($parser->getSorts());
+    $this->filters = iterator_to_array($this->getFilters());
 
     $page = $this->getPage();
     $this->pageSize = $page['size'] ?? self::DEFAULT_PAGE_SIZE;
@@ -94,18 +94,18 @@ class JsonApiRequest {
     $query = [];
     if ($this->includes) {
       $query['include'] = implode(",", array_map(function($item){
-        return implode(".", iterator_to_array($item));
-      }, iterator_to_array($this->includes)));
+        return implode(".", $item);
+      }, $this->includes));
     }
     if ($this->fields) {
       $query['field'] = array_map(function($item) {
-        return implode(",", iterator_to_array($item));
-      }, iterator_to_array($this->fields));
+        return implode(",", $item);
+      }, $this->fields);
     }
     if ($this->filters) {
       $query['filter'] = array_map(function($item) {
         return implode(",", $item);
-      }, iterator_to_array($this->filters));
+      }, $this->filters);
     }
     if ($this->sorts) {
       $sorts = [];

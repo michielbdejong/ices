@@ -214,8 +214,11 @@ class IcesSerializer {
       unset($conditions['join']);
     }
     if (isset($conditions['limit'])) {
-      $query->range(0, $conditions['limit']);
+      $limit = $conditions['limit'];
+      $offset = $conditions['offset'] ?? 0;
+      $query->range($offset, $limit);
       unset($conditions['limit']);
+      unset($conditions['offset']);
     }
     if (isset($conditions['or'])) {
       $orcondition = db_or();
