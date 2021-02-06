@@ -36,8 +36,12 @@ class JsonApiRequest {
     $this->path = mb_substr($_GET['q'], mb_strlen($base_path . '/'));
 
     $parser = new BaseQueryParser($_GET);
-    $this->includes = array_map(iterator_to_array, iterator_to_array($parser->getIncludes()));
-    $this->fields = array_map(iterator_to_array, iterator_to_array($parser->getFields()));
+    $this->includes = array_map(function ($item) {
+      return iterator_to_array($item);
+    }, iterator_to_array($parser->getIncludes()));
+    $this->fields = array_map(function ($item) {
+      return iterator_to_array($item);
+    }, iterator_to_array($parser->getFields()));
     $this->sorts = iterator_to_array($parser->getSorts());
     $this->filters = iterator_to_array($this->getFilters());
 

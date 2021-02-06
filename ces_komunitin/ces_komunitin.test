@@ -51,7 +51,7 @@ class CesKomunitinestCase extends CesBankTestCase
     $this->createExchanges();
     $this->createAccounts();
     // Now we are ready to test the Komunitin API.
-    //$this->doAccountingApi();
+    $this->doAccountingApi();
     $this->createSocialData();
     $this->doSocialApi();
   }
@@ -206,7 +206,7 @@ class CesKomunitinestCase extends CesBankTestCase
     if (!empty($includes)) {
       $query['include'] = implode(",", $includes);
     }
-    $result = $this->request('ces/api/accounting/' . $exchange_id . '/transfers/' . $id, $token, ['query' => $query], $status);
+    $result = $this->request('ces/api/accounting/' . $exchange_id . '/transfers/' . $id, $token, ['query' => $query], [], $status);
 
     $this->assertEqual($result->headers['content-type'], "application/vnd.api+json");
     $response = json_decode($result->data);

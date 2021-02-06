@@ -141,7 +141,8 @@ function ces_komunitin_api_accounting_transfers_create($exchange, $body) {
 
   // 3. Return transaction.
   $transaction = $bank->getTransaction($transaction['id']);
-  return new Transfer($transaction, $exchange);
+  $currency = new Currency($exchange);
+  return new Transfer($transaction, $exchange, $currency);
 }
 
 /**
