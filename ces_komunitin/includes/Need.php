@@ -2,6 +2,7 @@
 
 use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
 use Neomerx\JsonApi\Schema\BaseSchema;
+use League\HTMLToMarkdown\HtmlConverter;
 
 class Need {
   public $groupCode;
@@ -25,7 +26,9 @@ class Need {
     $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::NEED, $resource->id);
     // Attributes
     $this->code = $resource->code;
-    $this->content = $resource->body;
+    $converter = new HtmlConverter();
+    $markdown = $converter->convert($resource->body);
+    $this->content = $markdown;
     $this->images = [];
     if ($resource->image) {
       $file = file_load($resource->image);
