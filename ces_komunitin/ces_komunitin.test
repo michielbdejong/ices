@@ -391,24 +391,24 @@ class CesKomunitinestCase extends CesBankTestCase
     $adminhora = $this->getMember($token, 'HORA', 'HORA0000');
 
     // Get all exchange members.
-    $members = $this->listMembers($token, 'HORA', 200, [$adminhora->data->id, $me->included[0]->id, $account12->data->id]);
+    $members = $this->listMembers($token, 'HORA', [], 200, [$adminhora->data->id, $me->included[0]->id, $account12->data->id]);
 
     // Get single offer.
     $offer = $this->getOffer($token, 'HORA', 'potatoes');
     // List group offers
-    $uuids = array_map(function ($offer) {
+    $ouuids = array_map(function ($offer) {
       return ces_komunitin_api_social_get_uuid(ResourceTypes::OFFER, $offer->id);
     }, $this->offers);
-    $offers = $this->listOffers($token, 'HORA', [], [], 200, $uuids);
+    $offers = $this->listOffers($token, 'HORA', [], [], 200, $ouuids);
     // List account offers
-    $account1_offers = $this->listOffers($token, 'HORA', ['member' => $me->included[0]->id], [], 200, [$uuids[0], $uuids[1]]);
-    $account2_offers = $this->listOffers($token, 'HORA', ['member' => $account12->data->id], [], 200, [$uuids[2]]);
+    $account1_offers = $this->listOffers($token, 'HORA', ['member' => $me->included[0]->id], [], 200, [$ouuids[0], $ouuids[1]]);
+    $account2_offers = $this->listOffers($token, 'HORA', ['member' => $account12->data->id], [], 200, [$ouuids[2]]);
     // Offers pagination
-    $result = $this->listOffers($token, 'HORA', [], ['after' => 0, 'size' => 2], 200, [$uuids[0], $uuids[1]]);
+    $result = $this->listOffers($token, 'HORA', [], ['after' => 0, 'size' => 2], 200, [$ouuids[0], $ouuids[1]]);
     $next = $result->links->next;
     $this->assert(strpos($next, rawurlencode('page[size]') . '=2') !== FALSE, 'Unexpected next link: ' . $next);
     $this->assert(strpos($next, rawurlencode('page[after]') . '=2') !== FALSE, 'Unexpected next link' . $next);
-    $result = $this->listOffers($token, 'HORA', [], ['after' => 2, 'size' => 2], 200, [$uuids[2]]);
+    $result = $this->listOffers($token, 'HORA', [], ['after' => 2, 'size' => 2], 200, [$ouuids[2]]);
     $next = $result->links->next;
     $this->assertEqual($next, null);
 
@@ -421,6 +421,11 @@ class CesKomunitinestCase extends CesBankTestCase
     $needs = $this->listNeeds($token, 'HORA', [], [], 200, $uuids);
     // List account needs
     $account1_needs = $this->listNeeds($token, 'HORA', ['member' => $me->included[0]->id], [], 200, [$uuids[0]]);
+
+    // Search members
+    $this->listMembers($token, 'HORA', ['search' => 'John'], 200, [$me->included[0]->id]);
+    // Search offers
+    $this->listOffers($token, 'HORA', ['search' => 'cheese'], [], 200, [$ouuids[0]]);
 
   }
   protected function getGroup($token, $code, $status = 200) {
@@ -498,8 +503,13 @@ class CesKomunitinestCase extends CesBankTestCase
       return $response;
     }
   }
-  protected function listMembers($token, $groupCode, $status = 200, $ids = null) {
-    $result = $this->request("ces/api/social/$groupCode/members", $token, ['query' => ['include' => 'contacts']], [], $status);
+  protected function listMembers($token, $groupCode, $filters = [], $status = 200, $ids = null) {
+    $urlargs = ['query' => ['include' => 'contacts']];
+    if (!empty($filters)) {
+      $urlargs['query']['filter'] = $filters;
+    }
+
+    $result = $this->request("ces/api/social/$groupCode/members", $token, $urlargs, [], $status);
     if ($status == 200) {
       $response = json_decode($result->data);
       $this->assertIds($response, $ids);
