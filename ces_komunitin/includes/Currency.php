@@ -73,7 +73,7 @@ class CurrencySchema extends BaseSchema {
    */
   protected function getSelfSubUrl($resource): string
   {
-    return $resource->code . '/currency';
+    return '/' . $resource->code . '/currency';
   }
 
 }

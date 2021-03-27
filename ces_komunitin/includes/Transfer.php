@@ -166,6 +166,6 @@ class TransferSchema extends BaseSchema {
 
   protected function getSelfSubUrl($resource): string
   {
-    return $resource->currency->code . '/' .$this->getResourcesSubUrl() . '/' . $resource->id;;
+    return '/' . $resource->currency->code . $this->getResourcesSubUrl() . '/' . $resource->id;;
   }
 }
