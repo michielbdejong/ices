@@ -160,6 +160,17 @@ function ces_komunitin_api_social_members_load_collection($exchange, $filters, $
         );
       }
     }
+    else if ($field == 'account') {
+      if (count($values) == 1) {
+        $query->condition('a.uuid', $values[0]);
+      }
+      else  {
+        $query->condition('a.uuid', $values, 'IN');
+      }
+    }
+    else {
+      ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED, "Filtering other than 'account' or 'search' is not supported.");
+    }
   }
 
   $query
