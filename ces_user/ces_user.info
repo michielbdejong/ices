@@ -3,4 +3,8 @@ description = Add some fields to the standard user profile and an api to access 
 core = 7.x
 package = ices
 dependencies[] = ices
-version = "7.x-1.18"
+dependencies[] = geofield
+dependencies[] = geocoder
+
+version = "7.x-1.24"
+

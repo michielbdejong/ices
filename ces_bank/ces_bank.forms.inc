@@ -176,6 +176,7 @@ function ces_bank_exchange_form($form, &$form_state, $op, $exchange_id = NULL) {
     '#required' => FALSE,
     '#maxlength' => 200,
   );
+
   $languages = language_list('enabled');
   $lang_options = array();
   foreach ($languages[1] as $lang) {

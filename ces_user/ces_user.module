@@ -691,6 +691,18 @@ function ces_user_admin() {
   );
   return system_settings_form($form);
 }
+
+function ces_user_entity_property_info_alter(&$info) {
+  $info['user']['bundles']['user']['properties']['ces_full_address'] = array(
+    'type' => 'text',
+    'label' => 'Full adress (from other fields)',
+    'getter callback' => 'ces_user_full_address',
+  );
+}
+
+function ces_user_full_address($entity, $options, $field, $entity_type, $property) {
+  return ces_user_get_full_address($entity);
+}
 /**
  * @}
  */
