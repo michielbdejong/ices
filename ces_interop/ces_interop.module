@@ -1184,6 +1184,7 @@ function ces_interop_cenip() {
         ces_interop_send_httpquery('200 OK ', $receipt);
       }
       catch (Exception $e) {
+        watchdog_exception('ces_interop', $e);
         ces_interop_cenip_error(CES_INTEROP_CEN_ERR_SERVER_ERROR, $txid);
       }
     }
@@ -1250,6 +1251,7 @@ function ces_interop_cenip() {
     }
   }
   catch (Exception $e) {
+    watchdog_exception('ces_interop', $e);
     ces_interop_cenip_error(CES_INTEROP_CEN_ERR_SERVER_ERROR, $txid);
   }
 }
