@@ -256,7 +256,30 @@ function ces_message_menu() {
 
   return $items;
 }
+/*
+ * Get the exchange id and populate the $params['exchange'] from message params.
+ *
+ * This is not really neat, but it does not worse the situation and solves a bu
+ * with remote CENIP transactions.
+*/
+function _ces_message_get_exchange_from_message_params(&$params) {
 
+  if (!isset($params['exchange'])) {
+    if (isset($params['account'])) {
+      $params['exchange'] = ces_bank_get_exchange($params['account']['exchange']);
+    } elseif (isset($params['transaction']['fromaccount'])) {
+      $params['exchange'] = ces_bank_get_exchange_by_name(substr($params['transaction']['fromaccount'], 0, 4));
+    } else {
+      $params['exchange'] = ces_bank_get_current_exchange();
+    }
+  }
+
+  if (!empty($params['exchange'])) {
+    return $params['exchange']['id'];
+  } else {
+    return FALSE;
+  }
+}
 /**
  * Get a template.
  *
@@ -275,7 +298,7 @@ function ces_message_menu() {
  * @param int $exchange_id
  *   Id of exchange.
  */
-function ces_message_get_template($action, $language, $exchange_id = FALSE) {
+function ces_message_get_template($action, $language, $exchange_id) {
 
   $record = FALSE;
 
@@ -343,26 +366,7 @@ function ces_message_get_template($action, $language, $exchange_id = FALSE) {
  */
 function ces_message_send_notify($action, $params, $recipient = array(), $sender_id = FALSE, $mail = TRUE) {
 
-  // If not contain exchange, we seek.
-  if (!isset($params['exchange'])) {
-    if (isset($params['account'])) {
-      $params['exchange'] = ces_bank_get_exchange($params['account']['exchange']);
-    }
-    elseif (isset($params['transaction']['fromaccount'])) {
-      $params['exchange'] = ces_bank_get_exchange_by_name(substr($params['transaction']['fromaccount'], 0, 4));
-    }
-    else {
-      $params['exchange'] = ces_bank_get_current_exchange();
-    }
-  }
-
-  if (!empty($params['exchange'])) {
-    $exchange_id = $params['exchange']['id'];
-  }
-  else {
-    trigger_error(t('Undefined exchange.'), E_USER_ERROR);
-    return FALSE;
-  }
+  $exchange_id = _ces_message_get_exchange_from_message_params($params);
 
   foreach ($recipient as $user_recipient_id) {
     $user_recipient = user_load($user_recipient_id);
@@ -407,7 +411,8 @@ function ces_message_mail($key, &$message, $params) {
     $message['language'] :
     language_default();
 
-  $template = ces_message_get_template($key, $language);
+  $exchange_id = _ces_message_get_exchange_from_message_params($params);
+  $template = ces_message_get_template($key, $language, $exchange_id);
 
   if (!$template) {
     drupal_set_message(t('Error processing message template.'));
