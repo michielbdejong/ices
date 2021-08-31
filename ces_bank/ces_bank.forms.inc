@@ -1550,6 +1550,7 @@ function ces_bank_newuser_form_submit($form, &$form_state) {
   $newaccount['users'][0]['user'] = intval($form_state['values']['uid']);
   $newaccount['state'] = 1;
   $bank->createAccount($newaccount);
+  $bank->activateAccount($newaccount);
   $form_state['redirect'] = 'ces/admin/account';
 }
 
