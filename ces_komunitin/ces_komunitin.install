@@ -9,14 +9,17 @@
  * **/
 function _ces_komunitin_get_scopes() {
   return array(
-    // KOounitin scopes.
+    // Komunitin scopes for users.
     'komunitin_social' => 'Manage exchange group membership, offers, needs...',
     'komunitin_accounting' => 'Manage account, perform transactions, accept transactions...',
-    // OpenId scopes.
+    // OpenId scopes for users.
     'openid' => 'Know your user information',
     'offline_access' => "Access the API when you're not present.",
     'email' => 'View your email address.',
-    'profile' => 'View basic information about your account.'
+    'profile' => 'View basic information about your account.',
+    // Komunitin scopes for services.
+    'komunitin_social_read_all' => 'Read all objects from social api, for service accounts.',
+    'komunitin_accounting_read_all' => 'Read all objects from accounting api, for service accounts.',
   );
 }
 /**
@@ -41,6 +44,7 @@ function ces_komunitin_install() {
       'authorization_code' => 'authorization_code',
       'refresh_token' => 'refresh_token',
       'password' => 'password',
+      'client_credentials' => 'client_credentials'
     ),
     'always_issue_new_refresh_token' => TRUE,
     'id_lifetime' => 3600,
@@ -71,6 +75,20 @@ function ces_komunitin_install() {
   $client->automatic_authorization=FALSE;
   $client->save();
 
+  // Create OAuth2 client for Notifications app.
+  $notifications_client_id = getenv('NOTIFICATIONS_CLIENT_ID');
+  $notifications_client_secret = getenv('NOTIFICATIONS_CLIENT_SECRET');
+
+  $client = entity_create('oauth2_server_client', array());
+  $client->server = $server->name;
+  $client->client_key = $notifications_client_id;
+  $client->client_secret = oauth2_server_hash_client_secret($notifications_client_secret);
+  $client->label = 'notifications-service';
+  $client->redirect_uri = "http://localhost:2028";
+  $client->automatic_authorization = FALSE;
+  $client->save();
+
+
 }
 
 /**
@@ -80,13 +98,22 @@ function ces_komunitin_uninstall() {
   // Delete scopes.
   $scopes = _ces_komunitin_get_scopes();
   foreach ($scopes as $name => $description) {
-    $scope = oauth2_server_scope_load('komunitin', $name);
-    entity_delete('oauth2_server_scope', $scope->identifier());
+    if ($scope = oauth2_server_scope_load('komunitin', $name)) {
+      entity_delete('oauth2_server_scope', $scope->identifier());
+    }
   }
-  // Delete client.
-  $client = oauth2_server_client_load('komunitin', 'komunitin-app');
-  entity_delete('oauth2_server_client', $client);
+  // Delete client komunitin-app.
+  if ($client = oauth2_server_client_load('komunitin', 'komunitin-app')) {
+    entity_delete('oauth2_server_client', $client->identifier());
+  }
+
+  // Delete client notifications-service.
+  $notifications_client_id = getenv('NOTIFICATIONS_CLIENT_ID');
+  if ($client = oauth2_server_client_load('komunitin', $notifications_client_id)) {
+    entity_delete('oauth2_server_client', $client->identifier());
+  }
   // Delete server.
-  $server = oauth2_server_load('komunitin');
-  entity_delete('oauth2_server', $server);
+  if ($server = oauth2_server_load('komunitin')) {
+    entity_delete('oauth2_server', $server->identifier());
+  }
 }

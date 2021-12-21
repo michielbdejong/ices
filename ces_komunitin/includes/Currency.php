@@ -24,9 +24,9 @@ class Currency {
     $this->name = $exchange['currencyname'];
     $this->namePlural = $exchange['currenciesname'];
     $this->symbol = $exchange['currencysymbol'];
-    $this->decimals = $exchange['currencyscale'];
-    $this->scale = $exchange['currencyscale'];
-    $this->value = round(pow(10, 6) * $exchange['currencyvalue']);
+    $this->decimals = intval($exchange['currencyscale']);
+    $this->scale = intval($exchange['currencyscale']);
+    $this->value = intval(round(pow(10, 6) * $exchange['currencyvalue']));
   }
 }
 

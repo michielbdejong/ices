@@ -8,3 +8,7 @@ services:
       - type: bind
         source: .
         target: /var/www/html/sites/all/modules/ices
+    environment:
+      - NOTIFICATIONS_CLIENT_ID=notifications-service
+      - NOTIFICATIONS_CLIENT_SECRET=komunitin
+
