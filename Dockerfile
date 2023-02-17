@@ -45,7 +45,7 @@ COPY . sites/all/modules/ices
 RUN git clone --branch 7.x-1.x https://git.drupalcode.org/sandbox/esteve-1866046.git sites/all/themes/greences
 
 # download libraries.
-RUN git clone --branch master --depth 1 https://github.com/bshaffer/oauth2-server-php.git sites/all/libraries/oauth2-server-php && \
+RUN git clone --branch main --depth 1 https://github.com/bshaffer/oauth2-server-php.git sites/all/libraries/oauth2-server-php && \
   git clone --branch master  --depth 1 https://github.com/neomerx/json-api.git sites/all/libraries/json-api && \
   git clone --branch master  --depth 1 https://github.com/thephpleague/html-to-markdown.git sites/all/libraries/html-to-markdown
 
