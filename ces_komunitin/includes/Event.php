@@ -19,9 +19,10 @@ class Event {
   const TRANSACTION_COMMITTED = 'TransactionCommitted';
 
   function __construct($event, ExternalTransfer $transfer) {
+    global $base_url;
     $this->id = isset($event['id']) ? $event['id'] : null;
     $this->name = $event['name'];
-    $this->source = $CGG->wwwroot;
+    $this->source = $base_url;
     $this->time = SchemaUtils::encodeDate(time());
     $this->code = $event['code'];
     $this->transfer = $transfer;
