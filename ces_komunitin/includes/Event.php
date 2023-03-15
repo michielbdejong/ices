@@ -31,7 +31,7 @@ class Event {
 
 class EventSchema extends BaseSchema {
   public function getType(): string {
-    return 'transfers';
+    return 'events';
   }
   public function getId($event): ?string {
     assert($event instanceof Event);
