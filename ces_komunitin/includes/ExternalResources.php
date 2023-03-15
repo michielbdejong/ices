@@ -62,3 +62,11 @@ class ExternalCurrencySchema extends ExternalResourceSchema {
     return "currencies";
   }
 };
+
+class ExternalTransfer extends ExternalResource{};
+class ExternalTransferSchema extends ExternalResourceSchema {
+  public function getType(): string {
+    return "transfers";
+  }
+
+}

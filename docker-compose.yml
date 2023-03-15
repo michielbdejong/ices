@@ -11,4 +11,5 @@ services:
     environment:
       - NOTIFICATIONS_CLIENT_ID=notifications-service
       - NOTIFICATIONS_CLIENT_SECRET=komunitin
+      - NOTIFICATIONS_API_URL=http://localhost:2028
 

@@ -399,6 +399,9 @@ function ces_message_send_notify($action, $params, $recipient = array(), $sender
       drupal_mail('ces_message', 'ces_message ' . $action, $user_recipient->mail, $language, $params);
     }
 
+    // Invoke hook on ces_komunitin module (if enabled) so it can send the event
+    // to the komunitin notifications service.
+    module_invoke('ces_komunitin', 'notification', $action, $exchange_id, $user_recipient_id, $params, $sender_id);
   }
 }
 /**

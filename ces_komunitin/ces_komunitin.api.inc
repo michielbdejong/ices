@@ -20,6 +20,8 @@ require_once dirname(__FILE__) . '/includes/Category.php';
 require_once dirname(__FILE__) . '/includes/User.php';
 require_once dirname(__FILE__) . '/includes/ExternalResources.php';
 
+//Notification API objects
+require_once dirname(__FILE__) . '/includes/Event.php';
 
 use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 use Neomerx\JsonApi\Encoder\Encoder;
