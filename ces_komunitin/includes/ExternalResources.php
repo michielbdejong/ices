@@ -41,7 +41,10 @@ abstract class ExternalResourceSchema extends BaseSchema {
     return TRUE;
   }
   public function getResourceMeta($resource) {
-    return ['external' => TRUE];
+    return [
+      'external' => TRUE,
+      'href' => $resource->href
+    ];
   }
   public function getSelfLink($resource): LinkInterface {
     return new Link(false, $resource->href, false);
