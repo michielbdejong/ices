@@ -37,7 +37,7 @@ function ces_komunitin_notification_event($action, $exchange_id, $user_recipient
     $externalTransfer = new ExternalTransfer($transfer_id, 'transfers', $transferHref);
 
     $data = [
-      'name' => Event::TRANSACTION_COMMITTED,
+      'name' => Event::TRANSFER_COMMITTED,
       'code' => $code,
     ];
 

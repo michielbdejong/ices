@@ -16,7 +16,7 @@ class Event {
   // Relationships
   public $transfer;
 
-  const TRANSACTION_COMMITTED = 'TransactionCommitted';
+  const TRANSFER_COMMITTED = 'TransferCommitted';
 
   function __construct($event, ExternalTransfer $transfer) {
     global $base_url;
