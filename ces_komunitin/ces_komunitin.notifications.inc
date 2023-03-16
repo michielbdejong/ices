@@ -32,7 +32,8 @@ function ces_komunitin_notification_event($action, $exchange_id, $user_recipient
     $transaction = $bank->getTransaction($params['transaction']['id']);
     $transfer_id = $transaction['uuid'];
 
-    $transferHref = ces_komunitin_api_get_base_url() . '/accounting/' . $code . '/transfers/' . $transfer_id;
+    $urlPrefix = ces_komunitin_api_get_base_url() . '/accounting';
+    $transferHref = $urlPrefix . '/' . $code . '/transfers/' . $transfer_id;
     $externalTransfer = new ExternalTransfer($transfer_id, 'transfers', $transferHref);
 
     $data = [
@@ -45,7 +46,8 @@ function ces_komunitin_notification_event($action, $exchange_id, $user_recipient
     $content = CustomFactory::newEncoder(array(
       Event::class => EventSchema::class,
       ExternalTransfer::class => ExternalTransferSchema::class
-    ))->encodeData($event);
+    ))->withUrlPrefix($urlPrefix)
+      ->encodeData($event);
 
     // Send payload to notifications service.
     $notifications_url = getenv('NOTIFICATIONS_API_URL');
@@ -62,7 +64,8 @@ function ces_komunitin_notification_event($action, $exchange_id, $user_recipient
       'data' => $content
     ]);
     if (isset($result->error)) {
-      watchdog('ces_komunitin', $result->error, [], WATCHDOG_ERROR);
+      watchdog('ces_komunitin', $result->code . ' ' . $result->error . '. ' . $result->data, [], WATCHDOG_ERROR);
+      watchdog('ces_komunitin', "Sent: \n" . $content, [], WATCHDOG_DEBUG);
     }
   }
 }
