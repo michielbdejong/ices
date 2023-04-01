@@ -25,13 +25,14 @@ function ces_komunitin_api_accounting_transfers_load($exchange, $id) {
  * @return Transfer
  */
 function ces_komunitin_api_accounting_transfers_read($exchange, array $transaction) {
-  if (!ces_transaction_access('view', $transaction)) {
-    // Return a 404 Not found error when the user does not have access to READ
-    // the resource. This way we don't disclose whether the record actually
-    // exists or not.
-    ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+  if (ces_komunitin_api_client_access('komunitin_accounting_read_all')
+    || ces_transaction_access('view', $transaction)) {
+    return new Transfer($transaction, $exchange, new Currency($exchange));
   }
-  return new Transfer($transaction, $exchange, new Currency($exchange));
+  // Return a 404 Not found error when the user does not have access to READ
+  // the resource. This way we don't disclose whether the record actually
+  // exists or not.
+  ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
 }
 
 /**
@@ -43,7 +44,6 @@ function ces_komunitin_api_accounting_transfers_read($exchange, array $transacti
  */
 function ces_komunitin_api_accounting_transfers_create($exchange, $body) {
   // 1. Validation.
-
   // 1.1 Root object.
   if (!isset($body->data)) {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
@@ -150,7 +150,7 @@ function ces_komunitin_api_accounting_transfers_create($exchange, $body) {
  */
 function ces_komunitin_api_accounting_transfers_delete($exchange, array $transaction) {
   // Check access.
-  if (!ces_transaction_access('edit', $transaction)) {
+  if (!(ces_transaction_access('edit', $transaction))) {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
   }
   // Delete transaction.

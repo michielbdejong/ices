@@ -160,6 +160,17 @@ function ces_komunitin_api_social_members_load_collection($exchange, $filters, $
         );
       }
     }
+    else if ($field == 'account') {
+      if (count($values) == 1) {
+        $query->condition('a.uuid', $values[0]);
+      }
+      else  {
+        $query->condition('a.uuid', $values, 'IN');
+      }
+    }
+    else {
+      ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED, "Filtering other than 'account' or 'search' is not supported.");
+    }
   }
 
   $query
@@ -179,7 +190,9 @@ function ces_komunitin_api_social_members_load_collection($exchange, $filters, $
 }
 
 function ces_komunitin_api_social_members_read($exchange, $member) {
-  if (ces_bank_user_access('view', $member['user'])) {
+  if (ces_komunitin_api_client_access('komunitin_social_read_all') ||
+    ces_bank_user_access('view', $member['user'])) {
+
     return new Member($member, new Group($exchange));
   }
   else {
@@ -188,11 +201,12 @@ function ces_komunitin_api_social_members_read($exchange, $member) {
 }
 
 function ces_komunitin_api_social_members_read_collection($exchange, array $members) {
-  if (ces_bank_access('view', 'exchange accounts', $exchange['id'])) {
+  $client_access = ces_komunitin_api_client_access('komunitin_social_read_all');
+  if ($client_access || ces_bank_access('view', 'exchange accounts', $exchange['id'])) {
     $group = new Group($exchange);
     $result = [];
     foreach ($members as $member) {
-      if (ces_bank_user_access('view', $member['user'])) {
+      if ($client_access || ces_bank_user_access('view', $member['user'])) {
         $result[] = new Member($member, $group);
       }
     }

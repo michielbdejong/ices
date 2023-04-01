@@ -72,3 +72,12 @@ function ces_komunitin_libraries_info()
   );
   return $libraries;
 }
+
+/**
+ * Implements hook_notification invoked by function ces_message_send_notify at
+ * ces_message/ces_message.module.
+ */
+function ces_komunitin_notification($action, $exchange_id, $user_recipient_id, $params, $sender_id = false) {
+  module_load_include('inc', 'ces_komunitin', 'ces_komunitin.notifications');
+  ces_komunitin_notification_event($action, $exchange_id, $user_recipient_id, $params, $sender_id);
+}

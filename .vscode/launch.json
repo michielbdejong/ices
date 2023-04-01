@@ -13,6 +13,7 @@
                 "/var/www/html/sites/all/modules/oauth2_server": "C:\\Users\\Personal\\projects\\ices\\.debug\\oauth2_server",
                 "/var/www/html/sites/all/libraries/oauth2-server-php": "C:\\Users\\Personal\\projects\\ices\\.debug\\oauth2-server-php",
                 "/var/www/html/sites/all/libraries/json-api": "C:\\Users\\Personal\\projects\\ices\\.debug\\json-api",
+                "/var/www/html/sites/all/modules/entity": "C:\\Users\\Personal\\projects\\ices\\.debug\\entity",
                 "/var/www/html/sites/all/modules/ices": "${workspaceRoot}",
                 "/var/www/html/": "${workspaceRoot}/.debug/drupal-7.69",
             },

@@ -1833,6 +1833,52 @@ function ces_bank_views_pre_render(&$view) {
     $view->result = $view_noduplicates;
   }
 }
+
+/**
+ * Implements hook_cron().
+ */
+function ces_bank_cron() {
+  // Automatically accept transactions.
+  $expiry_period = 60 * 60 * 24 * 15; // 15 days.
+  $expiry_time = time() - $expiry_period;
+  $query = db_query(
+    "SELECT t.id, t.fromaccount
+    FROM {ces_transaction} t
+    WHERE t.state = :triggered AND t.modified < :expiry",
+    array(
+      ':triggered' => CesBankTransactionInterface::STATE_TRIGGERED,
+      ':expiry' => $expiry_time
+    )
+  );
+  $num = $query->rowCount();
+  if ($num > 0) {
+    $queue = DrupalQueue::get('ces_bank_accept_transaction');
+    foreach ($query as $t) {
+      $queue->createItem($t);
+    }
+    watchdog('cron', 'Enqueued @num expired transaction(s) to be automatically accepted.', array('@num' => $num));
+  }
+}
+/**
+ * Implements hook_cron_queue_info().
+ */
+function ces_bank_cron_queue_info() {
+  $queues['ces_bank_accept_transaction'] = array(
+    'worker callback' => 'ces_bank_accept_transaction'
+  );
+  return $queues;
+}
+
+function ces_bank_accept_transaction($t) {
+  $bank = new CesBank();
+  try {
+    $bank->acceptTransaction($t->id, $t->fromaccount);
+    watchdog('cron', 'Automatically accepted expired transaction @trans', array('@trans' => $t->id));
+  } catch (Exception $e) {
+    // Could not accept transaction
+    watchdog_exception('ces_bank', $e);
+  }
+}
 /**
  * @}
  */

@@ -20,6 +20,8 @@ require_once dirname(__FILE__) . '/includes/Category.php';
 require_once dirname(__FILE__) . '/includes/User.php';
 require_once dirname(__FILE__) . '/includes/ExternalResources.php';
 
+//Notification API objects
+require_once dirname(__FILE__) . '/includes/Event.php';
 
 use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 use Neomerx\JsonApi\Encoder\Encoder;
@@ -43,17 +45,37 @@ function ces_komunitin_api() {
     $api = reset($path);
 
     // Log in with the token.
-    $token = oauth2_server_check_access('komunitin', 'komunitin_' . $api);
+    $token = oauth2_server_check_access('komunitin');
+    // Broad authorization check. Individual operations may perform additional
+    // checks. It is required to provide either:
+    //  - user credentials with komunitin_social or komunitin_accounting scope.
+    //  - client credentials with komunitin_social_read_all or ç
+    //    komunitin_accounting_read_all scope for read operations.
+    //  - nothing, for read operations on public endpoints.
+
+    // Unauthenticated request
     if ($token instanceof OAuth2\Response) {
-      // Unauthenticated request, check if it is to a public endpoint and quick return otherwise.
+      // Check if it is to a public endpoint and quick return otherwise.
       if (!($request->method == 'GET' && ces_komunitin_api_is_public_endpoint($path))) {
         $error_code = $token->getStatusCode() == 403 ?
           KomunitinApiError::FORBIDDEN : KomunitinApiError::UNAUTHORIZED;
         ces_komunitin_api_send_error($error_code);
       }
-    } else {
-      // Login user identified by Authorization header token.
-      $user = user_load($token['user_id']);
+    // Authenticated request carrying user credentials.
+    } else if ($token['user_id'] && ces_komunitin_api_client_access('komunitin_' . $api)) {
+        // Login user identified by Authorization header token.
+        $user = user_load($token['user_id']);
+    // Authenticated request carrying client credentials for GET request.
+    } else if (
+      !$token['user_id'] &&
+      ces_komunitin_api_client_access('komunitin_' . $api . '_read_all') &&
+      $request->method == 'GET'
+    ) {
+      $user = user_load(0);
+    }
+    // Insuficcient scope.
+    else {
+      ces_komunitin_api_send_error(KomunitinApiError::UNAUTHORIZED);
     }
 
     // Parse request.
@@ -362,4 +384,13 @@ function _ces_komunitin_api_http_status_text($code) {
 function ces_komunitin_api_check_valid_uuid($uuid) {
   return (is_string($uuid) &&
     (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $uuid)));
+}
+/**
+ * Check if the given scope is granted for the current request.
+ * @param string $scope space separated list of OAuth2 scopes.
+ * @return boolean
+ */
+function ces_komunitin_api_client_access($scope) {
+  $token = oauth2_server_check_access('komunitin', $scope);
+  return !($token instanceof OAuth2\Response);
 }

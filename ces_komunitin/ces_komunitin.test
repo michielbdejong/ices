@@ -69,9 +69,9 @@ class CesKomunitinestCase extends CesBankTestCase
     $hora2 = $this->getAccount($token, 'HORA', 'HORA0002');
 
     // List accounts
-    $accounts = $this->listAccounts($token, 'HORA');
+    $this->listAccounts($token, 'HORA');
     // Now list accounts by id
-    $accounts = $this->listAccounts($token, 'HORA', [$hora1->data->id, $hora2->data->id]);
+    $this->listAccounts($token, 'HORA', [$hora1->data->id, $hora2->data->id]);
 
     // Get currency.
     $hora = $this->getCurrency($token, 'HORA');
@@ -267,6 +267,7 @@ class CesKomunitinestCase extends CesBankTestCase
     $response = json_decode($result->data);
 
     $this->assertIds($response, $ids);
+    return $response;
   }
 
   protected function createSocialData() {
@@ -392,6 +393,12 @@ class CesKomunitinestCase extends CesBankTestCase
 
     // Get all exchange members.
     $members = $this->listMembers($token, 'HORA', [], 200, [$adminhora->data->id, $me->included[0]->id, $account12->data->id]);
+    // Filter members by account.
+    $account1 = $members->data[0]->relationships->account->data->id;
+    $account2 = $members->data[1]->relationships->account->data->id;
+
+    $this->listMembers($token, 'HORA', ['account' => $account1], 200, [$members->data[0]->id]);
+    $this->listMembers($token, 'HORA', ['account' => join(',', [$account1,$account2])], 200, [$members->data[0]->id, $members->data[1]->id]);
 
     // Get single offer.
     $offer = $this->getOffer($token, 'HORA', 'potatoes');
@@ -515,6 +522,7 @@ class CesKomunitinestCase extends CesBankTestCase
       $this->assertIds($response, $ids);
       // two contacts per member.
       $this->assertEqual(count($response->data) * 2, count($response->included));
+      return $response;
     }
   }
   protected function getOffer($token, $groupCode, $code, $status = 200) {
