@@ -223,8 +223,7 @@ function ces_bank_schema() {
     'primary key' => array('id'),
     'unique keys' => array(
       'code' => array('code'),
-      'ces_exchange_unique_uuid_currency' => array('uuid_currency'),
-
+      'ces_exchange_unique_uuid_currency' => array('uuid_currency')
     ),
     'foreign keys' => array(
       'limitchain' => array(
@@ -554,6 +553,10 @@ function ces_bank_schema() {
     'unique keys' => array(
       'ces_transaction_unique_uuid' => array('uuid'),
     ),
+    'indexes' => array(
+      'ces_transaction_fromaccount' => array('fromaccount'),
+      'ces_transaction_toaccount' => array('toaccount'),
+    )
   );
   $schema['ces_permission'] = array(
     'description' => 'Permissions',
@@ -666,6 +669,14 @@ function ces_bank_update_7104() {
   db_add_field('ces_exchange', 'lat', $lat);
   $lng = $schema['ces_exchange']['fields']['lng'];
   db_add_field('ces_exchange', 'lng', $lng);
+}
+
+/**
+ * Add account index to transaction table.
+ */
+function ces_bank_update_7105() {
+  db_add_index('ces_transaction', 'ces_transaction_fromaccount', ['fromaccount']);
+  db_add_index('ces_transaction', 'ces_transaction_toaccount', ['toaccount']);
 }
 
 /** @} */

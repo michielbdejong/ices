@@ -1838,6 +1838,10 @@ function ces_bank_views_pre_render(&$view) {
  * Implements hook_cron().
  */
 function ces_bank_cron() {
+  ces_bank_accept_expired_transactions();
+  ces_bank_rebuild_all_balances();
+}
+function ces_bank_accept_expired_transactions() {
   // Automatically accept transactions.
   $expiry_period = 60 * 60 * 24 * 15; // 15 days.
   $expiry_time = time() - $expiry_period;
@@ -1859,12 +1863,29 @@ function ces_bank_cron() {
     watchdog('cron', 'Enqueued @num expired transaction(s) to be automatically accepted.', array('@num' => $num));
   }
 }
+function ces_bank_rebuild_all_balances() {
+  $lastcron = variable_get('ces_bank_cron_last_run', 0);
+  variable_set('ces_bank_cron_last_run', REQUEST_TIME);
+  // Run it once a day
+  if ($lastcron + 60 * 60 * 24 < REQUEST_TIME) {
+    $exchanges = ces_bank_get_exchanges();
+    if (!empty($exchanges)) {
+      $queue = DrupalQueue::get('ces_bank_rebuild_balances');
+      foreach ($exchanges as $exchange) {
+        $queue->createItem($exchange['id']);
+      }
+    }
+  }
+}
 /**
  * Implements hook_cron_queue_info().
  */
 function ces_bank_cron_queue_info() {
   $queues['ces_bank_accept_transaction'] = array(
     'worker callback' => 'ces_bank_accept_transaction'
+  );
+  $queues['ces_bank_rebuild_balances'] = array(
+    'worker callback' => 'ces_bank_rebuild_balances'
   );
   return $queues;
 }
@@ -1877,6 +1898,32 @@ function ces_bank_accept_transaction($t) {
   } catch (Exception $e) {
     // Could not accept transaction
     watchdog_exception('ces_bank', $e);
+  }
+}
+
+function ces_bank_rebuild_balances($exchange_id) {
+  $query = db_query("SELECT a.id, a.name, a.balance,
+    (SELECT COALESCE(SUM(-amount),0) FROM {ces_transaction} WHERE fromaccount = a.id AND state = 3) +
+    (SELECT COALESCE(SUM(amount),0) FROM {ces_transaction} WHERE toaccount = a.id AND state = 3) AS newbalance
+    FROM {ces_account} a
+    WHERE a.exchange=:exchange AND a.state = 1",
+    array(':exchange' => $exchange_id)
+  );
+
+  while (($item = $query->fetchAssoc()) !== FALSE) {
+    if ($item['balance'] != $item['newbalance']) {
+      db_update('ces_account')->fields(array(
+        'balance' => $item['newbalance']
+      ))
+      ->condition('id', $item['id'])
+      ->execute();
+
+      watchdog('cron', 'Updated account %account from %a1 to %a2.', [
+        '%account' => $item['name'],
+        '%a1' => $item['balance'],
+        '%a2' => $item['newbalance']
+      ]);
+    }
   }
 }
 /**
