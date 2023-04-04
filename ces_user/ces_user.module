@@ -755,7 +755,7 @@ function ces_user_geocode_call($text) {
   $key = variable_get(CES_USER_GOOGLE_MAPS_KEY, '');
   if (empty($key)) {
     watchdog('ces_user', 'Missing Google Maps API Key.', null, WATCHDOG_ERROR);
-    return false
+    return false;
   }
   $url = url($maps_url, ['query' => [
     'address' => $text,
