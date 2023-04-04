@@ -64,7 +64,7 @@ function ces_komunitin_notification_event($action, $exchange_id, $user_recipient
       'data' => $content
     ]);
     if (isset($result->error)) {
-      watchdog('ces_komunitin', $result->code . ' ' . $result->error . '. ' . $result->data, [], WATCHDOG_ERROR);
+      watchdog('ces_komunitin', $result->code . ' ' . $result->error . '. ' . (isset($result->data) ? $result->data : ''), [], WATCHDOG_ERROR);
       watchdog('ces_komunitin', "Sent: \n" . $content, [], WATCHDOG_DEBUG);
     }
   }

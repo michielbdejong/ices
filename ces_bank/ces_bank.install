@@ -203,6 +203,22 @@ function ces_bank_schema() {
         'not null' => TRUE,
         'serialize' => TRUE,
       ),
+      'lat' => array(
+        'description' => 'Latitude',
+        'type' => 'numeric',
+        'not null' => TRUE,
+        'default' => 0.0,
+        'scale' => 10,
+        'precision' => 15,
+      ),
+      'lng' => array(
+        'description' => 'Longitude',
+        'type' => 'numeric',
+        'not null' => TRUE,
+        'default' => 0.0,
+        'scale' => 10,
+        'precision' => 15,
+      )
     ),
     'primary key' => array('id'),
     'unique keys' => array(
@@ -638,6 +654,18 @@ function ces_bank_update_7102() {
 function ces_bank_update_7103() {
   // uuid as a komunitin currency.
   _add_uuid_field('ces_exchange', 'uuid_currency', TRUE);
+}
+
+/**
+ * Add geolocation fields.
+ */
+function ces_bank_update_7104() {
+  // uuid as a komunitin currency.
+  $schema = ces_bank_schema();
+  $lat = $schema['ces_exchange']['fields']['lat'];
+  db_add_field('ces_exchange', 'lat', $lat);
+  $lng = $schema['ces_exchange']['fields']['lng'];
+  db_add_field('ces_exchange', 'lng', $lng);
 }
 
 /** @} */

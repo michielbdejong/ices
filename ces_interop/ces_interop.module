@@ -686,7 +686,7 @@ function ces_interop_exchange_form_validate($form, &$form_state) {
         'max_redirects' => 0,
       );
       $response = drupal_http_request($url . '/logon.php', $options);
-      if (strpos($response->redirect_url, 'index.php') !== FALSE) {
+      if (isset($response->redirect_url) && (strpos($response->redirect_url, 'index.php') !== FALSE)) {
         // We are being redirected to index, so the password is incorrect.
         form_set_error('cenip_user', t('The pair NID/password is incorrect.'));
       }

@@ -82,8 +82,6 @@ class CesKomunitinestCase extends CesBankTestCase
     $transaction1 = $this->getKomunitinTransfer($token, 'HORA', $transaction1->data->id, TRUE, TRUE, 200, $transaction1);
     // Check duplicated id.
     $this->doKomunitinTransfer($token, 'HORA', $hora1->data->id, $hora2->data->id, 100, 'Duplicated id transaction', 409, $transaction1->data->id);
-    // Perform charge.
-    $transaction2 = $this->doKomunitinTransfer($token, 'HORA', $hora2->data->id, $hora1->data->id, 500, 'Second komunitin transaction');
 
     // Check authorization error
     $this->doKomunitinTransfer('invalid', 'HORA', $hora1->data->id, $hora2->data->id, 100, 'Unauthorized transaction', 401);
@@ -94,6 +92,9 @@ class CesKomunitinestCase extends CesBankTestCase
     $hora0 = $this->getAccount($token, 'HORA', 'HORA0000');
     // Check access error.
     $this->doKomunitinTransfer($token, 'HORA', $hora0->data->id, $hora2->data->id, 100, 'Forbidden transaction', 403);
+
+    // Perform charge. Do it after several other things so the timestamp is different from the 1st transaction.
+    $transaction2 = $this->doKomunitinTransfer($token, 'HORA', $hora2->data->id, $hora1->data->id, 500, 'Second komunitin transaction');
 
     // List all own account transfers.
     $this->listTransfers($token, 'HORA', $hora1->data->id, 200, array($transaction2, $transaction1));
@@ -252,7 +253,7 @@ class CesKomunitinestCase extends CesBankTestCase
       $this->assertEqual(count($response->data), count($transactions), 'Incorrect number of transactions');
       $i = 0;
       foreach($transactions as $transaction) {
-        $this->assertEqual($response->data[$i]->id, $transaction->data->id, 'Found unexpected transaction in list.');
+        $this->assertEqual($response->data[$i]->id, $transaction->data->id);
         $i++;
       }
     }

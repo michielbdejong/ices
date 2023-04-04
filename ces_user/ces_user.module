@@ -10,6 +10,7 @@ define('CES_USER_DEVELOPERS_URL', 'ces_user_developers_url');
 define('CES_USER_DONATE_URL', 'ces_user_donate_url');
 define('CES_USER_TERMS_OF_SERVICE_URL', 'ces_user_terms_of_service_url');
 define('CES_USER_ABOUT_URL', 'ces_user_about_url');
+define('CES_USER_GOOGLE_MAPS_KEY', 'ces_user_google_maps_key');
 
 define('CES_USER_NEW_EXCHANGE_URL_DEF', 'ces/bank/exchange/new?lang=@langcode');
 define('CES_USER_DOCUMENTATION_URL_DEF', 'http://docs.integrales.net');
@@ -137,7 +138,7 @@ function ces_user_get_full_address($account = NULL) {
   $address = '';
   if (!empty($items)) {
     $item = reset($items);
-    $address = $item['safe_value'];
+    $address = $item['value'];
   }
   $items = field_get_items('user', $account, 'ces_postcode');
   if (!empty($items)) {
@@ -145,7 +146,7 @@ function ces_user_get_full_address($account = NULL) {
     if ($address != '') {
       $address .= ', ';
     }
-    $address .= $item['safe_value'];
+    $address .= $item['value'];
   }
   $items = field_get_items('user', $account, 'ces_town');
   if (!empty($items)) {
@@ -153,7 +154,7 @@ function ces_user_get_full_address($account = NULL) {
     if ($address != '') {
       $address .= ', ';
     }
-    $address .= $item['safe_value'];
+    $address .= $item['value'];
   }
   return $address;
 }
@@ -689,19 +690,104 @@ function ces_user_admin() {
     '#default_value' => variable_get(CES_USER_ABOUT_URL, CES_USER_ABOUT_URL_DEF),
     '#description' => t('The about page.'),
   );
+  $form[CES_USER_GOOGLE_MAPS_KEY] = array(
+    '#type' => 'textfield',
+    '#title' => t('Google Maps API Key'),
+    '#default_value' => '',
+    '#description' => t('Google Maps API Key.'),
+  );
   return system_settings_form($form);
 }
-
-function ces_user_entity_property_info_alter(&$info) {
-  $info['user']['bundles']['user']['properties']['ces_full_address'] = array(
-    'type' => 'text',
-    'label' => 'Full adress (from other fields)',
-    'getter callback' => 'ces_user_full_address',
-  );
+/**
+ * Geocode empty location fields
+ */
+function ces_user_field_attach_presave($entity_type, $entity) {
+  if ($entity_type == 'user') {
+    $items = field_get_items('user', $entity, 'ces_geolocation');
+    $empty = TRUE;
+    if (!empty($items)) {
+      $item = reset($items);
+      $empty = geolocation_field_is_empty($item, null);
+    }
+    if ($empty) {
+      $text = ces_user_get_full_address($entity);
+      if (!empty(trim($text, ' ,'))) {
+        watchdog('Calling google maps API for user %name', ['%name' => $entity->name]);
+        $geocode = ces_user_geocode($text);
+        $field_value = _ces_user_geolocation_field_value($geocode);
+        if ($field_value) {
+          $entity->ces_geolocation = array(
+            LANGUAGE_NONE => [$field_value]
+          );
+        }
+      }
+    }
+  }
+}
+function ces_user_geocode_cache_get($text) {
+  $cid = sha1($text);
+  if ($cache = cache_get($cid, 'cache_ces_user_geocoder')) {
+    return $cache->data;
+  }
+  return false;
+}
+function ces_user_geocode_cache_set($text, $data) {
+  $cid = sha1($text);
+  cache_set($cid, $data, 'cache_ces_user_geocoder', CACHE_PERMANENT);
+}
+/**
+ * Implements hook_flush_caches().
+ */
+function geocoder_flush_caches() {
+  return array('cache_ces_user_geocoder');
 }
 
-function ces_user_full_address($entity, $options, $field, $entity_type, $property) {
-  return ces_user_get_full_address($entity);
+function ces_user_geocode($text) {
+  $result = ces_user_geocode_cache_get($text);
+  if (!$result) {
+    $result = ces_user_geocode_call($text);
+    ces_user_geocode_cache_set($text, $result);
+  }
+  return $result;
+}
+function ces_user_geocode_call($text) {
+  $maps_url = 'https://maps.googleapis.com/maps/api/geocode/json';
+  $url = url($maps_url, ['query' => [
+    'address' => $text,
+    'key' => variable_get(CES_USER_GOOGLE_MAPS_KEY, '')
+  ]]);
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+  curl_setopt($ch, CURLOPT_HEADER, 0);
+  $data = curl_exec($ch);
+  curl_close($ch);
+  if ($data) {
+    $data = json_decode($data);
+    if ($data->status == 'OK') {
+      // Get the first result
+      $item = reset($data->results);
+      $lng = $item->geometry->location->lng;
+      $lat = $item->geometry->location->lat;
+      return array(
+        'lat' => $lat,
+        'lng' => $lng,
+      );
+    }
+  }
+  return false;
+}
+function _ces_user_geolocation_field_value($geocode) {
+  $lat = $geocode && isset($geocode['lat']) ? $geocode['lat'] : 0;
+  $lng = $geocode && isset($geocode['lng']) ? $geocode['lng'] : 0;
+  return array(
+    'lat' => $lat,
+    'lng' => $lng,
+    'lat_sin' => sin(deg2rad($lat)),
+    'lat_cos' => cos(deg2rad($lat)),
+    'lng_rad' => deg2rad($lng),
+  );
 }
 /**
  * @}

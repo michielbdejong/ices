@@ -52,7 +52,7 @@ class Group {
     $this->location = [
       'name' => $exchange['town'],
       'type' => 'Point',
-      'coordinates' => [0, 0]
+      'coordinates' => [$exchange['lng'], $exchange['lat']]
     ];
 
     // Relationships.

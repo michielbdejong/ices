@@ -74,14 +74,23 @@ class Member {
     $this->created = SchemaUtils::encodeDate($user->created);
     $this->updated = SchemaUtils::encodeDate($member['modified']);
 
+    $items = field_get_items('user', $user, 'ces_geolocation');
+    $lat = 0;
+    $lng = 0;
+    if (!empty($items)) {
+      $item = reset($items);
+      $lat = $item['lat'];
+      $lng = $item['lng'];
+    }
 
-    // There's no member description nor location.
-    $this->description = '';
     $this->location = [
       'name' => $town,
       'type' => 'Point',
-      'coordinates' => [0, 0]
+      'coordinates' => [$lng, $lat]
     ];
+
+    // There's no member description.
+    $this->description = '';
 
     // Relationships
     $this->account_id = $member['uuid'];

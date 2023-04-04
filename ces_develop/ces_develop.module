@@ -105,8 +105,9 @@ function ces_develop_register_user($name) {
     $form_state['values']['pass']['pass1'] = 'integralces';
     $form_state['values']['pass']['pass2'] = 'integralces';
     $form_state['values']['ces_firstname'][LANGUAGE_NONE][0]['value'] = $name;
-    $form_state['values']['ces_town'][LANGUAGE_NONE][0]['value'] = 'Somewhere';
-    $form_state['values']['ces_postcode'][LANGUAGE_NONE][0]['value'] = '12345';
+    $form_state['values']['ces_address'][LANGUAGE_NONE][0]['value'] = 'Acropolis';
+    $form_state['values']['ces_town'][LANGUAGE_NONE][0]['value'] = 'Athens';
+    $form_state['values']['ces_postcode'][LANGUAGE_NONE][0]['value'] = '105 58';
     $form_state['values']['ces_phonemobile'][LANGUAGE_NONE]['0']['value'] = '123456789';
     $form_state['values']['op'] = t('Create new account');
     drupal_form_submit('user_register_form', $form_state);

@@ -176,6 +176,20 @@ function ces_bank_exchange_form($form, &$form_state, $op, $exchange_id = NULL) {
     '#required' => FALSE,
     '#maxlength' => 200,
   );
+  $form['exchange']['location']['lat'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Latitude'),
+    '#default_value' => $exchange['lat'],
+    '#required' => FALSE,
+    '#maxlength' => 32,
+  );
+  $form['exchange']['location']['lng'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Longitude'),
+    '#default_value' => $exchange['lng'],
+    '#required' => FALSE,
+    '#maxlength' => 32,
+  );
 
   $languages = language_list('enabled');
   $lang_options = array();

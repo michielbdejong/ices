@@ -139,39 +139,30 @@ function _ces_user_create_user_fields() {
   _add_location_field();
   return TRUE;
 }
+
 function _add_location_field()
 {
   if (!field_info_field('ces_geolocation')) {
     field_create_field([
       'field_name' => 'ces_geolocation',
-      'type' => 'geofield',
+      'type' => 'geolocation_latlng',
       'cardinality' => 1,
     ]);
   }
-  $newinstance = [
-    'field_name' => 'ces_geolocation',
-    'entity_type' => 'user',
-    'bundle' => 'user',
-    'label' => t('Location'),
-    'widget' => [
-      'type' => 'geocoder',
-      'settings' => array(
-        'geocoder_field' => 'ces_full_address',
-        'geocoder_handler' => 'google',
-        'delta_handling' => 'default',
-      ),
-    ],
-    'display' => [
-      'default' => ['type' => 'geofield_latlon']
-    ]
-  ];
-  $instance = field_info_instance('user', 'ces_geolocation', 'user');
-  if (!$instance) {
+  if(!field_info_instance('user', 'ces_geolocation', 'user')) {
+    $newinstance = [
+      'field_name' => 'ces_geolocation',
+      'entity_type' => 'user',
+      'bundle' => 'user',
+      'label' => 'Location',
+      'widget' => [
+        'type' => 'geolocation_text',
+      ],
+      'display' => [
+        'default' => ['type' => 'hidden']
+      ]
+    ];
     field_create_instance($newinstance);
-  }
-  else {
-    $newinstance = $newinstance + $instance;
-    field_update_instance($newinstance);
   }
 }
 /**
@@ -197,6 +188,7 @@ function _ces_user_translation_template() {
     t('Will only be displayed in your account details'),
     t('Website'),
     t('Your personal or organization website address'),
+    t('Location')
   );
 }
 

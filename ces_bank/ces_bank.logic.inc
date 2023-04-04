@@ -1634,6 +1634,14 @@ class CesBankExchange extends IcesDBObject {
    */
   public $map;
   /**
+   * Latitude
+   */
+  public $lat;
+  /**
+   * Longitude
+   */
+  public $lng;
+  /**
    * Administrator user uid.
    */
   public $admin;
@@ -1700,6 +1708,8 @@ class CesBankExchange extends IcesDBObject {
       'town' => 'Barcelona',
       'website' => 'http://www.example.com',
       'map' => 'https://maps.google.com/maps?q=barcelona,+spain',
+      'lat' => 41.3874,
+      'lng' => 2.1686,
       'admin' => 1,
       'limitchain' => 1,
       'currencysymbol' => 'XCR',
