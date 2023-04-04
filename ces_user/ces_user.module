@@ -712,7 +712,7 @@ function ces_user_field_attach_presave($entity_type, $entity) {
     if ($empty) {
       $text = ces_user_get_full_address($entity);
       if (!empty(trim($text, ' ,'))) {
-        watchdog('Calling google maps API for user %name', ['%name' => $entity->name]);
+        watchdog('ces_user', 'Calling google maps API for user %name', ['%name' => $entity->name]);
         $geocode = ces_user_geocode($text);
         $field_value = _ces_user_geolocation_field_value($geocode);
         if ($field_value) {
@@ -738,7 +738,7 @@ function ces_user_geocode_cache_set($text, $data) {
 /**
  * Implements hook_flush_caches().
  */
-function geocoder_flush_caches() {
+function ces_user_flush_caches() {
   return array('cache_ces_user_geocoder');
 }
 
@@ -752,9 +752,14 @@ function ces_user_geocode($text) {
 }
 function ces_user_geocode_call($text) {
   $maps_url = 'https://maps.googleapis.com/maps/api/geocode/json';
+  $key = variable_get(CES_USER_GOOGLE_MAPS_KEY, '');
+  if (empty($key)) {
+    watchdog('ces_user', 'Missing Google Maps API Key.', null, WATCHDOG_ERROR);
+    return false
+  }
   $url = url($maps_url, ['query' => [
     'address' => $text,
-    'key' => variable_get(CES_USER_GOOGLE_MAPS_KEY, '')
+    'key' => $key
   ]]);
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
