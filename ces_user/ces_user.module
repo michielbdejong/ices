@@ -707,7 +707,7 @@ function ces_user_field_attach_presave($entity_type, $entity) {
     $empty = TRUE;
     if (!empty($items)) {
       $item = reset($items);
-      $empty = geolocation_field_is_empty($item, null);
+      $empty = empty($item['lat']) && empty($item['lng']);
     }
     if ($empty) {
       $text = ces_user_get_full_address($entity);
