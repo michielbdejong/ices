@@ -693,7 +693,7 @@ function ces_user_admin() {
   $form[CES_USER_GOOGLE_MAPS_KEY] = array(
     '#type' => 'textfield',
     '#title' => t('Google Maps API Key'),
-    '#default_value' => '',
+    '#default_value' => variable_get(CES_USER_GOOGLE_MAPS_KEY, ''),,
     '#description' => t('Google Maps API Key.'),
   );
   return system_settings_form($form);
@@ -724,22 +724,19 @@ function ces_user_field_attach_presave($entity_type, $entity) {
     }
   }
 }
+function _ces_user_cid($text) {
+  return 'ces_geo:' . sha1($text);
+}
 function ces_user_geocode_cache_get($text) {
-  $cid = sha1($text);
-  if ($cache = cache_get($cid, 'cache_ces_user_geocoder')) {
+  $cid = _ces_user_cid($text);
+  if ($cache = cache_get($cid)) {
     return $cache->data;
   }
   return false;
 }
 function ces_user_geocode_cache_set($text, $data) {
-  $cid = sha1($text);
-  cache_set($cid, $data, 'cache_ces_user_geocoder', CACHE_PERMANENT);
-}
-/**
- * Implements hook_flush_caches().
- */
-function ces_user_flush_caches() {
-  return array('cache_ces_user_geocoder');
+  $cid = _ces_user_cid($text);
+  cache_set($cid, $data);
 }
 
 function ces_user_geocode($text) {
