@@ -693,7 +693,7 @@ function ces_user_admin() {
   $form[CES_USER_GOOGLE_MAPS_KEY] = array(
     '#type' => 'textfield',
     '#title' => t('Google Maps API Key'),
-    '#default_value' => variable_get(CES_USER_GOOGLE_MAPS_KEY, ''),,
+    '#default_value' => variable_get(CES_USER_GOOGLE_MAPS_KEY, ''),
     '#description' => t('Google Maps API Key.'),
   );
   return system_settings_form($form);
