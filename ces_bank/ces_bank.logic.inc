@@ -1232,6 +1232,9 @@ class CesBank {
     try {
       // Get transaction. May be any type of transaction.
       $transaction = $this->getObject('CesBankBasicTransaction', $transaction_id);
+      if ($transaction === FALSE) {
+        throw new Exception("Invalid transaction id $transaction_id.");
+      }
       if (!$force) {
         $transaction->acceptByAccount($account_id);
       }

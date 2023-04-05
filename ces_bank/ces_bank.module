@@ -1846,7 +1846,7 @@ function ces_bank_accept_expired_transactions() {
   $expiry_period = 60 * 60 * 24 * 15; // 15 days.
   $expiry_time = time() - $expiry_period;
   $query = db_query(
-    "SELECT t.id, t.fromaccount
+    "SELECT t.id, t.fromaccount, t.modified
     FROM {ces_transaction} t
     WHERE t.state = :triggered AND t.modified < :expiry",
     array(
@@ -1902,12 +1902,12 @@ function ces_bank_accept_transaction($t) {
     // Mark transaction as error after 2 more weeks.
     if ($t->modified < time() - 60*60*24*30) {
       db_update('ces_transaction')->fields(array(
-        'state' => CesBankTransactionInterface::STATE_ERRROR
+        'state' => CesBankTransactionInterface::STATE_ERROR
       ))
       ->condition('id', $t->id)
       ->execute();
 
-      watchdog('ces_bank', 'Marked transaction %id as error.', array('%id', $t->id));
+      watchdog('ces_bank', 'Marked transaction @id as error.', array('@id' => $t->id));
     }
 
   }
