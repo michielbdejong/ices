@@ -1356,7 +1356,6 @@ function _ces_offerswants_newoffer_html($alerts, $nowtime) {
     AND ow.created < :nowtime
     GROUP BY ow.id",
     array(
-      ':alertid' => $alerts->id,
       ':exchange' => $alerts->exchange,
       ':lasttime' => $alerts->newoffer_lasttime,
       ':nowtime' => $nowtime,
