@@ -19,10 +19,6 @@ define('CES_USER_DONATE_URL_DEF', 'https://www.coopfunding.net/campaigns/integra
 define('CES_USER_TERMS_OF_SERVICE_URL_DEF', '');
 define('CES_USER_ABOUT_URL_DEF', '');
 
-$ces_user_google_maps_key_def = getenv('CES_USER_GOOGLE_MAPS_KEY');
-$ces_user_google_maps_key_def = !empty($ces_user_google_maps_key_def) ? $ces_user_google_maps_key_def : '';
-
-
 /**
  * @defgroup ces_user Ces User
  * @ingroup ices
@@ -752,6 +748,10 @@ function ces_user_geocode($text) {
   return $result;
 }
 function ces_user_geocode_call($text) {
+
+  $ces_user_google_maps_key_def = getenv('CES_USER_GOOGLE_MAPS_KEY');
+  $ces_user_google_maps_key_def = !empty($ces_user_google_maps_key_def) ? $ces_user_google_maps_key_def : '';
+
   $maps_url = 'https://maps.googleapis.com/maps/api/geocode/json';
   $key = variable_get(CES_USER_GOOGLE_MAPS_KEY, $ces_user_google_maps_key_def);
   if (empty($key)) {
