@@ -1350,7 +1350,6 @@ function _ces_offerswants_newoffer_html($alerts, $nowtime) {
     LEFT JOIN {ces_accountuser} au ON ow.user = au.user
     LEFT JOIN {ces_account} a ON au.account = a.id
     WHERE a.exchange = :exchange
-    AND ua.alert = :alertid
     AND ow.state = 1
     AND ow.type = 'offer'
     AND ow.created > :lasttime
