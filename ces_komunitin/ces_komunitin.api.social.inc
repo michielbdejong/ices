@@ -461,7 +461,7 @@ function _ces_komunitin_api_social_offerneeds_load($code, $type = 'offer') {
 }
 
 function ces_komunitin_api_social_members_count($exchange) {
-  return db_select('ces_account')
+  $count = db_select('ces_account')
     ->fields(NULL, array('id'))
     ->condition('exchange', $exchange['id'])
     ->condition('kind', 4, '<')
@@ -469,6 +469,7 @@ function ces_komunitin_api_social_members_count($exchange) {
     ->countQuery()
     ->execute()
     ->fetchField();
+  return intval($count);
 }
 function ces_komunitin_api_social_needs_count($exchange) {
   return _ces_komunitin_api_social_offersneeds_count($exchange, 'need');
@@ -499,7 +500,7 @@ function _ces_komunitin_api_social_category_offersneeds_count($category, $type) 
     ->countQuery()
     ->execute()
     ->fetchField();
-  return $count;
+  return intval($count);
 }
 function _ces_komunitin_api_social_offersneeds_count($exchange, $type) {
   $type = $type == 'offer' ? 'offer' : 'want';
@@ -514,7 +515,7 @@ function _ces_komunitin_api_social_offersneeds_count($exchange, $type) {
     ->countQuery()
     ->execute()
     ->fetchField();
-  return $count;
+  return intval($count);
 }
 function _ces_komunitin_api_social_account_offersneeds_count($account_id, $exchange_id, $type) {
   $type = $type == 'offer' ? 'offer' : 'want';
@@ -533,7 +534,7 @@ function _ces_komunitin_api_social_account_offersneeds_count($account_id, $excha
     ->countQuery()
     ->execute()
     ->fetchField();
-    return $count;
+    return intval($count);
   } else {
     return 0;
   }
