@@ -269,7 +269,7 @@ function ces_komunitin_api_get_endpoints() {
       'transfers' => array(
         'operations' => array('read', 'create'),
         '%' => array(
-          'operations' => array('read', 'delete')
+          'operations' => array('read', 'delete', 'update')
         )
       )
     ),

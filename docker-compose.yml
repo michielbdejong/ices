@@ -11,5 +11,11 @@ services:
     environment:
       - NOTIFICATIONS_CLIENT_ID=notifications-service
       - NOTIFICATIONS_CLIENT_SECRET=komunitin
-      - NOTIFICATIONS_API_URL=http://localhost:2028
+      - NOTIFICATIONS_API_URL=http://notifications:2028
+    networks:
+      - komunitin
+networks:
+  komunitin:
+    driver: bridge
+    name: komunitin
 

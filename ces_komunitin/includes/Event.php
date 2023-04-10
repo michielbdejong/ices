@@ -17,6 +17,7 @@ class Event {
   public $transfer;
 
   const TRANSFER_COMMITTED = 'TransferCommitted';
+  const TRANSFER_PENDING = 'TransferPending';
 
   function __construct($event, ExternalTransfer $transfer) {
     global $base_url;

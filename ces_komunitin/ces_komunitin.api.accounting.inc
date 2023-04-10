@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Ñoad a transaction ces_bank record. Send error on failure.
+ * Load a transaction ces_bank record. Send error on failure.
  *
  * @return array transaction record.
  */
@@ -143,6 +143,91 @@ function ces_komunitin_api_accounting_transfers_create($exchange, $body) {
   $transaction = $bank->getTransaction($transaction['id']);
   $currency = new Currency($exchange);
   return new Transfer($transaction, $exchange, $currency);
+}
+
+/**
+ * Update transaction. Applies the transaction if the state is updated.
+ */
+function ces_komunitin_api_accounting_transfers_update($exchange, array $transaction, $body) {
+  // Check access.
+  if (!(ces_transaction_access('edit', $transaction))) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+  if (!isset($body->data)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+  }
+  $data = $body->data;
+
+  // 1.2 type & id.
+  if ($data->type !== 'transfers') {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Bad type');
+  }
+  // Use komunitin data model.
+  $oldtransfer = ces_komunitin_api_accounting_transfers_read($exchange, $transaction);
+
+  // Check id.
+  $id = strtolower($data->id);
+  if ($oldtransfer->id != $id) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Incorrect id');
+  }
+
+  if (isset($data->attributes)) {
+    $atts = $data->attributes;
+    // Check we're not trying to update other fields than state (though we could
+    // allow changing fields before committing).
+    if ((isset($atts->meta) && $atts->meta != $oldtransfer->meta)
+      || (isset($atts->amount) && $atts->amount != $oldtransfer->amount)) {
+      ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN, 'It is not allowed to modify a transaction after it is created');
+    }
+    if ($atts->state != $oldtransfer->state) {
+      if ($oldtransfer->state == Transfer::STATE_NEW || $oldtransfer->state == Transfer::STATE_PENDING) {
+        global $user;
+        $bank = new CesBank();
+        $accounts = $bank->getUserAccounts($user->uid);
+        $account = null;
+        foreach ($accounts as $one) {
+          if ($one['id'] == $transaction['fromaccount'] || $one['id'] == $transaction['toaccount']) {
+            $account = $one;
+            break;
+          }
+        }
+        if ($account == null) {
+          // . print_r($accounts, true) . print_r($transaction, true)
+          ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'You don\'t have any account in this transaction.');
+        }
+        if ($atts->state == Transfer::STATE_ACCEPTED || $atts->state == Transfer::STATE_COMMITTED) {
+          // Accept pending transaction.
+          try {
+            $bank->acceptTransaction($transaction['id'], $account['id']);
+          } catch (Exception $e) {
+            ces_komunitin_api_send_error(KomunitinApiError::INTERNAL_SERVER_ERROR, $e->getMessage());
+          }
+        } else if ($atts->state == Transfer::STATE_REJECTED || $atts->state == Transfer::STATE_DELETED) {
+          // Reject pending transaction.
+          try {
+            $bank->rejectTransaction($transaction['id'], $account['id']);
+          } catch (Exception $e) {
+            ces_komunitin_api_send_error(KomunitinApiError::INTERNAL_SERVER_ERROR, $e->getMessage());
+          }
+        } else {
+          // unexpected state change.
+          ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Invalid state change');
+        }
+        $transaction = $bank->getTransaction($transaction['id']);
+        return ces_komunitin_api_accounting_transfers_read($exchange, $transaction);
+      } else if ($oldtransfer->state == Transfer::STATE_COMMITTED || $oldtransfer->state == Transfer::STATE_DELETED) {
+        ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN, 'Can\'t update a committed or deleted transfer');
+      } else {
+        // updating a accepted or rejected transfer, but still not committed nor deleted.
+        // We don't still have a use case for that.
+        ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED, 'Can\'t update a transfer with accepted or rejected state');
+      }
+    } else {
+      // This is an empty update.
+      return $oldtransfer;
+    }
+  }
+
 }
 
 /**

@@ -61,7 +61,7 @@ RUN service mysql start && sleep 2 && \
   drush vset theme_default greences && \
   drush role-add-perm 'anonymous user' 'use oauth2 server' && \
   drush role-add-perm 'authenticated user' 'use oauth2 server' && \
-  drush ev "variable_set('cors_domains', array('*'=>'<mirror>|GET,POST,OPTIONS|Content-Type,Authorization|true'));" && \
+  drush ev "variable_set('cors_domains', array('*'=>'<mirror>|GET,POST,PATCH,OPTIONS|Content-Type,Authorization|true'));" && \
   service mysql stop
 
 

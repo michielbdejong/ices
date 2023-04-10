@@ -104,15 +104,33 @@ class CesKomunitinestCase extends CesBankTestCase
     // Delete again (not found)
     $this->deleteKomunitinTransfer($token, 'HORA', $transaction1->data->id, 404);
 
-    // Authenticate as BCNA0001
-    $account2 = $this->account21;
+    // Configure hora0002 to manually accept transactions.
+    $user2 = $this->accountUser($this->account12);
+    $this->setManualAuthorization($user2);
+    $this->drupalLogout();
+    // Try transaction from HORA0001 to HORA0002
+    $transaction3 = $this->doKomunitinTransfer($token, 'HORA', $hora2->data->id, $hora1->data->id, 120, 'Manually accepted transaction 1.', 201, null, 'pending');
+    $transaction4 = $this->doKomunitinTransfer($token, 'HORA', $hora2->data->id, $hora1->data->id, 120, 'Manually accepted transaction 2.', 201, null, 'pending');
+    // Accept by the same user has no effect.
+    $this->updateTransferState($token, 'HORA', $transaction3->data->id, 'accepted', 200, 'pending');
+    // Accept by payer.
+    $account2 = $this->account12;
     $token = $this->authorize($account2['account']['mail'], $account2['account']['pass_raw']);
+    $this->updateTransferState($token, 'HORA', $transaction3->data->id, 'accepted', 200, 'committed');
+    $this->updateTransferState($token, 'HORA', $transaction4->data->id, 'rejected', 200, 'rejected');
+    // Can't reject committed transfer
+    $this->updateTransferState($token, 'HORA', $transaction3->data->id, 'rejected', 403, 'committed');
+
+    // Authenticate as BCNA0001
+    $account3 = $this->account21;
+    $token = $this->authorize($account3['account']['mail'], $account3['account']['pass_raw']);
 
     // Check access error (API returns 404 on read access forbidden).
     $this->getKomunitinTransfer($token, 'HORA', $transaction1->data->id, FALSE, FALSE, 404);
     $this->deleteKomunitinTransfer($token, 'HORA', $transaction1->data->id, 404);
     // List other account transactions: empty list as user has no access to them.
     $this->listTransfers($token, 'HORA', $hora1->data->id, 200, array());
+
   }
   /**
    * Get a komunitin account object given its code.
@@ -144,7 +162,7 @@ class CesKomunitinestCase extends CesBankTestCase
    *
    * @return The decoded object in data response.
    */
-  protected function doKomunitinTransfer($token, $exchange_id, $payer_id, $payee_id, $amount, $meta, $status = 201, $id = NULL)
+  protected function doKomunitinTransfer($token, $exchange_id, $payer_id, $payee_id, $amount, $meta, $status = 201, $id = NULL, $state = 'committed')
   {
     if ($id === NULL) {
       $id = $this->uuid();
@@ -183,10 +201,31 @@ class CesKomunitinestCase extends CesBankTestCase
     $this->assertEqual($result->headers['content-type'], "application/vnd.api+json");
     $data = json_decode($result->data);
     if ($status == 201) {
-      $this->assertEqual($data->data->attributes->state, 'committed');
+      $this->assertEqual($data->data->attributes->state, $state);
       $this->assertEqual($data->data->id, $id);
     }
     return $data;
+  }
+  protected function updateTransferState($token, $exchange_id, $transfer_id, $state, $status, $res_state) {
+    $data = json_encode(array(
+      'data' => array(
+        'type' => 'transfers',
+        'id' => $transfer_id,
+        'attributes' => array(
+          'state' => $state,
+        )
+      ),
+    ));
+    $result = $this->request('ces/api/accounting/' . $exchange_id . '/transfers/' . $transfer_id, $token, [], [
+      'method' => 'PATCH',
+      'data' => $data,
+      'headers' => ['Content-Type' => 'application/vnd.api+json']
+    ], $status);
+
+    if ($status == 200) {
+      $data = json_decode($result->data);
+      $this->assertEqual($data->data->attributes->state, $res_state);
+    }
   }
   /**
    * Test GET /transfers/id

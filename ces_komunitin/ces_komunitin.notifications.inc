@@ -23,7 +23,7 @@ require_once __DIR__ . "/ces_komunitin.api.inc";
 function ces_komunitin_notification_event($action, $exchange_id, $user_recipient_id, $params, $sender_id = false) {
   // Both account_credited and account_debited actions are called after a
   // transaction is committed.
-  if ($action == 'account_credited') {
+  if ($action == 'account_credited' || $action == 'account_credit_pending') {
     // Create Event object.
     $exchange = ces_bank_get_exchange($exchange_id);
     $code = $exchange['code'];
@@ -36,36 +36,44 @@ function ces_komunitin_notification_event($action, $exchange_id, $user_recipient
     $transferHref = $urlPrefix . '/' . $code . '/transfers/' . $transfer_id;
     $externalTransfer = new ExternalTransfer($transfer_id, 'transfers', $transferHref);
 
+    $events = [
+      'account_credit_pending' => Event::TRANSFER_PENDING,
+      'account_credited' => Event::TRANSFER_COMMITTED
+    ];
     $data = [
-      'name' => Event::TRANSFER_COMMITTED,
+      'name' => $events[$action],
       'code' => $code,
     ];
 
     $event = new Event($data, $externalTransfer);
-    // Serialize payload.
-    $content = CustomFactory::newEncoder(array(
-      Event::class => EventSchema::class,
-      ExternalTransfer::class => ExternalTransferSchema::class
-    ))->withUrlPrefix($urlPrefix)
-      ->encodeData($event);
+    ces_komunitin_send_event($event, $urlPrefix);
+  }
+}
 
-    // Send payload to notifications service.
-    $notifications_url = getenv('NOTIFICATIONS_API_URL');
-    if (empty($notifications_url)) {
-      watchdog('ces_komunitin', 'Missing NOTIFICATIONS_API_URL environment variable.', [], WATCHDOG_WARNING);
-      $notifications_url = 'https://notifications.komunitin.org';
-    }
-    $url = $notifications_url . '/events';
-    $result = drupal_http_request($url, [
-      'method' => 'POST',
-      'headers' => [
-        'Content-Type' => 'application/vnd.api+json'
-      ],
-      'data' => $content
-    ]);
-    if (isset($result->error)) {
-      watchdog('ces_komunitin', $result->code . ' ' . $result->error . '. ' . (isset($result->data) ? $result->data : ''), [], WATCHDOG_ERROR);
-      watchdog('ces_komunitin', "Sent: \n" . $content, [], WATCHDOG_DEBUG);
-    }
+function ces_komunitin_send_event($event, $urlPrefix) {
+  // Serialize payload.
+  $content = CustomFactory::newEncoder(array(
+    Event::class => EventSchema::class,
+    ExternalTransfer::class => ExternalTransferSchema::class
+  ))->withUrlPrefix($urlPrefix)
+    ->encodeData($event);
+
+  // Send payload to notifications service.
+  $notifications_url = getenv('NOTIFICATIONS_API_URL');
+  if (empty($notifications_url)) {
+    watchdog('ces_komunitin', 'Missing NOTIFICATIONS_API_URL environment variable.', [], WATCHDOG_WARNING);
+    $notifications_url = 'https://notifications.komunitin.org';
+  }
+  $url = $notifications_url . '/events';
+  $result = drupal_http_request($url, [
+    'method' => 'POST',
+    'headers' => [
+      'Content-Type' => 'application/vnd.api+json'
+    ],
+    'data' => $content
+  ]);
+  if (isset($result->error)) {
+    watchdog('ces_komunitin', $result->code . ' ' . $result->error . '. ' . (isset($result->data) ? $result->data : ''), [], WATCHDOG_ERROR);
+    watchdog('ces_komunitin', "Event sent: \n" . $content, [], WATCHDOG_DEBUG);
   }
 }
