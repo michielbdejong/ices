@@ -36,6 +36,12 @@ function ces_komunitin_notification_event($action, $exchange_id, $user_recipient
     $transferHref = $urlPrefix . '/' . $code . '/transfers/' . $transfer_id;
     $externalTransfer = new ExternalTransfer($transfer_id, 'transfers', $transferHref);
 
+    global $user;
+    $userId = ces_komunitin_api_social_get_uuid(ResourceTypes::USER, $user->uid);
+    $urlPrefix = ces_komunitin_api_get_base_url() . '/social';
+    $userHref = $urlPrefix . '/users/' . $userId;
+    $externalUser = new ExternalUser($userId, 'users', $userHref);
+
     $events = [
       'account_credit_pending' => Event::TRANSFER_PENDING,
       'account_credited' => Event::TRANSFER_COMMITTED
@@ -45,7 +51,7 @@ function ces_komunitin_notification_event($action, $exchange_id, $user_recipient
       'code' => $code,
     ];
 
-    $event = new Event($data, $externalTransfer);
+    $event = new Event($data, $externalUser, $externalTransfer);
     ces_komunitin_send_event($event, $urlPrefix);
   }
 }
@@ -54,7 +60,8 @@ function ces_komunitin_send_event($event, $urlPrefix) {
   // Serialize payload.
   $content = CustomFactory::newEncoder(array(
     Event::class => EventSchema::class,
-    ExternalTransfer::class => ExternalTransferSchema::class
+    ExternalTransfer::class => ExternalTransferSchema::class,
+    ExternalUser::class => ExternalUserSchema::class
   ))->withUrlPrefix($urlPrefix)
     ->encodeData($event);
 
@@ -73,7 +80,7 @@ function ces_komunitin_send_event($event, $urlPrefix) {
     'data' => $content
   ]);
   if (isset($result->error)) {
-    watchdog('ces_komunitin', $result->code . ' ' . $result->error . '. ' . (isset($result->data) ? $result->data : ''), [], WATCHDOG_ERROR);
-    watchdog('ces_komunitin', "Event sent: \n" . $content, [], WATCHDOG_DEBUG);
+    watchdog('ces_komunitin', 'Error sending event: ' $result->code . ' ' . $result->error . '. ' . (isset($result->data) ? $result->data : ''), [], WATCHDOG_ERROR);
+    watchdog('ces_komunitin', "Event sent: \n" . $content, [], WATCHDOG_ERROR);
   }
 }

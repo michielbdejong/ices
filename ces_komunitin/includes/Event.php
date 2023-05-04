@@ -15,11 +15,12 @@ class Event {
 
   // Relationships
   public $transfer;
+  public $user;
 
   const TRANSFER_COMMITTED = 'TransferCommitted';
   const TRANSFER_PENDING = 'TransferPending';
 
-  function __construct($event, ExternalTransfer $transfer) {
+  function __construct($event, ExternalUser $user, ExternalTransfer $transfer) {
     global $base_url;
     $this->id = isset($event['id']) ? $event['id'] : null;
     $this->name = $event['name'];
@@ -27,6 +28,7 @@ class Event {
     $this->time = SchemaUtils::encodeDate(time());
     $this->code = $event['code'];
     $this->transfer = $transfer;
+    $this->user = $user;
   }
 }
 
@@ -58,6 +60,11 @@ class EventSchema extends BaseSchema {
         self::RELATIONSHIP_LINKS_SELF => false,
         self::RELATIONSHIP_LINKS_RELATED => false
       ],
+      'user' => [
+        self::RELATIONSHIP_DATA => $event->user,
+        self::RELATIONSHIP_LINKS_SELF => false,
+        self::RELATIONSHIP_LINKS_RELATED => false
+      ]
     ];
   }
 }

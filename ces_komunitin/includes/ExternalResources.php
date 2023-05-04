@@ -56,7 +56,7 @@ class ExternalAccountSchema extends ExternalResourceSchema {
   public function getType(): string {
     return "accounts";
   }
-};
+}
 
 class ExternalCurrency extends ExternalResource {};
 class ExternalCurrencySchema extends ExternalResourceSchema {
@@ -64,12 +64,18 @@ class ExternalCurrencySchema extends ExternalResourceSchema {
   {
     return "currencies";
   }
-};
+}
 
 class ExternalTransfer extends ExternalResource{};
 class ExternalTransferSchema extends ExternalResourceSchema {
   public function getType(): string {
     return "transfers";
   }
+}
 
+class ExternalUser extends ExternalResource{};
+class ExternalUserSchema extends ExternalResourceSchema {
+  public function getType(): string {
+    return "users";
+  }
 }
