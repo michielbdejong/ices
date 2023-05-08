@@ -45,6 +45,14 @@ function ces_komunitin_menu() {
     'file path' => drupal_get_path('module', 'ces_komunitin'),
     'access callback' => TRUE
   );
+  $items['admin/config/services/komunitin'] = array(
+    'title' => 'Komunitin settings',
+    'description' => 'Change global settings related to Komunitin API.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ces_komunitin_admin_form'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+  );
   return $items;
 }
 /**
@@ -72,6 +80,28 @@ function ces_komunitin_libraries_info()
   );
   return $libraries;
 }
+/**
+ * The configuration settings for the komunitin module.
+ */
+function ces_komunitin_admin_form() {
+  $events_user = getenv('NOTIFICATIONS_EVENTS_USERNAME');
+  $events_pass = getenv('NOTIFICATIONS_EVENTS_PASSWORD');
+  $form = array();
+  $form['ces_komunitin_events_username'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Events service username'),
+    '#default_value' => variable_get('ces_komunitin_events_username', $events_user),
+    '#description' => t('The username to authenticate to the Komunitin events service.'),
+  );
+  $form['ces_komunitin_events_password'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Events service password'),
+    '#default_value' => variable_get('ces_komunitin_events_password', $events_pass),
+    '#description' => t('The password to authenticate to the Komunitin events service.'),
+  );
+  return system_settings_form($form);
+}
+
 
 /**
  * Implements hook_notification invoked by function ces_message_send_notify at

@@ -12,6 +12,8 @@ services:
       - NOTIFICATIONS_CLIENT_ID=notifications-service
       - NOTIFICATIONS_CLIENT_SECRET=komunitin
       - NOTIFICATIONS_API_URL=http://notifications:2028
+      - NOTIFICATIONS_EVENTS_USERNAME=integralces
+      - NOTIFICATIONS_EVENTS_PASSWORD=komunitin
     networks:
       - komunitin
 networks:

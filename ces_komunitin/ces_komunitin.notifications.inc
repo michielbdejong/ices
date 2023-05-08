@@ -72,15 +72,23 @@ function ces_komunitin_send_event($event, $urlPrefix) {
     $notifications_url = 'https://notifications.komunitin.org';
   }
   $url = $notifications_url . '/events';
+
+  $username = variable_get('ces_komunitin_events_username', getenv('NOTIFICATIONS_EVENTS_USERNAME'));
+  $password = variable_get('ces_komunitin_events_password', getenv('NOTIFICATIONS_EVENTS_PASSWORD'));
+
+  if (strpos($notifications_url, 'https://') !== 0) {
+    watchdog('ces_komunitin', 'Notifications URL %url is not secure. Your credentials may be stolen.', ['%url' => $notifications_url], WATCHDOG_WARNING);
+  }
   $result = drupal_http_request($url, [
     'method' => 'POST',
     'headers' => [
-      'Content-Type' => 'application/vnd.api+json'
+      'Content-Type' => 'application/vnd.api+json',
+      'Authorization' => 'Basic ' . base64_encode( $username . ':' . $password)
     ],
     'data' => $content
   ]);
   if (isset($result->error)) {
-    watchdog('ces_komunitin', 'Error sending event: ' $result->code . ' ' . $result->error . '. ' . (isset($result->data) ? $result->data : ''), [], WATCHDOG_ERROR);
+    watchdog('ces_komunitin', 'Error sending event: ' . $result->code . ' ' . $result->error . '. ' . (isset($result->data) ? $result->data : ''), [], WATCHDOG_ERROR);
     watchdog('ces_komunitin', "Event sent: \n" . $content, [], WATCHDOG_ERROR);
   }
 }
