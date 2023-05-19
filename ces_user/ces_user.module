@@ -344,11 +344,12 @@ function ces_user_form_alter(&$form, &$form_state, $form_id) {
     $form['exchange']['terms']['require_terms'] = array(
       '#type' => 'checkbox',
       '#title' => t('Require terms agreement'),
-      '#default_value' => !empty($exchange['data']['require_terms']),
+      '#default_value' => isset($form_state['values']['data']['require_terms']) ? $form_state['values']['data']['require_terms'] : FALSE,
     );
-    if (isset($exchange['data']['terms_text'])) {
-      $text = $exchange['data']['terms_text']['value'];
-      $format = $exchange['data']['terms_text']['format'];
+
+    if (isset($form_state['values']['data']['terms_text'])) {
+      $text = $form_state['values']['data']['terms_text']['value'];
+      $format = $form_state['values']['data']['terms_text']['format'];
     }
     $form['exchange']['terms']['terms_text'] = array(
       '#type' => 'text_format',
