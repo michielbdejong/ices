@@ -1,13 +1,41 @@
 version: "3.3"
 services:
+  db: 
+    image: mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: yes
+      MYSQL_DATABASE: integralces
+      MYSQL_USER: integralces
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-integralces}
+    volumes:
+      - db:/var/lib/mysql
+    networks:
+      - komunitin
+  
+  phpmyadmin:
+    image: phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports: 
+      - 2026:80
+    environment:
+      PMA_HOST: db
+    networks:
+      - komunitin
+
   integralces:
     build: .
+    restart: unless-stopped
+    depends_on:
+      - db
     ports: 
-      - 2029:2029
+      - 2029:80
     volumes:
-      - type: bind
-        source: .
-        target: /var/www/html/sites/all/modules/ices
+      - .:/var/www/html/sites/all/modules/ices
+      - files:/var/www/html/sites/default
+      
     environment:
       - NOTIFICATIONS_CLIENT_ID=notifications-service
       - NOTIFICATIONS_CLIENT_SECRET=komunitin
@@ -16,8 +44,12 @@ services:
       - NOTIFICATIONS_EVENTS_PASSWORD=komunitin
     networks:
       - komunitin
+
 networks:
   komunitin:
     driver: bridge
     name: komunitin
 
+volumes:
+  db:
+  files:
