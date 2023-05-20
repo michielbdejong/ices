@@ -1,4 +1,4 @@
-Integral Community Exchange System:
+# Integral Community Exchange System
 
 Integral Community Exchange System or IntegralCES is a set of modules to deploy
 a community exchange network using social currency (also known as complementary
@@ -8,19 +8,14 @@ This project wants to be a new version of the popular software Community
 Exchange System (http://www.ces.org.za) but it is not officially supported by
 its authors.
 
-=======
-
-Installation:
+## Installation
 
 ```
 docker compose up -d
 ./install.dh
 ```
 
-
-=======
-
-Module structure:
+## Module structure
 
 There is a main virtual module called ices. This module does not have any
 feature. It is used as a container for the other modules and contains several
@@ -42,9 +37,7 @@ From ices there hang several modules:
  - ces_summaryblock: A block with a summary of your account state.
  - ces_user: Adds several fields to the usual drupal user entity.
 
-=======
-
-Links: 
+## Links
 
 Community Exchange Systems Wikipedia:
 http://en.wikipedia.org/wiki/Community_Exchange_System
