@@ -1,4 +1,5 @@
 #!/bin/bash
+
 while [ $# -gt 0 ]; do
   case $1 in
     --demo)
@@ -15,7 +16,8 @@ while [ $# -gt 0 ]; do
   esac
 done
 # Install Drupal
-docker compose exec integralces drush si standard --db-url=mysql://integralces:${ICES_MYSQL_PASSWORD:-integralces}@db/integralces --account-name=admin --account-pass=${ICES_ADMIN_PASSWORD:-integralces} --site-name=${ICES_SITE_NAME:-IntegralCES} -y
+echo "Installing site ${ICES_SITE_NAME:-IntegralCES}, with admin password ${ICES_ADMIN_PASSWORD:-integralces}."
+docker compose exec integralces drush si standard --db-url="mysql://integralces:${ICES_MYSQL_PASSWORD:-integralces}@db/integralces" --account-name="admin" --account-pass="${ICES_ADMIN_PASSWORD:-integralces}" --site-name="${ICES_SITE_NAME:-IntegralCES}" -y
 # Enable modules
 docker compose exec integralces drush en -y \
   oauth2_server services image views \
