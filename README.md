@@ -12,9 +12,11 @@ its authors.
 
 Installation:
 
-1) Install and enable this module.
-2) Setup the initial page to /ces/blog
-3) Setup blocks.
+```
+docker compose up -d
+./install.dh
+```
+
 
 =======
 
@@ -40,9 +42,6 @@ From ices there hang several modules:
  - ces_summaryblock: A block with a summary of your account state.
  - ces_user: Adds several fields to the usual drupal user entity.
 
-For a more comprehensive developer documentation see the documents in docs/
-folders and also visit http://www.integralces.net.
-
 =======
 
 Links: 
@@ -56,11 +55,6 @@ http://www.integralces.net
 Drupal project page:
 https://www.drupal.org/project/ices
 
-Documentation for developers:
-http://docs.integralces.net
-
 Demonstration site:
 http://demo.integralces.net
 
-Contact mail:
-info@integralces.net
