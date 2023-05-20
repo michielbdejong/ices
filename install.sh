@@ -15,7 +15,7 @@ while [ $# -gt 0 ]; do
   esac
 done
 # Install Drupal
-docker compose exec integralces drush si standard --db-url=mysql://integralces:${MYSQL_PASSWORD:-integralces}@db/integralces --account-name=admin --account-pass=${ADMIN_PASSWORD:-integralces} --site-name=${SITE_NAME:-IntegralCES} -y
+docker compose exec integralces drush si standard --db-url=mysql://integralces:${ICES_MYSQL_PASSWORD:-integralces}@db/integralces --account-name=admin --account-pass=${ICES_ADMIN_PASSWORD:-integralces} --site-name=${ICES_SITE_NAME:-IntegralCES} -y
 # Enable modules
 docker compose exec integralces drush en -y \
   oauth2_server services image views \
