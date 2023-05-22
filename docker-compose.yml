@@ -37,11 +37,11 @@ services:
       - files:/var/www/html/sites/default
       
     environment:
-      - NOTIFICATIONS_CLIENT_ID=notifications-service
-      - NOTIFICATIONS_CLIENT_SECRET=komunitin
-      - NOTIFICATIONS_API_URL=http://notifications:2028
-      - NOTIFICATIONS_EVENTS_USERNAME=integralces
-      - NOTIFICATIONS_EVENTS_PASSWORD=komunitin
+      - NOTIFICATIONS_CLIENT_ID=${NOTIFICATIONS_CLIENT_ID:-notifications-service}
+      - NOTIFICATIONS_CLIENT_SECRET=${NOTIFICATIONS_CLIENT_SECRET:-komunitin}
+      - NOTIFICATIONS_API_URL=${NOTIFICATIONS_API_URL:-http://notifications:2028}
+      - NOTIFICATIONS_EVENTS_USERNAME=${NOTIFICATIONS_EVENTS_USERNAME:-integralces}
+      - NOTIFICATIONS_EVENTS_PASSWORD=${NOTIFICATIONS_EVENTS_PASSWORD:-komunitin}
     networks:
       - komunitin
 
