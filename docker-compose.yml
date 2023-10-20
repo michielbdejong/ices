@@ -47,7 +47,6 @@ services:
 
 networks:
   komunitin:
-    driver: bridge
     name: komunitin
 
 volumes:

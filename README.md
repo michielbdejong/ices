@@ -12,7 +12,7 @@ its authors.
 
 ```
 docker compose up -d
-./install.dh
+sh install.sh [--demo|--dev]
 ```
 
 ## Module structure

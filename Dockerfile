@@ -38,7 +38,8 @@ RUN drush dl -y \
   cors login_emailusername smtp bounce geolocation \
   ices
 # Download libraries
-RUN git clone --branch main --depth 1 https://github.com/bshaffer/oauth2-server-php.git sites/all/libraries/oauth2-server-php && \
+RUN curl https://codeload.github.com/bshaffer/oauth2-server-php/zip/refs/tags/v1.13.0 --output oauth2-server-php.zip && \
+  unzip oauth2-server-php.zip && mv oauth2-server-php-1.13.0 sites/all/libraries/oauth2-server-php && rm oauth2-server-php.zip && \
   git clone --branch master  --depth 1 https://github.com/neomerx/json-api.git sites/all/libraries/json-api && \
   git clone --branch master  --depth 1 https://github.com/thephpleague/html-to-markdown.git sites/all/libraries/html-to-markdown
 

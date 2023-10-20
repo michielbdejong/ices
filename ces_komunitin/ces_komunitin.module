@@ -45,6 +45,13 @@ function ces_komunitin_menu() {
     'file path' => drupal_get_path('module', 'ces_komunitin'),
     'access callback' => TRUE
   );
+  $items['ces/files'] = array(
+    'page callback' => 'ces_komunitin_files',
+    'type' => MENU_CALLBACK,
+    'file' => 'ces_komunitin.files.inc',
+    'file path' => drupal_get_path('module', 'ces_komunitin'),
+    'access callback' => TRUE
+  );
   $items['admin/config/services/komunitin'] = array(
     'title' => 'Komunitin settings',
     'description' => 'Change global settings related to Komunitin API.',

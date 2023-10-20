@@ -9,6 +9,7 @@ class ResourceTypes {
   const NEED = "need";
   const OFFER = "offer";
   const CATEGORY = "category";
+  const FILE = "file";
 
   const ALL_TYPES = [self::GROUP, self::EMAIL, self::PHONE, self::MEMBER, self::NEED, self::OFFER];
 }
