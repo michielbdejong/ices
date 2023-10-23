@@ -597,9 +597,33 @@ function _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filter
   $categories = ces_offerswants_get_categories_ids($type, $exchange['id']);
   $query->condition('o.category', $categories, 'IN');
 
-  // Active objects and not expired.
-  $query->condition('o.state', 1)
-    ->condition('o.expire', REQUEST_TIME, '>');
+  // Expired
+  $expired = ['false'];
+  if (isset($filters['expired'])) {
+    $expired = $filters['expired'];
+    unset($filters['expired']);
+  }
+  if (count($expired) == 2 && in_array('true', $expired) && in_array('false', $expired)) {
+      // no need to add filter
+  } else if (in_array('true', $expired)) {
+    $query->condition('o.expire', REQUEST_TIME, '<=');
+  } else if (in_array('false', $expired)) {
+    $query->condition('o.expire', REQUEST_TIME, '>');
+  }
+
+  // State
+  $state = ['published'];
+  if (isset($filters['state'])) {
+    $state = $filters['state'];
+    unset($filters['state']);
+  }
+  if (count($state) == 2 && in_array('published', $state) && in_array('hidden', $state)) {
+    // no need to add filter
+  } else if (in_array('published', $state)) {
+    $query->condition('o.state', 1);
+  } else if (in_array('hidden', $state)) {
+    $query->condition('o.state', 0);
+  }
 
   // Apply API filtering.
   foreach ($filters as $field => $values) {

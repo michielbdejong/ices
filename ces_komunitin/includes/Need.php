@@ -13,6 +13,7 @@ class Need {
   public $content;
   public $images;
   public $access;
+  public $state;
   public $expires;
   public $created;
   public $updated;
@@ -39,6 +40,8 @@ class Need {
     }
 
     $this->access = 'group';
+    $states = ['hidden', 'published'];
+    $this->state = $states[$resource->state];
     $this->expires = SchemaUtils::encodeDate($resource->expire);
     $this->created = SchemaUtils::encodeDate($resource->created);
     $this->updated = SchemaUtils::encodeDate($resource->modified);
@@ -47,8 +50,6 @@ class Need {
     $this->category = $category;
     $this->member = $member;
   }
-
-
 }
 
 class NeedSchema extends BaseSchema {
@@ -69,6 +70,7 @@ class NeedSchema extends BaseSchema {
       'content' => $need->content,
       'images' => $need->images,
       'access' => $need->access,
+      'state' => $need->state,
       'expires' => $need->expires,
       'created' => $need->created,
       'updated' => $need->updated
