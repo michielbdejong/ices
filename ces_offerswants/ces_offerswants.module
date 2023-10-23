@@ -667,11 +667,12 @@ function ces_offerwant_form($form, &$form_state, $offerwant_type = 'offer', $off
     '#default_value' => $offerwant->keywords,
     '#weight' => 20,
   );
+  $images = explode(',', $offerwant->image);
   $form['image'] = array(
     '#type' => 'managed_file',
     '#title' => t('Image'),
     '#description' => t('Upload an image for your announce.'),
-    '#default_value' => $offerwant->image,
+    '#default_value' => $images[0],
     '#weight' => 21,
   );
   $form['expire'] = array(
@@ -759,9 +760,13 @@ function ces_offerwant_form_submit($form, &$form_state) {
   }
   // Delete old images.
   if (!empty($original) && !empty($original->image) && $original->image != $offerwant->image) {
-    $ofile = file_load($original->image);
-    file_usage_delete($ofile, 'ces_offerswants', 'ces_offerwant', $offerwant->id);
-    file_delete($ofile);
+    // entity may have multiple images if edited from komunitin api.
+    $images = explode(',', $original->image);
+    foreach ($images as $image) {
+      $ofile = file_load($image);
+      file_usage_delete($ofile, 'ces_offerswants', 'ces_offerwant', $offerwant->id);
+      file_delete($ofile);
+    }
   }
   $form_state['redirect'] = 'ces/bank/account/my' . $offerwant->type . 's/' . $offerwant->id . '/view';
 }
@@ -880,7 +885,9 @@ function template_preprocess_ces_offerwant(&$variables) {
   // Image.
   $variables['ces_offerwant_image'] = '';
   if (!empty($offerwant->image)) {
-    $image = file_load($offerwant->image);
+    // We only use 1st image in IntegralCES.
+    $images = explode(",", $offerwant->image);
+    $image = file_load($images[0]);
     $variables['ces_offerwant_image'] = theme('ces_offerswants_image',
       array('image' => $image, 'title' => $variables['ces_offerwant_title']));
   }

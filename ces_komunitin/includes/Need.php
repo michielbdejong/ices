@@ -31,8 +31,11 @@ class Need {
     $this->content = $markdown;
     $this->images = [];
     if ($resource->image) {
-      $file = file_load($resource->image);
-      $this->images[] = file_create_url($file->uri);
+      $images = explode(',', $resource->image);
+      foreach ($images as $image) {
+        $file = file_load($image);
+        $this->images[] = file_create_url($file->uri);
+      }
     }
 
     $this->access = 'group';

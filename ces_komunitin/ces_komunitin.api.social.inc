@@ -296,8 +296,9 @@ function _ces_komunitin_api_social_user_account_id($uid, $exchangeid) {
   return $account ? $account->account : NULL;
 }
 
-
-
+/**
+ * Returns account from user & exchange
+ */
 function _ces_komunitin_api_social_user_member($uid, $exchangeid) {
   $id = _ces_komunitin_api_social_user_account_id($uid, $exchangeid);
   if ($id == NULL) return NULL;
@@ -348,6 +349,202 @@ function ces_komunitin_api_social_needs_read_collection($exchange, $needs)
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
   }
 }
+
+function ces_komunitin_api_social_needs_validate($exchange, $body, $new) {
+  $validated = [];
+  if (!isset($body->data)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+  }
+  $data = $body->data;
+  // type & id.
+  if ($data->type !== 'needs') {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Bad type');
+  }
+  if ($new && isset($data->id)) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN, 'Id must not be set');
+  }
+  // attributes.
+  if (!isset($data->attributes)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Attributes must be set');
+  }
+  $attributes = $data->attributes;
+  // content
+  if ($new && !isset($attributes->content)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Content must be set');
+  }
+  if (isset($attributes->content)) {
+    if ((!is_string($attributes->content) || strlen(trim($attributes->content)) < 10)) {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Invalid content');
+    }
+    $validated['body'] = trim($attributes->content);
+  }
+
+  if (isset($attributes->expires)) {
+    $date = DateTimeImmutable::createFromFormat(DateTime::RFC3339_EXTENDED, $attributes->expires);
+    if (!$date) {
+      $date = DateTimeImmutable::createFromFormat(DateTime::RFC3339, $attributes->expires);
+    }
+    if (!$date) {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Invalid expires format');
+    }
+    $expires = $date->getTimestamp();
+    if ($expires < REQUEST_TIME) {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Invalid expires range');
+    }
+    $validated['expire'] = $expires;
+  }
+
+  if (isset($attributes->state)) {
+    $states = ['hidden', 'published'];
+    if (!in_array($attributes->state, $states)) {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Invalid state');
+    }
+    $validated['state'] = array_search($attributes->state, $states);
+  }
+
+  $images = [];
+  $uploaded = [];
+  if (isset($attributes->images) && is_array($attributes->images)) {
+    foreach ($attributes->images as $url) {
+      $filename = basename($url);
+      $query = new EntityFieldQuery();
+      $query->entityCondition('entity_type', 'file')
+        ->propertyCondition('uri', "%/". $filename, 'LIKE');
+      $result = $query->execute();
+      if (isset($result['file']) && count($result['file']) > 0) {
+        $resultFile = reset($result['file']);
+        $file = file_load($resultFile->fid);
+        // move file to permanent storage.
+        if (!$file->status) {
+          $info = image_get_info($file->uri);
+          if ($info) {
+            $directory = file_default_scheme() . '://' . variable_get('ces_offerswants_picture_path', 'ces_offerswants_pictures');
+            // Prepare the pictures directory.
+            file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+            $destination = file_stream_wrapper_uri_normalize($directory . '/' . sha1_file($file->uri) . '.' . $info['extension']);
+            if (($file = file_move($file, $destination, FILE_EXISTS_RENAME)) !== FALSE) {
+              $file->status = FILE_STATUS_PERMANENT;
+              $file = file_save($file);
+              $uploaded[] = $file;
+            }
+          }
+        }
+        $images[] = $file->fid;
+      } else {
+        ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Invalid image ' . $url);
+      }
+    }
+  }
+  $validated['image'] = implode(',',$images);
+  $validated['uploaded'] = $uploaded;
+
+  // category
+  if ($new && (!isset($data->relationships) || !isset($data->relationships->category) || !isset($data->relationships->category->data))) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Category must be set');
+  }
+  if (isset($data->relationships) && isset($data->relationships->category)) {
+    $categoryId = ces_komunitin_api_social_get_id($data->relationships->category->data->id);
+    $category = ces_category_load($categoryId->id);
+    if (!$category || $category->exchange !== $exchange['id']) {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Invalid category' );
+    }
+    $validated['category'] = $category->id;
+  }
+
+  // member
+  if ($new && (!isset($data->relationships)||!isset($data->relationships->member) || !isset($data->relationships->member->data))) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Member must be set');
+  }
+  if (isset($data->relationships) && isset($data->relationships->member)) {
+    $obj = ces_komunitin_api_social_get_id($data->relationships->member->data->id);
+    $uid = _ces_komunitin_api_social_account_user_id($obj->id);
+    $validated['user'] = $uid;
+  }
+
+  return $validated;
+
+}
+
+function ces_komunitin_api_social_needs_create($exchange, $body) {
+  // Access.
+  if (!ces_offerwant_access('add')) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+  $data = ces_komunitin_api_social_needs_validate($exchange, $body, TRUE);
+  $need = (object)[
+    'type' => 'want',
+    'title' => ces_komunitin_api_social_create_title($data['body'], 50),
+    'body' => $data['body'],
+    'keywords' => '',
+    'state' => $data['state'],
+    'image' => $data['image'],
+    'created' => REQUEST_TIME,
+    'modified' => REQUEST_TIME,
+    'expire' => isset($data['expire']) ? $data['expire'] : REQUEST_TIME + 7*24*60*60, // 7 days,
+    'user' => $data['user'],
+    'category' => $data['category']
+  ];
+
+  // Check that user has enough privileges.
+  if (!ces_offerwant_access('edit', $need)) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+
+  // Create the need.
+  $need = ces_offerwant_save($need);
+
+  // Mark uploaded files.
+  foreach ($data['uploaded'] as $file) {
+    file_usage_add($file, 'ces_offerswants', 'ces_offerwant', $need->id);
+  }
+
+  // Return the created need.
+  return ces_komunitin_api_social_needs_read($exchange, $need);
+}
+
+function ces_komunitin_api_social_needs_update($exchange, $need, $body) {
+  if (!ces_offerwant_access('edit', $need)) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+  $data = ces_komunitin_api_social_needs_validate($exchange, $body, FALSE);
+  if (isset($data['body'])) {
+    $need->title = ces_komunitin_api_social_create_title($data['body'], 50);
+    $need->body = $data['body'];
+  }
+  if (isset($data['state'])) {
+    $need->state = $data['state'];
+  }
+  if (isset($data['expire'])) {
+    $need->expire = $data['expire'];
+  }
+  if (isset($data['category'])) {
+    $need->category = $data['category'];
+  }
+  if (isset($data['user']) && ($data['user'] !== $need->user)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'User cannot be changed');
+  }
+  $need->modified = REQUEST_TIME;
+  if (isset($data['image'])) {
+    // Delete old files.
+    $oldFiles = explode(',', $need->image);
+    $newFiles = explode(',', $data['image']);
+    $deletedFiles = array_diff($oldFiles, $newFiles);
+    foreach ($deletedFiles as $fid) {
+      $file = file_load($fid);
+      file_usage_delete($file, 'ces_offerswants', 'ces_offerwant', $need->id);
+      file_delete($file);
+    }
+    // Add new files.
+    $need->image = $data['image'];
+    foreach ($data['uploaded'] as $file) {
+      file_usage_add($file, 'ces_offerswants', 'ces_offerwant', $need->id);
+    }
+  }
+
+  $need = ces_offerwant_save($need);
+  return ces_komunitin_api_social_needs_read($exchange, $need);
+}
+
 
 function ces_komunitin_api_social_offers_read($exchange, $offer){
   if (ces_offerwant_access('view', $offer)) {
@@ -539,5 +736,36 @@ function _ces_komunitin_api_social_account_offersneeds_count($account_id, $excha
   } else {
     return 0;
   }
+}
+/**
+ * Trim content to create a title for the content, using the first words and
+ * never exceeding given character count.
+ */
+function ces_komunitin_api_social_create_title($text, $size = 50) {
+  $text = trim($text, " .,");
+
+  if (drupal_strlen($text) <= $size) {
+    return $text;
+  }
+
+  $punctuation = [".", ",", ";", ":", "(", ")", "[", "]"];
+  $all = impode("", $punctuation);
+
+  foreach ($punctuation as $p) {
+    if (($pos = strpos($text, $p)) !== FALSE) {
+      $text = substr($text, 0, $pos);
+      $text = trim($text, $all);
+    }
+    if (drupal_strlen($text) <= $size) {
+      return $text;
+    }
+  }
+
+  $text = substr($text, 0, $size);
+  $pos = strrpos($text, " ");
+  if ($pos !== FALSE) {
+    $text = substr($text, 0, $pos);
+  }
+  return $text;
 }
 
