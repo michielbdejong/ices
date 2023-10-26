@@ -406,10 +406,10 @@ function ces_komunitin_api_social_needs_validate($exchange, $body, $new) {
   $uploaded = [];
   if (isset($attributes->images) && is_array($attributes->images)) {
     foreach ($attributes->images as $url) {
-      $filename = basename($url);
+      $filename = basename(rawurldecode($url));
       $query = new EntityFieldQuery();
       $query->entityCondition('entity_type', 'file')
-        ->propertyCondition('uri', "%/". $filename, 'LIKE');
+        ->propertyCondition('uri', "%/". db_like($filename), 'LIKE');
       $result = $query->execute();
       if (isset($result['file']) && count($result['file']) > 0) {
         $resultFile = reset($result['file']);
@@ -526,13 +526,14 @@ function ces_komunitin_api_social_needs_update($exchange, $need, $body) {
   $need->modified = REQUEST_TIME;
   if (isset($data['image'])) {
     // Delete old files.
-    $oldFiles = explode(',', $need->image);
-    $newFiles = explode(',', $data['image']);
+    $oldFiles = strlen($need->image) > 0 ? explode(',', $need->image) : [];
+    $newFiles = strlen($data['image']) > 0 ? explode(',', $data['image']) : [];
     $deletedFiles = array_diff($oldFiles, $newFiles);
     foreach ($deletedFiles as $fid) {
-      $file = file_load($fid);
-      file_usage_delete($file, 'ces_offerswants', 'ces_offerwant', $need->id);
-      file_delete($file);
+      if (($file = file_load($fid)) !== FALSE) {
+        file_usage_delete($file, 'ces_offerswants', 'ces_offerwant', $need->id);
+        file_delete($file);
+      }
     }
     // Add new files.
     $need->image = $data['image'];

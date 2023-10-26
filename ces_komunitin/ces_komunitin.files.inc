@@ -22,10 +22,10 @@ function ces_komunitin_files() {
 
     $validators = array('file_validate_is_image' => array());
     $file = file_save_upload('file', $validators);
-    $file->url = file_create_url($file->uri);
     if (!$file) {
       throw new RuntimeException('Failed to move uploaded file.');
     }
+    $file->url = file_create_url($file->uri);
     $result = new File($file);
 
     // Return file info.
