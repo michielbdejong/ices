@@ -201,7 +201,7 @@ class CesInteropCENIPTransaction extends CesBankDecoratedTransaction {
   /**
    * Check.
    *
-   * Overrides the default check() method so it always sets the stransaction 
+   * Overrides the default check() method so it always sets the stransaction
    * state to one of ACCEPTED or REJECTED.
    */
   public function check() {
@@ -311,6 +311,7 @@ class CesInteropCENIPOutgoingTransaction extends CesInteropCENIPTransaction {
       'seller_country' => $toexchange->country,
       'description' => $this->getConcept(),
       'amount' => $this->getAmount(),
+      'payment' => 0,
     );
     // Make the remote call.
     $response = $this->callClearingCentralService($data);
