@@ -30,7 +30,7 @@ docker compose exec integralces drush en -y \
 docker compose exec integralces drush vset theme_default greences 
 docker compose exec integralces drush role-add-perm 'anonymous user' 'use oauth2 server' 
 docker compose exec integralces drush role-add-perm 'authenticated user' 'use oauth2 server'
-docker compose exec integralces drush ev "variable_set('cors_domains', array('*'=>'<mirror>|GET,POST,PATCH,OPTIONS|Content-Type,Authorization|true'));"
+docker compose exec integralces drush ev "variable_set('cors_domains', array('*'=>'<mirror>|GET,POST,PATCH,DELETE,OPTIONS|Content-Type,Authorization|true'));"
 
 if [ "$DEMO" = "TRUE" ]; then
   docker compose exec integralces drush dl -y devel

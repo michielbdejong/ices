@@ -546,6 +546,17 @@ function ces_komunitin_api_social_needs_update($exchange, $need, $body) {
   return ces_komunitin_api_social_needs_read($exchange, $need);
 }
 
+function ces_komunitin_api_social_needs_delete($exchange, $need) {
+  if (ces_offerwant_access('edit', $need)) {
+    ces_offerwant_delete($need->id);
+    return TRUE; // Send 204 No Content.
+  }
+  else {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+}
+
+
 
 function ces_komunitin_api_social_offers_read($exchange, $offer){
   if (ces_offerwant_access('view', $offer)) {

@@ -19,8 +19,10 @@ function ces_komunitin_files() {
   try {
     // Use drupal API to save a temporary file. It will be automatically
     // cleaned up if not used.
-
-    $validators = array('file_validate_is_image' => array());
+    $validators = array(
+      'file_validate_is_image' => array(),
+      'file_validate_image_resolution' => array('1200x1200')
+    );
     $file = file_save_upload('file', $validators);
     if (!$file) {
       throw new RuntimeException('Failed to move uploaded file.');
