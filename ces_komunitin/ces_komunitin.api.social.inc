@@ -785,7 +785,7 @@ function ces_komunitin_api_social_create_title($text, $size = 50) {
   }
 
   $punctuation = [".", ",", ";", ":", "(", ")", "[", "]"];
-  $all = impode("", $punctuation);
+  $all = implode("", $punctuation);
 
   foreach ($punctuation as $p) {
     if (($pos = strpos($text, $p)) !== FALSE) {
