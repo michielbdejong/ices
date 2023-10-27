@@ -385,11 +385,13 @@ function ces_komunitin_api_accounting_accounts_load_collection($exchange, $filte
     // which is correctly interpreted as en IN clause.
     $conditions[$field] = $value;
   }
+  // Order
+
   // Pagination.
   $conditions['limit'] = $pageSize;
   $conditions['offset'] = $pageAfter;
 
-  return $bank->getAllAccounts($conditions);
+  return $bank->getAllAccounts($conditions, 'id');
 }
 
 function ces_komunitin_api_accounting_accounts_read_collection($exchange, array $accounts) {

@@ -31,7 +31,7 @@ services:
     depends_on:
       - db
     ports: 
-      - 2029:80
+      - 2029:2029
     volumes:
       - .:/var/www/html/sites/all/modules/ices
       - files:/var/www/html/sites/default

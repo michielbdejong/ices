@@ -16,8 +16,13 @@ RUN docker-php-ext-install -j$(nproc) gd opcache pdo_mysql zip
 RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
     docker-php-ext-install -j$(nproc) imap
 
-# Enable rewrite apache module
-RUN a2enmod rewrite
+# Configure apache: enable mod_rewrite and change port from 80 to 2029.
+# We ned to change the port so fomr inise the container the url localhost:2029 is accessible 
+# and hence drupal can access himself.
+RUN a2enmod rewrite && \
+  sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf && \
+  sed -i 's/Listen 80/Listen 2029/' /etc/apache2/ports.conf && \
+  sed -i 's/<VirtualHost \*:80>/<VirtualHost \*:2029>/' /etc/apache2/sites-available/000-default.conf
 
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -48,3 +53,5 @@ RUN git clone --branch 7.x-1.x https://git.drupalcode.org/sandbox/esteve-1866046
 
 # Set permissions to certain files.
 RUN chown www-data:www-data -R sites/default
+
+EXPOSE 2029
