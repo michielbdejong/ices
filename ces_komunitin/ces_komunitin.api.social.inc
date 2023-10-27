@@ -606,7 +606,7 @@ function _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filter
     ->fields('o', array('id'))
     ->condition('o.type', $type);
   // Filter by exchange.
-  $categories = ces_offerswants_get_categories_ids($type, $exchange['id']);
+  $categories = ces_offerswants_get_categories_ids(NULL, $exchange['id']);
   $query->condition('o.category', $categories, 'IN');
 
   // Expired
