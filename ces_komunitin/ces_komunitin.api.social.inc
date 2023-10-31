@@ -478,12 +478,16 @@ function _ces_komunitin_api_social_offersneeds_validate($exchange, $body, $new, 
     if ($new && !isset($attributes->name) || isset($attributes->name) && trim($attributes->name) == '') {
       ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Title must be set');
     }
-    $validated['title'] = trim($attributes->name);
+    if (isset($attributes->name)) {
+      $validated['title'] = trim($attributes->name);
+    }
     // price
     if ($new && !isset($attributes->price) || isset($attributes->price) && trim($attributes->price) == '') {
       ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Price must be set');
     }
-    $validated['price'] = trim($attributes->price);
+    if (isset($attributes->price)) {
+      $validated['price'] = trim($attributes->price);
+    }
   }
 
   return $validated;
@@ -591,7 +595,6 @@ function _ces_komunitin_api_social_offersneeds_update($exchange, $o, $body, $typ
   }
 
   $o = ces_offerwant_save($o);
-
   return $o;
 }
 
