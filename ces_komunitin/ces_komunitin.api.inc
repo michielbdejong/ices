@@ -298,9 +298,9 @@ function ces_komunitin_api_get_endpoints() {
         )
       ),
       'offers' => array(
-        'operations' => array('read'),
+        'operations' => array('read', 'create'),
         '%' => array(
-          'operations' => array('read')
+          'operations' => array('read', 'update', 'delete')
         )
       )
     )

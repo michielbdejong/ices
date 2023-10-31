@@ -350,24 +350,32 @@ function ces_komunitin_api_social_needs_read_collection($exchange, $needs)
   }
 }
 
-function ces_komunitin_api_social_needs_validate($exchange, $body, $new) {
+/**
+ * Validate fields common to offers and needs in create and update operations.
+ */
+function _ces_komunitin_api_social_offersneeds_validate($exchange, $body, $new, $type) {
   $validated = [];
   if (!isset($body->data)) {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
   }
   $data = $body->data;
-  // type & id.
-  if ($data->type !== 'needs') {
+
+  // type.
+  $resourceType = $type === 'offer' ? 'offers' : 'needs';
+  if ($data->type !== $resourceType) {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Bad type');
   }
+
   if ($new && isset($data->id)) {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN, 'Id must not be set');
   }
+
   // attributes.
   if (!isset($data->attributes)) {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Attributes must be set');
   }
   $attributes = $data->attributes;
+
   // content
   if ($new && !isset($attributes->content)) {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Content must be set');
@@ -379,6 +387,7 @@ function ces_komunitin_api_social_needs_validate($exchange, $body, $new) {
     $validated['body'] = trim($attributes->content);
   }
 
+  // expires
   if (isset($attributes->expires)) {
     $date = DateTimeImmutable::createFromFormat(DateTime::RFC3339_EXTENDED, $attributes->expires);
     if (!$date) {
@@ -388,12 +397,14 @@ function ces_komunitin_api_social_needs_validate($exchange, $body, $new) {
       ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Invalid expires format');
     }
     $expires = $date->getTimestamp();
-    if ($expires < REQUEST_TIME) {
+    // Only force future expire date for new needs.
+    if ($new && ($expires < REQUEST_TIME)) {
       ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Invalid expires range');
     }
     $validated['expire'] = $expires;
   }
 
+  //state
   if (isset($attributes->state)) {
     $states = ['hidden', 'published'];
     if (!in_array($attributes->state, $states)) {
@@ -402,6 +413,7 @@ function ces_komunitin_api_social_needs_validate($exchange, $body, $new) {
     $validated['state'] = array_search($attributes->state, $states);
   }
 
+  // images
   $images = [];
   $uploaded = [];
   if (isset($attributes->images) && is_array($attributes->images)) {
@@ -461,94 +473,132 @@ function ces_komunitin_api_social_needs_validate($exchange, $body, $new) {
     $validated['user'] = $uid;
   }
 
-  return $validated;
+  // Extra fields for offers.
+  if ($type == 'offer') {
+    if ($new && !isset($attributes->name) || isset($attributes->name) && trim($attributes->name) == '') {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Title must be set');
+    }
+    $validated['title'] = trim($attributes->name);
+    // price
+    if ($new && !isset($attributes->price) || isset($attributes->price) && trim($attributes->price) == '') {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Price must be set');
+    }
+    $validated['price'] = trim($attributes->price);
+  }
 
+  return $validated;
 }
 
-function ces_komunitin_api_social_needs_create($exchange, $body) {
+function _ces_komunitin_api_social_offersneeds_create($exchange, $body, $type) {
   // Access.
   if (!ces_offerwant_access('add')) {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
   }
-  $data = ces_komunitin_api_social_needs_validate($exchange, $body, TRUE);
-  $need = (object)[
-    'type' => 'want',
-    'title' => ces_komunitin_api_social_create_title($data['body'], 50),
+  $data = _ces_komunitin_api_social_offersneeds_validate($exchange, $body, TRUE, $type);
+
+  if ($type == 'need') {
+    $data['title'] = ces_komunitin_api_social_create_title($data['body'], 50);
+  }
+
+  $defaultExpire = REQUEST_TIME + ($type == 'need' ? 7 : 365) * 60*60*24*7; // 7 days for needs, 1 year for offers.
+
+  $o = (object)[
+    'type' => $type == 'offer' ? 'offer' : 'want',
+    'title' => $data['title'],
     'body' => $data['body'],
     'keywords' => '',
     'state' => $data['state'],
     'image' => $data['image'],
     'created' => REQUEST_TIME,
     'modified' => REQUEST_TIME,
-    'expire' => isset($data['expire']) ? $data['expire'] : REQUEST_TIME + 7*24*60*60, // 7 days,
+    'expire' => isset($data['expire']) ? $data['expire'] : $defaultExpire,
     'user' => $data['user'],
     'category' => $data['category']
   ];
+  // price
+  if (isset($data['price'])) {
+    $o->ces_offer_rate = array(LANGUAGE_NONE => array(array('value' => $data['price'])));
+  }
 
   // Check that user has enough privileges.
-  if (!ces_offerwant_access('edit', $need)) {
+  if (!ces_offerwant_access('edit', $o)) {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
   }
 
   // Create the need.
-  $need = ces_offerwant_save($need);
+  $o = ces_offerwant_save($o);
 
   // Mark uploaded files.
   foreach ($data['uploaded'] as $file) {
-    file_usage_add($file, 'ces_offerswants', 'ces_offerwant', $need->id);
+    file_usage_add($file, 'ces_offerswants', 'ces_offerwant', $o->id);
   }
 
-  // Return the created need.
-  return ces_komunitin_api_social_needs_read($exchange, $need);
+  return $o;
 }
 
-function ces_komunitin_api_social_needs_update($exchange, $need, $body) {
-  if (!ces_offerwant_access('edit', $need)) {
+function _ces_komunitin_api_social_offersneeds_update($exchange, $o, $body, $type) {
+  if (!ces_offerwant_access('edit', $o)) {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
   }
-  $data = ces_komunitin_api_social_needs_validate($exchange, $body, FALSE);
+  $data = _ces_komunitin_api_social_offersneeds_validate($exchange, $body, FALSE, $type);
   if (isset($data['body'])) {
-    $need->title = ces_komunitin_api_social_create_title($data['body'], 50);
-    $need->body = $data['body'];
+    $o->body = $data['body'];
   }
   if (isset($data['state'])) {
-    $need->state = $data['state'];
+    $o->state = $data['state'];
   }
   if (isset($data['expire'])) {
-    $need->expire = $data['expire'];
+    $o->expire = $data['expire'];
   }
   if (isset($data['category'])) {
-    $need->category = $data['category'];
+    $o->category = $data['category'];
   }
-  if (isset($data['user']) && ($data['user'] !== $need->user)) {
+  if (isset($data['user']) && ($data['user'] !== $o->user)) {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'User cannot be changed');
   }
-  $need->modified = REQUEST_TIME;
+  $o->modified = REQUEST_TIME;
+
   if (isset($data['image'])) {
     // Delete old files.
-    $oldFiles = strlen($need->image) > 0 ? explode(',', $need->image) : [];
+    $oldFiles = strlen($o->image) > 0 ? explode(',', $o->image) : [];
     $newFiles = strlen($data['image']) > 0 ? explode(',', $data['image']) : [];
     $deletedFiles = array_diff($oldFiles, $newFiles);
     foreach ($deletedFiles as $fid) {
       if (($file = file_load($fid)) !== FALSE) {
-        file_usage_delete($file, 'ces_offerswants', 'ces_offerwant', $need->id);
+        file_usage_delete($file, 'ces_offerswants', 'ces_offerwant', $o->id);
         file_delete($file);
       }
     }
     // Add new files.
-    $need->image = $data['image'];
+    $o->image = $data['image'];
     foreach ($data['uploaded'] as $file) {
-      file_usage_add($file, 'ces_offerswants', 'ces_offerwant', $need->id);
+      file_usage_add($file, 'ces_offerswants', 'ces_offerwant', $o->id);
     }
   }
 
-  $need = ces_offerwant_save($need);
-  return ces_komunitin_api_social_needs_read($exchange, $need);
+  // type specific data
+  if ($type == 'need') {
+    if (isset($data['body'])) {
+      $o->title = ces_komunitin_api_social_create_title($data['body'], 50);
+    }
+  } else if ($type == 'offer') {
+    if (isset($data['title'])) {
+      $o->title = $data['title'];
+    }
+    if (isset($data['price'])) {
+      $o->ces_offer_rate = array(LANGUAGE_NONE => array(array('value' => $data['price'])));
+    }
+  }
+
+  $o = ces_offerwant_save($o);
+
+  return $o;
 }
 
-function ces_komunitin_api_social_needs_delete($exchange, $need) {
-  if (ces_offerwant_access('edit', $need)) {
-    ces_offerwant_delete($need->id);
+
+function _ces_komunitin_api_social_offersneeds_delete($exchange, $o) {
+  if (ces_offerwant_access('edit', $o)) {
+    ces_offerwant_delete($o->id);
     return TRUE; // Send 204 No Content.
   }
   else {
@@ -556,7 +606,29 @@ function ces_komunitin_api_social_needs_delete($exchange, $need) {
   }
 }
 
+function ces_komunitin_api_social_needs_create($exchange, $body) {
+  $need = _ces_komunitin_api_social_offersneeds_create($exchange, $body, 'need');
+  // Return the created need.
+  return ces_komunitin_api_social_needs_read($exchange, $need);
+}
 
+function ces_komunitin_api_social_needs_update($exchange, $need, $body) {
+  $need = _ces_komunitin_api_social_offersneeds_update($exchange, $need, $body, 'need');
+  return ces_komunitin_api_social_needs_read($exchange, $need);
+}
+
+function ces_komunitin_api_social_needs_delete($exchange, $need) {
+  return _ces_komunitin_api_social_offersneeds_delete($exchange, $need);
+}
+
+function ces_komunitin_api_social_offers_load($exchange, $code) {
+  $offer = _ces_komunitin_api_social_offerneeds_load($code, 'offer');
+  return $offer;
+}
+
+function ces_komunitin_api_social_offers_load_collection($exchange, $filters, $sorts, $pageAfter, $pageSize) {
+  return _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filters, $sorts, 'offer', $pageAfter, $pageSize);
+}
 
 function ces_komunitin_api_social_offers_read($exchange, $offer){
   if (ces_offerwant_access('view', $offer)) {
@@ -589,13 +661,19 @@ function ces_komunitin_api_social_offers_read_collection($exchange, $offers) {
   }
 }
 
-function ces_komunitin_api_social_offers_load($exchange, $code) {
-  $offer = _ces_komunitin_api_social_offerneeds_load($code, 'offer');
-  return $offer;
+function ces_komunitin_api_social_offers_create($exchange, $body) {
+  $offer = _ces_komunitin_api_social_offersneeds_create($exchange, $body, 'offer');
+  // Return the created offer.
+  return ces_komunitin_api_social_offers_read($exchange, $offer);
 }
 
-function ces_komunitin_api_social_offers_load_collection($exchange, $filters, $sorts, $pageAfter, $pageSize) {
-  return _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filters, $sorts, 'offer', $pageAfter, $pageSize);
+function ces_komunitin_api_social_offers_update($exchange, $offer, $body) {
+  $offer = _ces_komunitin_api_social_offersneeds_update($exchange, $offer, $body, 'offer');
+  return ces_komunitin_api_social_offers_read($exchange, $offer);
+}
+
+function ces_komunitin_api_social_offers_delete($exchange, $offer) {
+  return _ces_komunitin_api_social_offersneeds_delete($exchange, $offer);
 }
 
 function _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filters, $sorts, $type, $pageAfter, $pageSize) {
@@ -723,6 +801,9 @@ function ces_komunitin_api_social_account_needs_count($account_id, $exchange_id)
 function ces_komunitin_api_social_account_offers_count($account_id, $exchange_id) {
   return _ces_komunitin_api_social_account_offersneeds_count($account_id, $exchange_id, 'offer');
 }
+/**
+ * Counts the number of offers or needs (not expired nor hidden) for a given category.
+ */
 function _ces_komunitin_api_social_category_offersneeds_count($category, $type) {
   $type = $type == 'offer' ? 'offer' : 'want';
   $count = db_select('ces_offerwant', 'o')
@@ -736,13 +817,15 @@ function _ces_komunitin_api_social_category_offersneeds_count($category, $type) 
     ->fetchField();
   return intval($count);
 }
+/**
+ * Counts the number of offers or needs (not expired nor hidden) for a given exchange.
+ */
 function _ces_komunitin_api_social_offersneeds_count($exchange, $type) {
   $type = $type == 'offer' ? 'offer' : 'want';
   $query = db_select('ces_offerwant', 'o');
   $query->join('ces_category', 'c', 'o.category = c.id');
   $count = $query->fields('o', array('id'))
     ->condition('c.exchange', $exchange['id'])
-    ->condition('c.context', $type == 'offer' ? [1,3] : [1,2], 'IN')
     ->condition('o.type', $type)
     ->condition('o.state', 1)
     ->condition('o.expire', REQUEST_TIME, '>')
@@ -751,6 +834,9 @@ function _ces_komunitin_api_social_offersneeds_count($exchange, $type) {
     ->fetchField();
   return intval($count);
 }
+/**
+ * Counts the number of offers or needs (not expired nor hidden) for a given account.
+ */
 function _ces_komunitin_api_social_account_offersneeds_count($account_id, $exchange_id, $type) {
   $type = $type == 'offer' ? 'offer' : 'want';
   $uid = _ces_komunitin_api_social_account_user_id($account_id);
