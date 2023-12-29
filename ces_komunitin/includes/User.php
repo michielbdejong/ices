@@ -13,6 +13,7 @@ class User {
 
   // Relationships
   public $members;
+  public $settings;
 
   function __construct($user, $exchange) {
     $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::USER, $user->uid);
@@ -24,6 +25,7 @@ class User {
       $account['user'] = $user;
       $this->members[] = new Member($account, $group);
     }
+    $this->settings = new UserSettings($user, $exchange);
   }
 }
 
@@ -50,6 +52,11 @@ class UserSchema extends BaseSchema
     return [
       'members' => [
         self::RELATIONSHIP_DATA => $user->members,
+        self::RELATIONSHIP_LINKS_SELF => false,
+        self::RELATIONSHIP_LINKS_RELATED => false
+      ],
+      'settings' => [
+        self::RELATIONSHIP_DATA => $user->settings,
         self::RELATIONSHIP_LINKS_SELF => false,
         self::RELATIONSHIP_LINKS_RELATED => false
       ]

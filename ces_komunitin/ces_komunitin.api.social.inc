@@ -2,6 +2,7 @@
 
 class ResourceTypes {
   const USER = "user";
+  const USER_SETTINGS = "user-settings";
   const GROUP = "group";
   const EMAIL = "email";
   const PHONE = "phone";
@@ -45,6 +46,9 @@ function ces_komunitin_api_social_get_uuid($type, $id) {
 }
 
 function ces_komunitin_api_social_get_id($uuid) {
+  if (!ces_komunitin_api_social_is_uuid($uuid)) {
+    return FALSE;
+  }
   // Recover type.
   try {
     $type = substr($uuid, 0, 8) . substr($uuid, 9, 4);
@@ -66,6 +70,24 @@ function ces_komunitin_api_social_get_id($uuid) {
   } catch (Exception $e) {
     return FALSE;
   }
+}
+
+function ces_komunitin_api_social_is_uuid($uuid) {
+  if (strlen($uuid) != 36) {
+    return FALSE;
+  }
+  $uuid = strtolower($uuid);
+  $parts = explode('-', $uuid);
+  if (count($parts) != 5) {
+    return FALSE;
+  }
+  if (strlen($parts[0]) != 8 || strlen($parts[1]) != 4 || strlen($parts[2]) != 4 || strlen($parts[3]) != 4 || strlen($parts[4]) != 12) {
+    return FALSE;
+  }
+  if (@hex2bin(implode('', $parts)) === FALSE) {
+    return FALSE;
+  }
+  return TRUE;
 }
 
 function ces_komunitin_api_social_groups_read($exchange) {
@@ -111,20 +133,43 @@ function ces_komunitin_api_social_groups_read_collection($exchanges) {
 }
 
 function ces_komunitin_api_social_users_read() {
+  // No need to check access since the user is the current user.
   global $user;
   $exchange = ces_bank_get_current_exchange();
   return new User($user, $exchange);
 }
 
+function ces_komunitin_api_social_users_settings_read() {
+  // No need to check access since the user is the current user.
+  global $user;
+  $exchange = ces_bank_get_current_exchange();
+  return new UserSettings($user, $exchange);
+}
+
+function ces_komunitin_api_social_users_settings_update($body) {
+  // No need to check access since the user is the current user.
+  global $user;
+  $exchange = ces_bank_get_current_exchange();
+  module_load_include('module', 'ces_user');
+  ces_user_set_settings($body->data->attributes);
+  return new UserSettings($user, $exchange);
+}
 
 function ces_komunitin_api_social_members_load($exchange, $code) {
-  // Code is the drupal user name.
+  // Load by id.
   $bank = new CesBank();
-  $account = $bank->getAccountByName($code);
+  if (ces_komunitin_api_social_is_uuid($code)) {
+    $id = ces_komunitin_api_social_get_id($code);
+    $account = $bank->getAccount($id->id);
+  } else {
+    // Load by account name.
+    $account = $bank->getAccountByName($code);
+  }
   $uid = _ces_komunitin_api_social_account_user_id($account['id']);
   $account['user'] = user_load($uid);
   return $account;
 }
+
 function ces_komunitin_api_social_members_load_collection($exchange, $filters, $sorts, $pageAfter, $pageSize) {
   $query = db_select('ces_account', 'a')
     ->fields('a')
@@ -768,11 +813,22 @@ function _ces_komunitin_api_social_offerneeds_load_collection($exchange, $filter
 
 function _ces_komunitin_api_social_offerneeds_load($code, $type = 'offer') {
   $type = ($type == 'offer') ? 'offer' : 'want';
-  $offers = ces_offerwant_load_multiple([], ['code' => $code, 'type' => $type]);
-  if (!$offers) {
-    ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+  if (ces_komunitin_api_social_is_uuid($code)) {
+    // Load by ID.
+    $id = ces_komunitin_api_social_get_id($code);
+    $offer = ces_offerwant_load($id->id);
+    if (!$offer || $offer->type != $type) {
+      ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+    }
+    return $offer;
+  } else {
+    // Load by code.
+    $offers = ces_offerwant_load_multiple([], ['code' => $code, 'type' => $type]);
+    if (!$offers) {
+      ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+    }
+    return reset($offers);
   }
-  return reset($offers);
 }
 
 function ces_komunitin_api_social_members_count($exchange) {

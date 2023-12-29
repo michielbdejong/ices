@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/ces_develop.module';
+
 /**
  * @file
  * This file is a script for filling the database with initial data for

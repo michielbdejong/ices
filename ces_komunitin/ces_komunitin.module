@@ -118,3 +118,26 @@ function ces_komunitin_notification($action, $exchange_id, $user_recipient_id, $
   module_load_include('inc', 'ces_komunitin', 'ces_komunitin.notifications');
   ces_komunitin_notification_event($action, $exchange_id, $user_recipient_id, $params, $sender_id);
 }
+
+/**
+ * Implements hook_entity_insert().
+ *
+ * @param $entity: The entity object.
+ * @param $type: The type of entity being inserted (i.e. node, user, comment)
+ */
+function ces_komunitin_entity_insert($entity, $type) {
+  // Adding this superfluous if because otherwise we find errors on module installation
+  if ($type == 'ces_offerwant')  {
+    module_load_include('inc', 'ces_komunitin', 'ces_komunitin.notifications');
+    ces_komunitin_notifications_entity_change($entity, $type);
+  }
+}
+
+function ces_komunitin_entity_update($entity, $type) {
+  // Adding this superfluous if because otherwise we find errors on module installation
+  if ($type == 'ces_offerwant') {
+    module_load_include('inc', 'ces_komunitin', 'ces_komunitin.notifications');
+    ces_komunitin_notifications_entity_change($entity, $type);
+  }
+}
+

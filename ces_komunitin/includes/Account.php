@@ -14,6 +14,7 @@ class Account {
 
   // Relatinships
   public $currency;
+  public $settings;
 
   function __construct($account, Currency $currency) {
     // Identifier.
@@ -38,7 +39,9 @@ class Account {
         }
       }
     }
+
     $this->currency = $currency;
+    $this->settings = new AccountSettings($account, $currency);
   }
 }
 class AccountSchema extends BaseSchema {
@@ -72,6 +75,11 @@ class AccountSchema extends BaseSchema {
     return [
       'currency' =>  [
         self::RELATIONSHIP_DATA => $account->currency,
+        self::RELATIONSHIP_LINKS_SELF => false,
+        self::RELATIONSHIP_LINKS_RELATED => false
+      ],
+      'settings' => [
+        self::RELATIONSHIP_DATA => $account->settings,
         self::RELATIONSHIP_LINKS_SELF => false,
         self::RELATIONSHIP_LINKS_RELATED => false
       ]
