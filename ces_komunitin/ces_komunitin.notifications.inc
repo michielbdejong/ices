@@ -127,8 +127,6 @@ function ces_komunitin_notifications_entity_change($entity, $type) {
     $published = $entity->state == 1 && $entity->expire > REQUEST_TIME;
     $oldpublished = isset($entity->original) && $entity->original->state == 1 && $entity->original->expire > REQUEST_TIME;
 
-    watchdog('ces_komunitin', 'Offer/need published: ' . $published . ' old: ' . $oldpublished . "entity: " . print_r($entity, true));
-
     if ($published && !$oldpublished) {
       // The offer or need has just been published.
       $category = ces_category_load($entity->category);

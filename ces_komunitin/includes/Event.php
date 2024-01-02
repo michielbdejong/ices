@@ -22,7 +22,9 @@ class Event {
   const TRANSFER_PENDING = 'TransferPending';
   const TRANSFER_REJECTED = 'TransferRejected';
   const NEED_PUBLISHED = 'NeedPublished';
+  const NEED_EXPIRED = 'NeedExpired';
   const OFFER_PUBLISHED = 'OfferPublished';
+  const OFFER_EXPIRED = 'OfferExpired';
   const MEMBER_JOINED = 'MemberJoined';
 
   /**

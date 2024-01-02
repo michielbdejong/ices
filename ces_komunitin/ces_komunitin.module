@@ -141,3 +141,59 @@ function ces_komunitin_entity_update($entity, $type) {
   }
 }
 
+/**
+ * Implements hook_cron().
+ */
+function ces_komunitin_cron() {
+  $last_cron = variable_get('ces_komunitin_cron_last_run', 0);
+  // Get published offers and wants that expired after last run.
+  $result = db_query("SELECT o.id, o.type, o.user, e.id as exchangeId, e.code as exchangeCode
+    FROM {ces_offerwant} o
+    LEFT JOIN {ces_category} c ON o.category = c.id
+    LEFT JOIN {ces_exchange} e ON c.exchange = e.id
+    WHERE o.state = 1 AND o.expire > :last_cron AND o.expire <= :nowtime", array(
+    ':last_cron' => $last_cron,
+    ':nowtime' => REQUEST_TIME
+  ));
+  $expireds = $result->fetchAll();
+  watchdog('ces_komunitin', 'Expired @count offers and wants.', array('@count' => count($expireds)), WATCHDOG_INFO);
+
+  $queue = DrupalQueue::get('ces_komunitin_notifications');
+  foreach ($expireds as $expired) {
+    $queue->createItem($expired);
+  }
+  variable_set('ces_komunitin_cron_last_run', REQUEST_TIME);
+}
+
+/**
+ * Implements hook_cron_queue_info().
+ */
+function ces_komunitin_cron_queue_info() {
+  $queues['ces_komunitin_notifications'] = array(
+    'worker callback' => 'ces_komunitin_notifications_cron_worker',
+    'time' => 60,
+  );
+  return $queues;
+}
+/**
+ * Queue worker function calling the notifications service.
+ */
+function ces_komunitin_notifications_cron_worker($expired) {
+  module_load_include('inc', 'ces_komunitin', 'ces_komunitin.notifications');
+  module_load_include('inc', 'ces_komunitin', 'ces_komunitin.api.social');
+
+  $account = _ces_komunitin_api_social_user_account_id($expired->user, $expired->exchangeId);
+  $member = ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $account);
+  if ($expired->type == 'offer') {
+    ces_komunitin_event(Event::OFFER_EXPIRED, $expired->exchangeCode, array(
+      'offer' => ces_komunitin_api_social_get_uuid(ResourceTypes::OFFER, $expired->id),
+      'member' => $member
+    ));
+  } else {
+    ces_komunitin_event(Event::NEED_EXPIRED, $expired->exchangeCode, array(
+      'need' => ces_komunitin_api_social_get_uuid(ResourceTypes::NEED, $expired->id),
+      'member' => $member
+    ));
+  }
+}
+
