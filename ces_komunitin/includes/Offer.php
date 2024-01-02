@@ -12,7 +12,7 @@ class Offer extends Need {
     parent::__construct($resource, $member, $group, $category);
     $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::OFFER, $resource->id);
     $this->name = $resource->title;
-    $this->price = $resource->ces_offer_rate[LANGUAGE_NONE][0]['safe_value'];
+    $this->price = $resource->ces_offer_rate[LANGUAGE_NONE][0]['value'];
   }
 }
 

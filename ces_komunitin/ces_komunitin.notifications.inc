@@ -3,7 +3,9 @@
 require_once __DIR__ . "/ces_komunitin.api.inc";
 
 /**
- * Sends event to Notifications service.
+ * Public function to be called to copy a mail notifcation to the notifications
+ * service. If you want to directly notify of an event, use the ces_komunitin_event
+ * function.
  *
  * @param $action The ces_message action name. One of:
  * 'new_exchange', 'exchange_activated', 'new_account', 'account_activated',
@@ -23,7 +25,7 @@ require_once __DIR__ . "/ces_komunitin.api.inc";
 function ces_komunitin_notification_event($action, $exchange_id, $user_recipient_id, $params, $sender_id = false) {
   // Both account_credited and account_debited actions are called after a
   // transaction is committed.
-  if ($action == 'account_credited' || $action == 'account_credit_pending') {
+  if ($action == 'account_credited' || $action == 'account_debit_pending' || $action == 'account_credit_rejected') {
     // Create Event object.
     $exchange = ces_bank_get_exchange($exchange_id);
     $code = $exchange['code'];
@@ -31,33 +33,55 @@ function ces_komunitin_notification_event($action, $exchange_id, $user_recipient
     $bank = new CesBank();
     $transaction = $bank->getTransaction($params['transaction']['id']);
     $transfer_id = $transaction['uuid'];
-
-    $urlPrefix = ces_komunitin_api_get_base_url() . '/accounting';
-    $transferHref = $urlPrefix . '/' . $code . '/transfers/' . $transfer_id;
-    $externalTransfer = new ExternalTransfer($transfer_id, 'transfers', $transferHref);
-
-    global $user;
-    $userId = ces_komunitin_api_social_get_uuid(ResourceTypes::USER, $user->uid);
-    $urlPrefix = ces_komunitin_api_get_base_url() . '/social';
-    $userHref = $urlPrefix . '/users/' . $userId;
-    $externalUser = new ExternalUser($userId, 'users', $userHref);
+    $payer = $bank->getTransactionFromAccount($transaction);
+    $payee = $bank->getTransactionToAccount($transaction);
 
     $events = [
-      'account_credit_pending' => Event::TRANSFER_PENDING,
-      'account_credited' => Event::TRANSFER_COMMITTED
+      'account_debit_pending' => Event::TRANSFER_PENDING,
+      'account_credited' => Event::TRANSFER_COMMITTED,
+      'account_credit_rejected' => Event::TRANSFER_REJECTED,
     ];
+
     $data = [
       'name' => $events[$action],
       'code' => $code,
     ];
 
-    $event = new Event($data, $externalUser, $externalTransfer);
-    ces_komunitin_send_event($event, $urlPrefix);
+    ces_komunitin_event($events[$action], $code, array(
+      'transfer' => $transfer_id,
+      'payer' => ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $payer['id']),
+      'payee' => ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $payee['id']),
+    ));
+
+  } else if ($action == 'account_activated') {
+    $exchange = ces_bank_get_exchange($exchange_id);
+    $code = $exchange['code'];
+    $member = $params['account'];
+    ces_komunitin_event(Event::MEMBER_JOINED, $code, array(
+      'member' => ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $member['id'])
+    ));
   }
 }
 
-function ces_komunitin_send_event($event, $urlPrefix) {
+/**
+ * Public function to be called to notify an event to the notifications service.
+ * @param $name The event name, from Event class constants.
+ * @param $code The exchange code.
+ * @param $data The event data as an string-indexed associative array.
+ */
+function ces_komunitin_event($name, $code, $data) {
+  $event = Event::create($name, $code, $data);
+  ces_komunitin_send_event($event);
+}
+
+/**
+ * Helper function, use ces_komunitin_event instead.
+ *
+ * Sends an event object to the notifications service
+ */
+function ces_komunitin_send_event($event) {
   // Serialize payload.
+  $urlPrefix = ces_komunitin_api_get_base_url() . '/social';
   $content = CustomFactory::newEncoder(array(
     Event::class => EventSchema::class,
     ExternalTransfer::class => ExternalTransferSchema::class,
@@ -90,5 +114,33 @@ function ces_komunitin_send_event($event, $urlPrefix) {
   if (isset($result->error)) {
     watchdog('ces_komunitin', 'Error sending event: ' . $result->code . ' ' . $result->error . '. ' . (isset($result->data) ? $result->data : ''), [], WATCHDOG_ERROR);
     watchdog('ces_komunitin', "Event sent: \n" . $content, [], WATCHDOG_ERROR);
+  }
+}
+
+/**
+ * Called from module file on entity_insert and entity_update hooks.
+ */
+function ces_komunitin_notifications_entity_change($entity, $type) {
+  if ($type == 'ces_offerwant') {
+    module_load_include('inc', 'ces_komunitin', 'ces_komunitin.api.social');
+
+    $published = $entity->state == 1 && $entity->expire > REQUEST_TIME;
+    $oldpublished = isset($entity->original) && $entity->original->state == 1 && $entity->original->expire > REQUEST_TIME;
+
+    if ($published && !$oldpublished) {
+      // The offer or need has just been published.
+      $category = ces_category_load($entity->category);
+      $exchange = ces_bank_get_exchange($category->exchange);
+
+      if ($entity->type == 'offer') {
+        ces_komunitin_event(Event::OFFER_PUBLISHED, $exchange['code'], array(
+          'offer' => ces_komunitin_api_social_get_uuid(ResourceTypes::OFFER, $entity->id),
+        ));
+      } else {
+        ces_komunitin_event(Event::NEED_PUBLISHED, $exchange['code'], array(
+          'need' => ces_komunitin_api_social_get_uuid(ResourceTypes::NEED, $entity->id),
+        ));
+      }
+    }
   }
 }

@@ -1287,7 +1287,7 @@ function ces_alerts_form_submit($form, &$form_state) {
     $fields['newwant_lasttime'] = REQUEST_TIME;
   }
   if ($new_alerts || ($alert->offersperiodical_status == 0 && $fields['offersperiodical_status'] > 0)) {
-    $fields['offersperiodical_status'] = REQUEST_TIME;
+    $fields['offersperiodical_lasttime'] = REQUEST_TIME;
   }
   if ($new_alerts || ($alert->wantsperiodical_status == 0 && $fields['wantsperiodical_status'] > 0)) {
     $fields['wantsperiodical_lasttime'] = REQUEST_TIME;
@@ -1885,6 +1885,7 @@ class CesOffersWantsEntityController extends DrupalDefaultEntityController {
       module_invoke_all('entity_insert', $offerwant, 'ces_offerwant');
     }
     else {
+      $offerwant->original = entity_load_unchanged('ces_offerwant', $offerwant->id);
       // Update.
       drupal_write_record('ces_offerwant', $offerwant, 'id');
       field_attach_update('ces_offerwant', $offerwant);
@@ -1921,6 +1922,8 @@ class CesOffersWantsCategoryEntityController extends DrupalDefaultEntityControll
       module_invoke_all('entity_insert', $category, 'ces_category');
     }
     else {
+      $offerwant->original = entity_load_unchanged('ces_category', $offerwant->id);
+
       drupal_write_record('ces_category', $category, 'id');
       field_attach_update('ces_category', $category);
       module_invoke_all('entity_update', $category, 'ces_category');

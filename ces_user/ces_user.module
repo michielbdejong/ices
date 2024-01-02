@@ -796,6 +796,74 @@ function _ces_user_geolocation_field_value($geocode) {
     'lng_rad' => deg2rad($lng),
   );
 }
+
+define('_CES_USER_DEFAULT_NOTIFICATION_SETTINGS', 'anom');
+/**
+ * return the array of user settings:
+ * [
+ * 'language' => lang
+ * 'notifications' => [
+ *   'myAccount' => bool,
+ *   'newNeeds' => bool,
+ *   'newOffers' => bool,
+ *   'newMembers' => bool,
+ * ]]
+ */
+function ces_user_get_settings($user) {
+  $settings = array();
+  // Get language from drupal core.
+  $lang = user_preferred_language($user);
+  $settings['language'] = $lang->language;
+
+  // Get notifications settings from user->data. We use a compressed encoding to
+  // save space in the data field.
+  $user_settings = isset($user->data['ces_user_settings']) ? $user->data['ces_user_settings'] : array();
+  $nstr = isset($user_settings['n']) ? $user_settings['n'] : _CES_USER_DEFAULT_NOTIFICATION_SETTINGS;
+
+  $settings['notifications'] = array(
+    'myAccount' => strpos($nstr, 'a') !== FALSE,
+    'newNeeds' => strpos($nstr, 'n') !== FALSE,
+    'newOffers' => strpos($nstr, 'o') !== FALSE,
+    'newMembers' => strpos($nstr, 'm') !== FALSE,
+  );
+  return $settings;
+}
+
+function ces_user_set_settings(&$user, $settings) {
+  $edit = array();
+  // Set language in drupal core.
+  if (isset($settings['language'])) {
+    $lang = $settings['language'];
+    $edit['language'] = $lang;
+  }
+  // Set notifications settings in user->data. We use a compressed encoding to
+  // save space in the data field.
+  if (isset($settings['notifications'])) {
+    $edit['data'] = $user->data;
+    if (!isset($edit['data']['ces_user_settings'])) {
+      $edit['data']['ces_user_settings'] = array();
+    }
+    $nstr = '';
+    $notifications = $settings['notifications'];
+    if ($notifications['myAccount']) {
+      $nstr .= 'a';
+    }
+    if ($notifications['newNeeds']) {
+      $nstr .= 'n';
+    }
+    if ($notifications['newOffers']) {
+      $nstr .= 'o';
+    }
+    if ($notifications['newMembers']) {
+      $nstr .= 'm';
+    }
+    $edit['data']['ces_user_settings']['n'] = $nstr;
+  }
+  if (!empty($edit)) {
+    $user = user_save($user, $edit);
+  }
+}
+
 /**
  * @}
  */

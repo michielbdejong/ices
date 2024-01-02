@@ -8,6 +8,7 @@ require_once dirname(__FILE__) . '/includes/CustomFactory.php';
 // Accounting API objects
 require_once dirname(__FILE__) . '/includes/Currency.php';
 require_once dirname(__FILE__) . '/includes/Account.php';
+require_once dirname(__FILE__) . '/includes/AccountSettings.php';
 require_once dirname(__FILE__) . '/includes/Transfer.php';
 
 // Social API objects
@@ -18,6 +19,7 @@ require_once dirname(__FILE__) . '/includes/Offer.php';
 require_once dirname(__FILE__) . '/includes/Need.php';
 require_once dirname(__FILE__) . '/includes/Category.php';
 require_once dirname(__FILE__) . '/includes/User.php';
+require_once dirname(__FILE__) . '/includes/UserSettings.php';
 require_once dirname(__FILE__) . '/includes/ExternalResources.php';
 
 //Notification API objects
@@ -124,6 +126,7 @@ function ces_komunitin_api() {
     );
 
     $resource_id = next($path);
+    $attribute = FALSE;
     if ($resource_id !== FALSE) {
       // This case is just for /users/me
       if (isset($endpoint[$resource_id])) {
@@ -137,6 +140,16 @@ function ces_komunitin_api() {
       }
       else {
         ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+      }
+      // Check if attribute is defined.
+      $attribute = next($path);
+      if ($attribute !== FALSE) {
+        if (isset($endpoint[$attribute])) {
+          $endpoint = $endpoint[$attribute];
+        }
+        else {
+          ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+        }
       }
     }
     // Check if method (GET, POST, PATCH, DELETE) is allowed on this endpoint.
@@ -197,7 +210,7 @@ function ces_komunitin_api() {
     }
 
     // Call operation.
-    $result = ces_komunitin_api_call_function($operation, $api, $type, $parameters);
+    $result = ces_komunitin_api_call_function($operation, $api, $type, $parameters, $attribute);
 
 
     if ($result === TRUE) {
@@ -215,6 +228,7 @@ function ces_komunitin_api() {
       $encoder = CustomFactory::newEncoder(array(
         Currency::class => CurrencySchema::class,
         Account::class => AccountSchema::class,
+        AccountSettings::class => AccountSettingsSchema::class,
         Transfer::class => TransferSchema::class,
         Group::class => GroupSchema::class,
         Contact::class => ContactSchema::class,
@@ -223,6 +237,7 @@ function ces_komunitin_api() {
         Need::class => NeedSchema::class,
         Category::class => CategorySchema::class,
         User::class => UserSchema::class,
+        UserSettings::class => UserSettingsSchema::class,
         ExternalAccount::class => ExternalAccountSchema::class,
         ExternalCurrency::class => ExternalCurrencySchema::class,
       ))
@@ -247,8 +262,17 @@ function ces_komunitin_api() {
   }
 }
 
-function ces_komunitin_api_call_function($operation, $api, $type, $params = []) {
-  $name = 'ces_komunitin_api_' . $api . '_' . $type  . '_' . $operation;
+/**
+ * Call a function in the API, for example:
+ *   - ces_komunitin_api_accounting_currency_read
+ *   - ces_komunitin_api_accounting_accounts_load
+ *   - ces_komunitin_api_accounting_accounts_settings_load
+ *
+ * The load and load_collection operations are only implemented in main types
+ * (without attribute param).
+ */
+function ces_komunitin_api_call_function($operation, $api, $type, $params = [], $attribute = null) {
+  $name = 'ces_komunitin_api_' . $api . '_' . $type . ($attribute ? '_' . $attribute :  '')  . '_' . $operation;
   return call_user_func_array($name, $params);
 }
 /**
@@ -263,6 +287,9 @@ function ces_komunitin_api_get_endpoints() {
       'accounts' => array(
         'operations' => array('read'),
         '%' => array(
+          'settings' => array(
+            'operations' => array('read', 'update')
+          ),
           'operations' => array('read')
         )
       ),
@@ -282,7 +309,10 @@ function ces_komunitin_api_get_endpoints() {
       ),
       'users' => array(
         'me' => array(
-          'operations' => array('read')
+          'operations' => array('read'),
+          'settings' => array(
+            'operations' => array('read', 'update')
+          )
         )
       ),
       'members' => array(
@@ -298,9 +328,9 @@ function ces_komunitin_api_get_endpoints() {
         )
       ),
       'offers' => array(
-        'operations' => array('read'),
+        'operations' => array('read', 'create'),
         '%' => array(
-          'operations' => array('read')
+          'operations' => array('read', 'update', 'delete')
         )
       )
     )

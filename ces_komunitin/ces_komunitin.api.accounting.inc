@@ -402,3 +402,27 @@ function ces_komunitin_api_accounting_accounts_read_collection($exchange, array 
   }
   return $result;
 }
+
+function ces_komunitin_api_accounting_accounts_settings_read($exchange, array $account) {
+  // Require edit access to account just to see the settings.
+  if (!ces_bank_access('edit', 'account', $account['id'])) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+  return new AccountSettings($account, new Currency($exchange));
+}
+
+function ces_komunitin_api_accounting_accounts_settings_update($exchange, array $account, $body) {
+  if (!ces_bank_access('edit', 'account', $account['id'])) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+  if (!isset($body->data) || !isset($body->data->attributes)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+  }
+  $attributes = $body->data->attributes;
+  if (isset($attributes->acceptPaymentsAutomatically)) {
+    $bank = new CesBank();
+    $account['data']['accept']['manual'] = !$attributes->acceptPaymentsAutomatically;
+    $bank->updateAccount($account);
+  }
+  return new AccountSettings($account, new Currency($exchange));
+}
