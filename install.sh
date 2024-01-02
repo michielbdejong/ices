@@ -22,10 +22,17 @@ docker compose exec -T integralces drush si standard --db-url="mysql://integralc
 docker compose exec -T integralces drush en -y \
   oauth2_server services image views \
   token libraries services_views \
-  cors login_emailusername smtp bounce geolocation 
+  cors login_emailusername smtp bounce geolocation \
+  locale
 docker compose exec -T integralces drush en -y \
   ices ces_bank ces_blog ces_interop ces_message ces_offerswants ces_qr ces_rest ces_statistics ces_summaryblock ces_user ces_komunitin \
   greences
+
+# Language
+docker compose exec -T integralces drush dl drush_language -y
+docker compose exec -T integralces drush language-add ca
+docker compose exec -T integralces drush language-add es
+
 # Configurations
 docker compose exec -T integralces drush vset theme_default greences 
 docker compose exec -T integralces drush role-add-perm 'anonymous user' 'use oauth2 server' 
