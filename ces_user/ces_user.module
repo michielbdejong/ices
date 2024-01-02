@@ -829,7 +829,7 @@ function ces_user_get_settings($user) {
   return $settings;
 }
 
-function ces_user_set_settings($user, $settings) {
+function ces_user_set_settings(&$user, $settings) {
   $edit = array();
   // Set language in drupal core.
   if (isset($settings['language'])) {
@@ -860,7 +860,7 @@ function ces_user_set_settings($user, $settings) {
     $edit['data']['ces_user_settings']['n'] = $nstr;
   }
   if (!empty($edit)) {
-    user_save($user, $edit);
+    $user = user_save($user, $edit);
   }
 }
 

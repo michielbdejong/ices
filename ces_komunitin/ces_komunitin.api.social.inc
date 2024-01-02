@@ -151,7 +151,15 @@ function ces_komunitin_api_social_users_settings_update($body) {
   global $user;
   $exchange = ces_bank_get_current_exchange();
   module_load_include('module', 'ces_user');
-  ces_user_set_settings($body->data->attributes);
+  $obj = $body->data->attributes;
+  $settings = [];
+  if (isset($obj->language)) {
+    $settings['language'] = $obj->language;
+  }
+  if (isset($obj->notifications)) {
+    $settings['notifications'] = (array) $obj->notifications;
+  }
+  ces_user_set_settings($user, $settings);
   return new UserSettings($user, $exchange);
 }
 
@@ -283,7 +291,7 @@ function ces_komunitin_api_social_categories_read_collection($exchange, $categor
 /*
  * IntegralCES and Komunitin have slightly different architecture for users and
  * accounts. IntegralCES has nxn relation between users and accounts, where offers
- * and wants belong to users and transactions belong to members.
+ * and wants belong to users and transactions belong to accounts.
  * Komunitin is simpler and defines a member with 1x1 relation to accounts. Thus
  * in order to make the mapping between the two systems we do:
  *
