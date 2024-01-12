@@ -10,4 +10,4 @@ dependencies[] = cors
 dependencies[] = login_emailusername
 dependencies[] = libraries
 
-version = "7.x-1.39"
+version = "7.x-1.40"
