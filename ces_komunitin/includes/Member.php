@@ -61,15 +61,26 @@ class Member {
         $this->type = self::TYPE_PUBLIC;
     }
 
-    $this->image = $user->picture ? file_create_url($user->picture->uri) : null;
-    $this->address = ces_user_get_full_address($user);
-    // Get user town.
-    $town = '';
-    $items = field_get_items('user', $user, 'ces_town');
-    if (!empty($items)) {
-      $item = reset($items);
-      $town = $item['safe_value'];
+    function check_field($entity, $field, $def = null) {
+      if (isset($entity->{$field}) && !empty($entity->{$field}[LANGUAGE_NONE][0]['value'])) {
+        return $entity->{$field}[LANGUAGE_NONE][0]['value'];
+      }
+      else {
+        return $def;
+      }
     }
+
+    $this->image = $user->picture ? file_create_url($user->picture->uri) : null;
+
+    $exchange = $group->exchange;
+
+    $this->address = [
+      "streetAddress" => check_field($user, 'ces_address'),
+      "addressLocality" => check_field($user, 'ces_town'),
+      "postalCode" => check_field($user, 'ces_postcode'),
+      "addressRegion" => check_field($user, 'ces_region', $exchange['region']),
+      "addressCountry" => check_field($user, 'ces_country', $exchange['country']),
+    ];
 
     $this->created = SchemaUtils::encodeDate($user->created);
     $this->updated = SchemaUtils::encodeDate($member['modified']);
@@ -84,13 +95,12 @@ class Member {
     }
 
     $this->location = [
-      'name' => $town,
+      'name' => check_field($user, 'ces_town'),
       'type' => 'Point',
       'coordinates' => [$lng, $lat]
     ];
 
-    // There's no member description.
-    $this->description = '';
+    $this->description = check_field($user, 'ces_description');
 
     // Relationships
     $this->account_id = $member['uuid'];
@@ -98,9 +108,9 @@ class Member {
     $this->group = $group;
     $this->contacts = [];
     // email
-    $this->contacts[] = new Contact($user, Contact::TYPE_EMAIL, $this->group->code);
-    if (ces_user_get_main_phone($user)) {
-      $this->contacts[] = new Contact($user, Contact::TYPE_PHONE, $this->group->code);
+    $contacts = ces_user_get_contacts($user);
+    foreach ($contacts as $type => $name) {
+      $this->contacts[] = new Contact($user, $type, $name, $this->group->code);
     }
 
     $this->offersCount = ces_komunitin_api_social_account_offers_count($member['id'], $member['exchange']);

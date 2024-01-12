@@ -22,21 +22,11 @@ class Contact {
   /**
    * @param $user Drupal user object.
    */
-  public function __construct($user, $type, $groupCode) {
+  public function __construct($user, $type, $name, $groupCode) {
     $this->groupCode = $groupCode;
-    if ($type == self::TYPE_PHONE) {
-      $this->name = ces_user_get_main_phone($user);
-      $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::PHONE, $user->uid);
-      $this->type = self::TYPE_PHONE;
-    }
-    else if ($type == self::TYPE_EMAIL){
-      $this->name = $user->mail;
-      $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::EMAIL, $user->uid);
-      $this->type = self::TYPE_EMAIL;
-    }
-    else {
-      throw new Exception("Invalid contact type.");
-    }
+    $this->name = $name;
+    $this->type = $type;
+    $this->id = ces_komunitin_api_social_get_uuid($type, $user->uid);
     $this->created = SchemaUtils::encodeDate($user->created);
     $this->updated = SchemaUtils::encodeDate($user->created);
   }

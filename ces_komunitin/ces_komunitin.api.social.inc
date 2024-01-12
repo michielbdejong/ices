@@ -4,15 +4,26 @@ class ResourceTypes {
   const USER = "user";
   const USER_SETTINGS = "user-settings";
   const GROUP = "group";
-  const EMAIL = "email";
-  const PHONE = "phone";
   const MEMBER = "member";
   const NEED = "need";
   const OFFER = "offer";
   const CATEGORY = "category";
   const FILE = "file";
 
-  const ALL_TYPES = [self::GROUP, self::EMAIL, self::PHONE, self::MEMBER, self::NEED, self::OFFER];
+  // Contact Types
+  const EMAIL = "email";
+  const PHONE = "phone";
+  const WEBSITE = "website";
+  const WHATSAPP = "whatsapp";
+  const TELEGRAM = "telegram";
+  const INSTAGRAM = "instagram";
+  const FACEBOOK = "facebook";
+  const TWITTER = "twitter";
+
+  const ALL_TYPES = [self::USER, self::USER_SETTINGS, self::GROUP, self::MEMBER,
+    self::NEED, self::OFFER, self::CATEGORY, self::FILE,
+    self::EMAIL, self::PHONE, self::WEBSITE, self::WHATSAPP, self::TELEGRAM,
+    self::INSTAGRAM, self::FACEBOOK, self::TWITTER];
 }
 
 function ces_komunitin_api_social_get_uuid($type, $id) {
@@ -137,6 +148,37 @@ function ces_komunitin_api_social_users_read() {
   global $user;
   $exchange = ces_bank_get_current_exchange();
   return new User($user, $exchange);
+}
+
+function ces_komunitin_api_social_users_update($body) {
+  // No need to check access since the user is the current user.
+  global $user;
+  if (!isset($body->data)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+  }
+  $data = $body->data;
+  if (isset($data->attributes)) {
+    // Providing password is required for updating email or password.
+    require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
+    $password = $data->attributes->password;
+    if (!user_check_password($password, $user)) {
+      ces_komunitin_api_send_error(KomunitinApiError::INVALID_PASSWORD);
+    }
+    $edit = [];
+    // Update email
+    if (isset($data->attributes->email)) {
+      $edit['mail'] = $data->attributes->email;
+    }
+    // Update password
+    if (isset($data->attributes->newPassword)) {
+      $edit['pass'] = $data->attributes->newPassword;
+    }
+    // Update user in database.
+    if (!empty($edit)) {
+      $user = user_save($user, $edit);
+    }
+  }
+  return ces_komunitin_api_social_users_read();
 }
 
 function ces_komunitin_api_social_users_settings_read() {
@@ -269,6 +311,107 @@ function ces_komunitin_api_social_members_read_collection($exchange, array $memb
   else {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
   }
+}
+
+function ces_komunitin_api_social_members_update($exchange, $member, $body) {
+  if (!ces_bank_access('edit', 'account', $member['id'])) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+  if (!$body->data) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+  }
+  $data = $body->data;
+  $user = $member['user'];
+  if (!empty($data->attributes)) {
+    $attributes = $data->attributes;
+    // Update ces_fields
+    $fields = [];
+    // Name
+    if (!empty($attributes->name)) {
+      // Integralces has both firstname and surname, but Komunitin has only
+      // the name. Since for organizations only the firstname is used, we match
+      // the whole komunitin name to the Integralces firstname.
+      $fields['ces_firstname'] = $attributes->name;
+    }
+    // Bio
+    if (!empty($attributes->description)) {
+      $fields['ces_description'] = $attributes->description;
+    }
+    // Address
+    if (!empty($attributes->address)) {
+      $address = $attributes->address->streetAddress;
+      $fields['ces_address'] = $address;
+      $town = $attributes->address->addressLocality;
+      $fields['ces_town'] = $town;
+      $postcode = $attributes->address->postalCode;
+      $fields['ces_postcode'] = $postcode;
+      $region = $attributes->address->addressRegion;
+      $fields['ces_region'] = $region;
+      $country = $attributes->address->addressCountry;
+      $fields['ces_country'] = $country;
+    }
+    // use correct format for field api.
+    $edit = [];
+    foreach($fields as $name => $value) {
+      $edit[$name] = [LANGUAGE_NONE => [['value' => $value]]];
+    }
+
+    // Location
+    if (!empty($attributes->location)) {
+      $edit['ces_geolocation'] = [LANGUAGE_NONE => [
+        _ces_user_geolocation_field_value([
+          'lat' => $attributes->location->coordinates[1],
+          'lng' => $attributes->location->coordinates[0],
+        ])
+      ]];
+    }
+
+
+    // Image
+    if (!empty($attributes->image)) {
+      // user_save takes care of the file usage.
+      $file = _ces_komunitin_api_social_get_file_by_url($attributes->image);
+      if ($file == NULL) {
+        ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Invalid image');
+      } else {
+        $edit['picture'] = $file;
+      }
+    }
+    // Update user in database.
+    $user = user_save($user, $edit);
+  }
+  if (!empty($data->relationships) && !empty($data->relationships->contacts)) {
+    if (!isset($body->included) || !isset($data->relationships->contacts->data)) {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Missing included or related contacts.");
+    }
+    $included = $body->included;
+    $contacts = [];
+    foreach ($data->relationships->contacts->data as $related) {
+      // Get the id of the related contact.
+      $id = $related->id;
+      // Find the id in the included array.
+      $contact = NULL;
+      foreach ($included as $item) {
+        if ($item->type == "contacts" &&  $item->id == $id) {
+          $contact = $item;
+          break;
+        }
+      }
+      // We could support not modified contacts that are present in the relationship
+      // but not in the included array, but it is not necessary for the actual
+      // app usage of the API.
+      if ($contact == NULL) {
+        ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Contact not found in included.");
+      }
+      $contacts[$contact->attributes->type] = $contact->attributes->name;
+    }
+    // Update contacts.
+    ces_user_set_contacts($user, $contacts);
+  }
+  // Update user object inside $member so we return an updated resource.
+  $member['user'] = user_load($user->uid);
+
+  return ces_komunitin_api_social_members_read($exchange, $member);
 }
 
 function ces_komunitin_api_social_categories_load_collection($exchange, $filters, $sorts) {
@@ -404,6 +547,23 @@ function ces_komunitin_api_social_needs_read_collection($exchange, $needs)
 }
 
 /**
+ * Return a file object or null.
+ */
+function _ces_komunitin_api_social_get_file_by_url($url) {
+  $filename = basename(rawurldecode($url));
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'file')
+    ->propertyCondition('uri', "%/". db_like($filename), 'LIKE');
+  $result = $query->execute();
+  if (isset($result['file']) && count($result['file']) > 0) {
+    $resultFile = reset($result['file']);
+    $file = file_load($resultFile->fid);
+    return $file;
+  } else {
+    return NULL;
+  }
+}
+/**
  * Validate fields common to offers and needs in create and update operations.
  */
 function _ces_komunitin_api_social_offersneeds_validate($exchange, $body, $new, $type) {
@@ -471,15 +631,10 @@ function _ces_komunitin_api_social_offersneeds_validate($exchange, $body, $new, 
   $uploaded = [];
   if (isset($attributes->images) && is_array($attributes->images)) {
     foreach ($attributes->images as $url) {
-      $filename = basename(rawurldecode($url));
-      $query = new EntityFieldQuery();
-      $query->entityCondition('entity_type', 'file')
-        ->propertyCondition('uri', "%/". db_like($filename), 'LIKE');
-      $result = $query->execute();
-      if (isset($result['file']) && count($result['file']) > 0) {
-        $resultFile = reset($result['file']);
-        $file = file_load($resultFile->fid);
-        // move file to permanent storage.
+      $file = _ces_komunitin_api_social_get_file_by_url($url);
+      if ($file == NULL) {
+        ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Invalid image ' . $url);
+      } else {
         if (!$file->status) {
           $info = image_get_info($file->uri);
           if ($info) {
@@ -495,8 +650,6 @@ function _ces_komunitin_api_social_offersneeds_validate($exchange, $body, $new, 
           }
         }
         $images[] = $file->fid;
-      } else {
-        ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Invalid image ' . $url);
       }
     }
   }

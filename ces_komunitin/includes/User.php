@@ -11,12 +11,16 @@ use Neomerx\JsonApi\Schema\BaseSchema;
 class User {
   public $id;
 
+  public $email;
+
   // Relationships
   public $members;
   public $settings;
 
   function __construct($user, $exchange) {
     $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::USER, $user->uid);
+    $this->email = $user->mail;
+
     $bank = new CesBank();
     $accounts = $bank->getUserAccounts($user->uid);
     $this->members = [];
@@ -43,7 +47,9 @@ class UserSchema extends BaseSchema
 
   public function getAttributes($user, ContextInterface $context): iterable {
     assert($user instanceof User);
-    $attributes = [];
+    $attributes = [
+      "email" => $user->email
+    ];
     return $attributes;
   }
 

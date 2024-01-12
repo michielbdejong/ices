@@ -30,6 +30,9 @@ class Group {
   public $needsCount;
   public $offersCount;
 
+  // Helper
+  public $exchange;
+
 
   function __construct($exchange)
   {
@@ -59,7 +62,7 @@ class Group {
     // Provide at least an email contact: this is the email of the exchange
     // admin user.
     $admin = user_load($exchange['admin']);
-    $this->contacts = [new Contact($admin, Contact::TYPE_EMAIL, $this->code)];
+    $this->contacts = [new Contact($admin, Contact::TYPE_EMAIL, $admin->mail, $this->code)];
 
     // Load categories for this group.
     $categories = ces_komunitin_api_social_categories_load_collection($exchange, null, null);
@@ -71,6 +74,8 @@ class Group {
     $this->membersCount = ces_komunitin_api_social_members_count($exchange);
     $this->needsCount = ces_komunitin_api_social_needs_count($exchange);
     $this->offersCount = ces_komunitin_api_social_offers_count($exchange);
+
+    $this->exchange = $exchange;
   }
 }
 

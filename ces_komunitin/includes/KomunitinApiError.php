@@ -3,20 +3,22 @@
 use Neomerx\JsonApi\Schema\Error;
 
 class KomunitinApiError {
-  public const NOT_IMPLEMENTED = '1001';
-  public const UNAUTHORIZED = '1002';
-  public const FORBIDDEN = '1003';
-  public const NOT_FOUND = '1004';
-  public const METHOD_NOT_ALLOWED = '1005';
-  public const BAD_REQUEST = '1006';
-  public const INTERNAL_SERVER_ERROR = '1007';
-  public const DUPLICATED_ID = '1008';
-  public const INVALID_ID = '1009';
-  public const BAD_PAYER = '1010';
-  public const BAD_PAYEE = '1011';
-  public const BAD_AMOUNT = '1012';
-  public const BAD_TRANSFER_STATE = '1013';
-  public const TRANSFER_ERROR = '1014';
+  public const NOT_IMPLEMENTED = 'NotImplemented';
+  public const UNAUTHORIZED = 'Unauthorized';
+  public const FORBIDDEN = 'Forbidden';
+  public const NOT_FOUND = 'NotFound';
+
+  public const METHOD_NOT_ALLOWED = 'MethodNotAllowed';
+  public const BAD_REQUEST = 'BadRequest';
+  public const INTERNAL_SERVER_ERROR = 'InternalServerError';
+  public const DUPLICATED_ID = 'DuplicatedId';
+  public const INVALID_ID = 'InvalidId';
+  public const BAD_PAYER = 'BadPayer';
+  public const BAD_PAYEE = 'BadPayee';
+  public const BAD_AMOUNT = 'BadAmount';
+  public const BAD_TRANSFER_STATE = 'BadTransferState';
+  public const TRANSFER_ERROR = 'TransferError';
+  public const INVALID_PASSWORD = 'InvalidPassword';
 
   public static $errors = array(
     self::NOT_IMPLEMENTED => array('Not implemented', 501),
@@ -33,6 +35,7 @@ class KomunitinApiError {
     self::BAD_AMOUNT => array('Invalid amount', 400),
     self::BAD_TRANSFER_STATE => array('Invalid transaction state', 400),
     self::TRANSFER_ERROR => array('Error operating transaction', 400),
+    self::INVALID_PASSWORD => array('Invalid password', 400),
   );
 
   // API error code.

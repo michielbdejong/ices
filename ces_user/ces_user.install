@@ -137,6 +137,7 @@ function _ces_user_create_user_fields() {
     }
   }
   _add_location_field();
+  _add_extra_fields();
   return TRUE;
 }
 
@@ -163,6 +164,51 @@ function _add_location_field()
       ]
     ];
     field_create_instance($newinstance);
+  }
+}
+/**
+ * Add fields for komunitin that do not show in IntegralCES.
+ */
+function _add_extra_fields() {
+  $fields = [
+    'ces_description' => [
+      'type' => 'text_long',
+      'label' => 'Description',
+      'weight' => 15
+    ],
+    'ces_region' => [
+      'type' => 'text',
+      'label' => 'Region',
+      'weight' => 36
+    ],
+    'ces_country' => [
+      'type' => 'text',
+      'label' => 'Country',
+      'weight' => 37
+    ],
+  ];
+  foreach($fields as $name => $field) {
+    if (!field_info_field($name)) {
+      field_create_field([
+        'field_name' => $name,
+        'type' => $field['type'],
+        'cardinality' => 1,
+      ]);
+    }
+    if(!field_info_instance('user', $name, 'user')) {
+      field_create_instance([
+        'field_name' => $name,
+        'entity_type' => 'user',
+        'bundle' => 'user',
+        'label' => $field['label'],
+        'display' => [
+          'default' => ['type' => 'hidden']
+        ],
+        'widget' => [
+          'weight' => $field['weight'],
+        ]
+      ]);
+    }
   }
 }
 /**
@@ -197,5 +243,12 @@ function _ces_user_translation_template() {
  */
 function ces_user_update_7101() {
   _add_location_field();
+}
+
+/**
+ * Add description to users (only for komunitin)
+ */
+function ces_user_update_7102() {
+  _add_extra_fields();
 }
 /** @} */

@@ -864,6 +864,49 @@ function ces_user_set_settings(&$user, $settings) {
   }
 }
 
+function ces_user_get_contacts($user) {
+  $contacts = array();
+  // Always email contact.
+  $contacts['email'] = $user->mail;
+  // Phone contact.
+  $phone = ces_user_get_main_phone($user);
+  if (!empty($phone)) {
+    $contacts['phone'] = $phone;
+  }
+  // Website contact.
+  if (!empty($user->ces_website) && !empty($user->ces_website[LANGUAGE_NONE][0]['value'])) {
+    $contacts['website'] = $user->ces_website[LANGUAGE_NONE][0]['value'];
+  }
+  // Additional contacts.
+  if (isset($user->data['ces_user_contacts'])) {
+    $data = $user->data['ces_user_contacts'];
+    foreach ($data as $key => $value) {
+      $contacts[$key] = $value;
+    }
+  }
+  return $contacts;
+}
+
+function ces_user_set_contacts(&$user, $contacts) {
+  $edit = array();
+  // Do NOT edit email this way.
+  unset($contacts['email']);
+  // Save phone in special field.
+  $edit['ces_phonemobile'] = [
+    LANGUAGE_NONE => [['value' => !empty($contacts['phone']) ? $contacts['phone'] : NULL]]
+  ];
+  unset($contacts['phone']);
+  // Save website in special field.
+  $edit['ces_website'] = [
+    LANGUAGE_NONE => [['value' => !empty($contacts['website']) ? $contacts['website'] : NULL]]
+  ];
+  // Save other contacts in $user->data.
+  $edit['data'] = $user->data;
+  $edit['data']['ces_user_contacts'] = $contacts;
+
+  $user = user_save($user, $edit);
+}
+
 /**
  * @}
  */

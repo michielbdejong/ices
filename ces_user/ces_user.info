@@ -6,5 +6,5 @@ dependencies[] = ices
 dependencies[] = geolocation
 
 
-version = "7.x-1.38"
+version = "7.x-1.39"
 

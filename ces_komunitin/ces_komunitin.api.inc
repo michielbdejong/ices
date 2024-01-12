@@ -309,7 +309,7 @@ function ces_komunitin_api_get_endpoints() {
       ),
       'users' => array(
         'me' => array(
-          'operations' => array('read'),
+          'operations' => array('read', 'update'),
           'settings' => array(
             'operations' => array('read', 'update')
           )
@@ -318,7 +318,7 @@ function ces_komunitin_api_get_endpoints() {
       'members' => array(
         'operations' => array('read'),
         '%' => array(
-          'operations' => array('read')
+          'operations' => array('read', 'update')
         )
       ),
       'needs' => array(
