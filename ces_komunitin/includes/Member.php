@@ -61,7 +61,7 @@ class Member {
         $this->type = self::TYPE_PUBLIC;
     }
 
-    function check_field($entity, $field, $def = null) {
+    function _ces_komunitin_check_field($entity, $field, $def = null) {
       if (isset($entity->{$field}) && !empty($entity->{$field}[LANGUAGE_NONE][0]['value'])) {
         return $entity->{$field}[LANGUAGE_NONE][0]['value'];
       }
@@ -75,11 +75,11 @@ class Member {
     $exchange = $group->exchange;
 
     $this->address = [
-      "streetAddress" => check_field($user, 'ces_address'),
-      "addressLocality" => check_field($user, 'ces_town'),
-      "postalCode" => check_field($user, 'ces_postcode'),
-      "addressRegion" => check_field($user, 'ces_region', $exchange['region']),
-      "addressCountry" => check_field($user, 'ces_country', $exchange['country']),
+      "streetAddress" => _ces_komunitin_check_field($user, 'ces_address'),
+      "addressLocality" => _ces_komunitin_check_field($user, 'ces_town'),
+      "postalCode" => _ces_komunitin_check_field($user, 'ces_postcode'),
+      "addressRegion" => _ces_komunitin_check_field($user, 'ces_region', $exchange['region']),
+      "addressCountry" => _ces_komunitin_check_field($user, 'ces_country', $exchange['country']),
     ];
 
     $this->created = SchemaUtils::encodeDate($user->created);
@@ -95,12 +95,12 @@ class Member {
     }
 
     $this->location = [
-      'name' => check_field($user, 'ces_town'),
+      'name' => _ces_komunitin_check_field($user, 'ces_town'),
       'type' => 'Point',
       'coordinates' => [$lng, $lat]
     ];
 
-    $this->description = check_field($user, 'ces_description');
+    $this->description = _ces_komunitin_check_field($user, 'ces_description');
 
     // Relationships
     $this->account_id = $member['uuid'];
