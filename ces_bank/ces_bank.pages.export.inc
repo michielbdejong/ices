@@ -247,17 +247,17 @@ function generate_sql($exchange_id, $csv) {
     $SQLS['balances']['sql'] = "SELECT
 
             ca.name AS 'UID',
-            ( SELECT count(id) 
-                    FROM ces_transaction WHERE ces_transaction.toaccount = ca.id 
+            ( SELECT count(id)
+                    FROM ces_transaction WHERE ces_transaction.toaccount = ca.id
             ) AS 'Sales',
-            ( SELECT SUM(amount) 
-                    FROM ces_transaction WHERE ces_transaction.toaccount = ca.id 
+            ( SELECT SUM(amount)
+                    FROM ces_transaction WHERE ces_transaction.toaccount = ca.id
             ) AS 'Income',
-            ( SELECT count(id) 
-                FROM ces_transaction WHERE ces_transaction.fromaccount = ca.id 
+            ( SELECT count(id)
+                FROM ces_transaction WHERE ces_transaction.fromaccount = ca.id
             ) AS 'Purchases',
-            ( SELECT SUM(amount) 
-                FROM ces_transaction WHERE ces_transaction.fromaccount = ca.id 
+            ( SELECT SUM(amount)
+                FROM ces_transaction WHERE ces_transaction.fromaccount = ca.id
             ) AS 'Expenditure',
             0 AS 'Levy',
             FORMAT(ca.balance,2) AS 'Balance'
@@ -295,7 +295,7 @@ function generate_sql($exchange_id, $csv) {
             ct.concept AS 'Description'
 
         FROM ces_transaction ct
-        
+
         INNER JOIN users u ON ct.user = u.uid
         INNER JOIN ces_accountuser cau ON cau.user = u.uid
 
@@ -447,8 +447,9 @@ function csv_file($csv, $enlace = FALSE) {
     $USER_DB = $GLOBALS['databases']['default']['default']['username'];
     $PASS_DB = $GLOBALS['databases']['default']['default']['password'];
     $NAME_DB = $GLOBALS['databases']['default']['default']['database'];
+    $HOST_DB = $GLOBALS['databases']['default']['default']['host'];
 
-    $enlace = mysqli_connect("127.0.0.1", $USER_DB, $PASS_DB, $NAME_DB);
+    $enlace = mysqli_connect($HOST_DB, $USER_DB, $PASS_DB, $NAME_DB);
 
     if (!$enlace) {
         echo "Error: No se pudo conectar a MySQL." . PHP_EOL;
