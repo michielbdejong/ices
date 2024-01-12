@@ -332,6 +332,7 @@ function ces_komunitin_api_social_members_update($exchange, $member, $body) {
       // the name. Since for organizations only the firstname is used, we match
       // the whole komunitin name to the Integralces firstname.
       $fields['ces_firstname'] = $attributes->name;
+      $fields['ces_surname'] = '';
     }
     // Bio
     if (!empty($attributes->description)) {

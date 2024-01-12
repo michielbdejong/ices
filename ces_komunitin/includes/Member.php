@@ -6,6 +6,14 @@ use Neomerx\JsonApi\Schema\Identifier;
 use Neomerx\JsonApi\Schema\Link;
 use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 
+function _ces_komunitin_check_field($entity, $field, $def = null) {
+  if (isset($entity->{$field}) && !empty($entity->{$field}[LANGUAGE_NONE][0]['value'])) {
+    return $entity->{$field}[LANGUAGE_NONE][0]['value'];
+  }
+  else {
+    return $def;
+  }
+}
 
 class Member {
   const TYPE_PERSONAL = 'personal';
@@ -59,15 +67,6 @@ class Member {
       case CesBankLocalAccount::TYPE_PUBLIC:
       case CesBankLocalAccount::TYPE_VIRTUAL:
         $this->type = self::TYPE_PUBLIC;
-    }
-
-    function _ces_komunitin_check_field($entity, $field, $def = null) {
-      if (isset($entity->{$field}) && !empty($entity->{$field}[LANGUAGE_NONE][0]['value'])) {
-        return $entity->{$field}[LANGUAGE_NONE][0]['value'];
-      }
-      else {
-        return $def;
-      }
     }
 
     $this->image = $user->picture ? file_create_url($user->picture->uri) : null;
