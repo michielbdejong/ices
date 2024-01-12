@@ -12,7 +12,8 @@ RUN docker-php-ext-configure gd \
 		--with-freetype \
 		--with-jpeg=/usr \
 		--with-webp
-RUN docker-php-ext-install -j$(nproc) gd opcache pdo_mysql zip
+RUN docker-php-ext-install -j$(nproc) gd opcache pdo_mysql mysqli zip \
+  && docker-php-ext-enable mysqli
 RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
     docker-php-ext-install -j$(nproc) imap
 
