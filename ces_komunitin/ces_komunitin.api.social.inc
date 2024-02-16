@@ -151,6 +151,7 @@ function ces_komunitin_api_social_users_read() {
 }
 
 function ces_komunitin_api_social_users_update($body) {
+  require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
   // No need to check access since the user is the current user.
   global $user;
   if (!isset($body->data)) {
@@ -159,11 +160,17 @@ function ces_komunitin_api_social_users_update($body) {
   $data = $body->data;
   if (isset($data->attributes)) {
     // Providing password is required for updating email or password.
-    require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
-    $password = $data->attributes->password;
-    if (!user_check_password($password, $user)) {
-      ces_komunitin_api_send_error(KomunitinApiError::INVALID_PASSWORD);
+    $auth_access = ces_komunitin_api_client_access('komunitin_auth');
+    if (!$auth_access) {
+      if (!isset($data->attributes->password)) {
+        ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "'komunitin_auth' scope or password is required for updating email or password.");
+      }
+      $password = $data->attributes->password;
+      if (!user_check_password($password, $user)) {
+        ces_komunitin_api_send_error(KomunitinApiError::INVALID_PASSWORD);
+      }
     }
+
     $edit = [];
     // Update email
     if (isset($data->attributes->email)) {

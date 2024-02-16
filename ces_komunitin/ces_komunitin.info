@@ -9,5 +9,6 @@ dependencies[] = oauth2_server
 dependencies[] = cors
 dependencies[] = login_emailusername
 dependencies[] = libraries
+dependencies[] = xautoload
 
-version = "7.x-1.41"
+version = "7.x-1.42"

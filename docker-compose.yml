@@ -42,6 +42,7 @@ services:
       - NOTIFICATIONS_API_URL=${NOTIFICATIONS_API_URL:-http://notifications:2028}
       - NOTIFICATIONS_EVENTS_USERNAME=${NOTIFICATIONS_EVENTS_USERNAME:-integralces}
       - NOTIFICATIONS_EVENTS_PASSWORD=${NOTIFICATIONS_EVENTS_PASSWORD:-komunitin}
+      - MAILERSEND_API_KEY=${MAILERSEND_API_KEY:-'mlsn.xxxxxxxxxxxxxx'}
     networks:
       - komunitin
 

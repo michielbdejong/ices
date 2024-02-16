@@ -12,6 +12,7 @@ function _ces_komunitin_get_scopes() {
     // Komunitin scopes for users.
     'komunitin_social' => 'Manage exchange group membership, offers, needs...',
     'komunitin_accounting' => 'Manage account, perform transactions, accept transactions...',
+    'komunitin_auth' => 'Password reset.',
     // OpenId scopes for users.
     'openid' => 'Know your user information',
     'offline_access' => "Access the API when you're not present.",
@@ -88,7 +89,7 @@ function ces_komunitin_install() {
   $client->automatic_authorization = FALSE;
   $client->save();
 
-
+  _ces_komunitin_add_mail_system();
 }
 
 /**
@@ -116,4 +117,35 @@ function ces_komunitin_uninstall() {
   if ($server = oauth2_server_load('komunitin')) {
     entity_delete('oauth2_server', $server->identifier());
   }
+
+  _ces_komunitin_remove_mail_system();
+}
+
+function ces_komunitin_update_7101() {
+  // Add new scope komunitin_auth.
+  $scopes = _ces_komunitin_get_scopes();
+
+  $scope = entity_create('oauth2_server_scope', array());
+  $scope->server = 'komunitin';
+  $scope->name = 'komunitin_auth';
+  $scope->description = $scopes['komunitin_auth'];
+
+  $scope->save();
+}
+
+function ces_komunitin_update_7102() {
+  // set mail system
+  _ces_komunitin_add_mail_system();
+}
+
+function _ces_komunitin_add_mail_system() {
+  $mail_system = variable_get('mail_system', array('default-system' => 'DefaultMailSystem'));
+  $mail_system['ces_komunitin'] = 'CesKomunitinMailSystem';
+  variable_set('mail_system', $mail_system);
+}
+
+function _ces_komunitin_remove_mail_system() {
+  $mail_system = variable_get('mail_system', array('default-system' => 'DefaultMailSystem'));
+  unset($mail_system['ces_komunitin']);
+  variable_set('mail_system', $mail_system);
 }
