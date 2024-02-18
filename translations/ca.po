@@ -3134,7 +3134,7 @@ msgstr "Ens han demanat que restablim la teva contrasenya. Clica el següent bot
 
 #: ces_komunitin/ces_komunitin.mail.inc:20
 msgid "If you didn't request this, you can safely ignore this email."
-msgstr ""
+msgstr "Si no ho has demanat tu, pots ignorar aquest email"
 
 #: ces_komunitin/ces_komunitin.mail.inc:21
 msgid "Set password"
