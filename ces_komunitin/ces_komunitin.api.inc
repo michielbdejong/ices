@@ -13,6 +13,7 @@ require_once dirname(__FILE__) . '/includes/Transfer.php';
 
 // Social API objects
 require_once dirname(__FILE__) . '/includes/Group.php';
+require_once dirname(__FILE__) . '/includes/SignupSettings.php';
 require_once dirname(__FILE__) . '/includes/Contact.php';
 require_once dirname(__FILE__) . '/includes/Member.php';
 require_once dirname(__FILE__) . '/includes/Offer.php';
@@ -58,7 +59,7 @@ function ces_komunitin_api() {
     // Unauthenticated request
     if ($token instanceof OAuth2\Response) {
       // Check if it is to a public endpoint and quick return otherwise.
-      if (!($request->method == 'GET' && ces_komunitin_api_is_public_endpoint($path))) {
+      if (!ces_komunitin_api_is_public_endpoint($path, $request->method)) {
         $error_code = $token->getStatusCode() == 403 ?
           KomunitinApiError::FORBIDDEN : KomunitinApiError::UNAUTHORIZED;
         ces_komunitin_api_send_error($error_code);
@@ -231,6 +232,7 @@ function ces_komunitin_api() {
         AccountSettings::class => AccountSettingsSchema::class,
         Transfer::class => TransferSchema::class,
         Group::class => GroupSchema::class,
+        SignupSettings::class => SignupSettingsSchema::class,
         Contact::class => ContactSchema::class,
         Member::class => MemberSchema::class,
         Offer::class => OfferSchema::class,
@@ -308,6 +310,7 @@ function ces_komunitin_api_get_endpoints() {
         )
       ),
       'users' => array(
+        'operations' => array('create'),
         'me' => array(
           'operations' => array('read', 'update'),
           'settings' => array(
@@ -339,8 +342,9 @@ function ces_komunitin_api_get_endpoints() {
 }
 function ces_komunitin_get_public_paths() {
   return [
-    'social/groups',
-    'social/%',
+    'social/groups' => ['GET'],
+    'social/%' => ['GET'],
+    'social/users' => ['POST'],
   ];
 }
 /**
@@ -348,23 +352,29 @@ function ces_komunitin_get_public_paths() {
  * Public endpoints are:
  *
  */
-function ces_komunitin_api_is_public_endpoint($path) {
+function ces_komunitin_api_is_public_endpoint($path, $method) {
   $public = ces_komunitin_get_public_paths();
-  foreach ($public as $candidate) {
-    $items = explode('/', $candidate);
-    if (count($path) == count($items)) {
-      $match = TRUE;
-      foreach ($items as $i => $item) {
-        if ($item != $path[$i] && $item != '%') {
-          $match = FALSE;
-        }
-      }
-      if ($match) return TRUE;
+  foreach ($public as $candidate => $methods) {
+    if (in_array($method, $methods) && ces_komunitin_api_path_matches($path, $candidate)) {
+      return TRUE;
     }
   }
   return FALSE;
 }
 
+function ces_komunitin_api_path_matches($path, $candidate) {
+  $match = FALSE;
+  $items = explode('/', $candidate);
+  if (count($path) == count($items)) {
+    $match = TRUE;
+    foreach ($items as $i => $item) {
+      if ($item != $path[$i] && $item != '%') {
+        $match = FALSE;
+      }
+    }
+  }
+  return $match;
+}
 
 /**
  * Send a JSON API error object.

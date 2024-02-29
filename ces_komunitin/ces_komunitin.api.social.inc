@@ -4,6 +4,7 @@ class ResourceTypes {
   const USER = "user";
   const USER_SETTINGS = "user-settings";
   const GROUP = "group";
+  const SIGNUP_SETTINGS = "signup-settings";
   const MEMBER = "member";
   const NEED = "need";
   const OFFER = "offer";
@@ -20,8 +21,8 @@ class ResourceTypes {
   const FACEBOOK = "facebook";
   const TWITTER = "twitter";
 
-  const ALL_TYPES = [self::USER, self::USER_SETTINGS, self::GROUP, self::MEMBER,
-    self::NEED, self::OFFER, self::CATEGORY, self::FILE,
+  const ALL_TYPES = [self::USER, self::USER_SETTINGS, self::GROUP, self::SIGNUP_SETTINGS,
+    self::MEMBER, self::NEED, self::OFFER, self::CATEGORY, self::FILE,
     self::EMAIL, self::PHONE, self::WEBSITE, self::WHATSAPP, self::TELEGRAM,
     self::INSTAGRAM, self::FACEBOOK, self::TWITTER];
 }
@@ -170,6 +171,9 @@ function ces_komunitin_api_social_users_update($body) {
         ces_komunitin_api_send_error(KomunitinApiError::INVALID_PASSWORD);
       }
     }
+    if (!valid_email_address($data->attributes->email)) {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Invalid email");
+    }
 
     $edit = [];
     // Update email
@@ -186,6 +190,113 @@ function ces_komunitin_api_social_users_update($body) {
     }
   }
   return ces_komunitin_api_social_users_read();
+}
+
+/**
+ * Create a new user. This endpoint is called in the signup process and hence
+ * it is not protected.
+ */
+function ces_komunitin_api_social_users_create($body) {
+  // Validate request. It must have email, password and a member with name
+  // associated to an exchange.
+  if (!isset($body->data) || !isset($body->data->attributes)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+  }
+  $attributes = $body->data->attributes;
+  if (!isset($attributes->email) || !isset($attributes->password)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+  }
+  if (!valid_email_address($attributes->email)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Invalid email");
+  }
+  $user = null;
+  if ($user = user_load_by_mail($attributes->email)) {
+    // Email already in use.
+    // There are 2 options here
+    // 1. The user is active. In this case we return an error and the client will
+    // need to recover their password.
+    if ($user->status == 1) {
+      ces_komunitin_api_send_error(KomunitinApiError::DUPLICATED_EMAIL, "Email already in use");
+    }
+    // 2.  The user is inactive. In this case we'll update this user and resend
+    // the validation email.
+  }
+  if (strlen($attributes->password) < 8) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Password too short");
+  }
+  if (!isset($body->data->relationships) || !isset($body->data->relationships->members) || !isset($body->data->relationships->members->data) || count($body->data->relationships->members->data) !== 1) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Missing member");
+  }
+  $member = $body->data->relationships->members->data[0];
+  if (empty($member->attributes->name)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Missing member name");
+  }
+  if (!isset($member->relationships) || !isset($member->relationships->group) || !isset($member->relationships->group->data) || !isset($member->relationships->group->data->id)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Missing member group");
+  }
+  $exchange_id = ces_komunitin_api_social_get_id($member->relationships->group->data->id);
+  $exchange = ces_bank_get_exchange($exchange_id->id);
+  if ($exchange == NULL) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Invalid member group");
+  }
+  $language = isset($exchange['data']['default_lang']) ? $exchange['data']['default_lang'] : language_default();
+  if (isset($body->data->relationships->settings)) {
+    $settings = $body->data->relationships->settings->data;
+    if (!empty($settings) && !empty($settings->attributes)) {
+      $language = $settings->attributes->language;
+    }
+  }
+
+  // All right! Create the user.
+  require_once __DIR__ . '/ces_komunitin.api.auth.inc';
+
+  $name = trim($member->attributes->name);
+  // 1. Get free username.
+  $username = ces_offerswants_slugify(substr($name, 0, 20));
+  $error = user_validate_name($username);
+  if ($error) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Invalid member name");
+  }
+  if (($existing = user_load_by_name($username)) && (empty($user) || $existing->uid != $user->uid)) {
+    $number = 1;
+    do {
+      $new_username = $username . $number;
+      $number++;
+    } while (user_load_by_name($new_username));
+    $username = $new_username;
+  }
+
+  // 2. Create user.
+  $user = user_save($user, [
+    'name' => $username,
+    'mail' => trim($attributes->email),
+    'init' => trim($attributes->email),
+    'pass' => $attributes->password,
+    'language' => $language,
+    'status' => 0,
+    'ces_firstname' => [LANGUAGE_NONE => [['value' => $name]]],
+    'ces_surname' => [LANGUAGE_NONE => [['value' => ""]]],
+  ]);
+
+  if (!$user) {
+    ces_komunitin_api_send_error(KomunitinApiError::INTERNAL_SERVER_ERROR, "User not created");
+  }
+
+  // 3. Create account (if not exists).
+  $bank = new CesBank();
+  $accounts = $bank->getUserAccountsInExchange($user->uid, $exchange['id']);
+  if (empty($accounts)) {
+    // Create account.
+    $account = $bank->getDefaultAccount($exchange['id']);
+    $account['users'][0]['user'] = $user->uid;
+    $bank->createAccount($account, FALSE); // Do not send default email.
+  }
+
+  // Send validation email.
+  ces_komunitin_send_validation_email($user->uid, $exchange['code']);
+
+  // Return newly created user.
+  return new User($user, $exchange);
 }
 
 function ces_komunitin_api_social_users_settings_read() {

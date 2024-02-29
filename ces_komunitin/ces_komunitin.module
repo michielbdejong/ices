@@ -55,6 +55,13 @@ function ces_komunitin_menu() {
     'file path' => drupal_get_path('module', 'ces_komunitin'),
     'access callback' => TRUE
   );
+  $items['oauth2/resend-validation'] = array(
+    'page callback' => 'ces_komunitin_api_auth_resend_validation_email',
+    'type' => MENU_CALLBACK,
+    'file' => 'ces_komunitin.api.auth.inc',
+    'file path' => drupal_get_path('module', 'ces_komunitin'),
+    'access callback' => TRUE
+  );
   $items['ces/files'] = array(
     'page callback' => 'ces_komunitin_files',
     'type' => MENU_CALLBACK,
@@ -244,3 +251,20 @@ function ces_komunitin_notifications_cron_worker($expired) {
   }
 }
 
+/**
+ * Implements hook_oauth2_server_token().
+ */
+function ces_komunitin_oauth2_server_token($server, $request, $response) {
+  // Activate user in case this is a authorization code request.
+  if ($request->request['client_id'] == 'komunitin-app' && $request->request['grant_type'] === 'authorization_code'
+    && (($access_token = $response->getParameter('access_token')) != NULL)) {
+    // Succesful login by authorization code. This means we can verify user email and hence unblock user.
+    $token = oauth2_server_token_load($access_token);
+    $user = user_load($token->uid);
+    if ($user->status == 0) {
+      $user = user_save($user, ['status' => 1]);
+      watchdog('ces_komunitin', 'Verified email %email', ['%email' => $user->mail]);
+    }
+  }
+
+}

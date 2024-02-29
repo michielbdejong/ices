@@ -817,6 +817,17 @@ class CesBank {
     return $accounts;
   }
 
+  public function getUserAccountsInExchange($uid, $exchange_id) {
+    $exchange_accounts = array();
+    $accounts = $this->getUserAccounts($uid);
+    foreach ($accounts as $account) {
+      if ($account['exchange'] == $exchange_id) {
+        $exchange_accounts[] = $account;
+      }
+    }
+    return $exchange_accounts;
+  }
+
   /**
    * Deletes an account.
    */
