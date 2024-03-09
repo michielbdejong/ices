@@ -281,7 +281,7 @@ class CesBankTestCase extends DrupalWebTestCase {
         'phonemobile' => '11111111',
         'phonework' => '22222222',
         'phonehome' => '',
-        'website' => '',
+        'website' => 'http://www.integralces.net',
       ),
       'bankaccount' => array(
         'kind' => '0',
@@ -318,7 +318,7 @@ class CesBankTestCase extends DrupalWebTestCase {
         'phonemobile' => '333333333',
         'phonework' => '444444444',
         'phonehome' => '',
-        'website' => '',
+        'website' => 'https://integralces.net',
       ),
       'bankaccount' => array(
         'kind' => '0',
@@ -342,7 +342,7 @@ class CesBankTestCase extends DrupalWebTestCase {
         'phonemobile' => '333333333',
         'phonework' => '444444444',
         'phonehome' => '',
-        'website' => '',
+        'website' => 'https://integralces.net',
       ),
       'bankaccount' => array(
         'kind' => '0',

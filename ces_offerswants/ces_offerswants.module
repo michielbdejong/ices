@@ -966,10 +966,10 @@ function ces_offerwant_access($operation, $offerwant = NULL, $account = NULL) {
   $bankaccount = ces_bank_get_current_account($account);
   // Handle empty offerwant
   if (empty($offerwant)) {
-    // Handle 'add' operation. Any user with an active account can add offers into
-    // its exchange group.
+    // Handle 'add' operation. Any active user with an account (even inactive)
+    // can add offers into its exchange group.
     if ($operation == 'add') {
-      return !empty($bankaccount) && ($bankaccount['state'] == CesBankLocalAccount::STATE_ACTIVE);
+      return !empty($bankaccount) && ($user->status == 1);
     }
     // Deny access to empty $offerwant parameter besides 'add'.
     else {

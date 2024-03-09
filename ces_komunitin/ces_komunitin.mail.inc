@@ -11,15 +11,20 @@
 function ces_komunitin_mail($key, &$message, $params) {
   // TODO: send as system@komunitin.org.
   $langcode = $message['language']->language;
+  $message['headers']['Content-Type'] = 'text/html; charset=UTF-8;';
   switch ($key) {
     case 'reset_password':
-      $message['headers']['Content-Type'] = 'text/html; charset=UTF-8;';
       $message['subject'] = t('Reset your Komunitin password', [], ['langcode' => $langcode]);
       $message['body'][] = _ces_komunitin_mail_html_template([
         t('We\'ve been requested to reset your password. Please click the following button to set a new password for your account.', [], ['langcode' => $langcode]),
         t('If you didn\'t request this, you can safely ignore this email.', [], ['langcode' => $langcode]),
       ], t('Set password'), $params['url'], $langcode);
       break;
+    case 'signup_validate_email':
+      $message['subject'] = t('Validate your email', [], ['langcode' => $langcode]);
+      $message['body'][] = _ces_komunitin_mail_html_template([
+        t('Welcome to Komunitin! Please click the following button to validate your email address and proceed with your registration.', [], ['langcode' => $langcode]),
+      ], t('Validate email'), $params['url'], $langcode);
   }
 }
 
@@ -92,7 +97,8 @@ class CesKomunitinMailSystem extends DefaultMailSystem {
 
     // Save html version of body before computing the text version.
     $html = $message['body'];
-
+    // Get the text version.
+    $message['body'] = [$message['body']];
     $message = parent::format($message);
     $text = $message['body'];
 

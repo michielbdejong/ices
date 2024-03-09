@@ -265,7 +265,7 @@ class CesInteropCENIPOutgoingTransaction extends CesInteropCENIPTransaction {
    */
   public $buyer_country;
 
-  public __construct($parent, $record) {
+  public function __construct($parent, $record) {
     parent::__construct($parent, $record);
     if (!isset($this->txid)) {
       $this->txid = $this->uuid();

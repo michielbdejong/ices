@@ -2031,7 +2031,7 @@ function ces_bank_transaction_form_validate($form, &$form_state) {
     form_set_error('fromaccountname', t('Buyer account %acc is incorrect.', array('%acc' => $account2)));
     $error = TRUE;
   }
-  if ($account1['id'] == $account2['id']) {
+  if (!$error && ($account1['id'] == $account2['id'])) {
     form_set_error('fromaccountname', t('Buyer account cannot be the same as seller account.'));
     $error = TRUE;
   }

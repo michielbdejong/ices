@@ -25,6 +25,7 @@ class Group {
   public $currency_id;
   public $contacts;
   public $categories;
+  public $signupSettings;
 
   public $membersCount;
   public $needsCount;
@@ -74,6 +75,8 @@ class Group {
     $this->membersCount = ces_komunitin_api_social_members_count($exchange);
     $this->needsCount = ces_komunitin_api_social_needs_count($exchange);
     $this->offersCount = ces_komunitin_api_social_offers_count($exchange);
+
+    $this->signupSettings = new SignupSettings($exchange);
 
     $this->exchange = $exchange;
   }
@@ -144,6 +147,11 @@ class GroupSchema extends BaseSchema {
         self::RELATIONSHIP_LINKS_RELATED => true,
         self::RELATIONSHIP_META => ['count' => $group->needsCount]
       ],
+      'signup-settings' => [
+        self::RELATIONSHIP_DATA => $group->signupSettings,
+        self::RELATIONSHIP_LINKS_SELF => false,
+        self::RELATIONSHIP_LINKS_RELATED => false
+      ]
     ];
   }
   /**

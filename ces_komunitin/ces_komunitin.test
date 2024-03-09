@@ -544,9 +544,9 @@ class CesKomunitinestCase extends CesBankTestCase
     if ($status == 200) {
       $response = json_decode($result->data);
       $this->assertEqual($response->data->attributes->code, $code);
-      // two contact objects (email & phone)
-      $this->assertEqual(count($response->included), 2);
-      $this->assertEqual(count($response->data->relationships->contacts->data), 2);
+      // 3 contact objects (email, phone & website)
+      $this->assertEqual(count($response->included), 3);
+      $this->assertEqual(count($response->data->relationships->contacts->data), 3);
       return $response;
     }
   }
@@ -560,8 +560,8 @@ class CesKomunitinestCase extends CesBankTestCase
     if ($status == 200) {
       $response = json_decode($result->data);
       $this->assertIds($response, $ids);
-      // two contacts per member.
-      $this->assertEqual(count($response->data) * 2, count($response->included));
+      // 3 contacts per member.
+      $this->assertEqual(count($response->data) * 3, count($response->included));
       return $response;
     }
   }

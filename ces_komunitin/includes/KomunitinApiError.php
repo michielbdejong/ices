@@ -10,6 +10,7 @@ class KomunitinApiError {
 
   public const METHOD_NOT_ALLOWED = 'MethodNotAllowed';
   public const BAD_REQUEST = 'BadRequest';
+  public const DUPLICATED_EMAIL = 'DuplicatedEmail';
   public const INTERNAL_SERVER_ERROR = 'InternalServerError';
   public const DUPLICATED_ID = 'DuplicatedId';
   public const INVALID_ID = 'InvalidId';
@@ -20,6 +21,7 @@ class KomunitinApiError {
   public const TRANSFER_ERROR = 'TransferError';
   public const INVALID_PASSWORD = 'InvalidPassword';
 
+
   public static $errors = array(
     self::NOT_IMPLEMENTED => array('Not implemented', 501),
     self::UNAUTHORIZED => array('Unauthorized', 401),
@@ -27,6 +29,7 @@ class KomunitinApiError {
     self::NOT_FOUND => array('Not Found', 404),
     self::METHOD_NOT_ALLOWED => array('Method Not Allowed', 405),
     self::BAD_REQUEST => array('Bad Request', 400),
+    self::DUPLICATED_EMAIL => array('Duplicated email', 409),
     self::INTERNAL_SERVER_ERROR => array('Internal Server Error', 500),
     self::DUPLICATED_ID => array('Duplicated identifier', 409),
     self::INVALID_ID => array('Invalid id', 400),

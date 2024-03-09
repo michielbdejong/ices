@@ -45,6 +45,8 @@ services:
       - MAILERSEND_API_KEY=${MAILERSEND_API_KEY:-'mlsn.xxxxxxxxxxxxxx'}
     networks:
       - komunitin
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 networks:
   komunitin:
