@@ -28,8 +28,8 @@ class SignupSettings {
       "requireAdminApproval" => true,
       "requireAcceptTerms" => !empty($exchange['data']['require_terms']),
       "terms" => $markdown,
-      "minOffers" => $exchange['data']['registration_offers'],
-      "minNeeds" => $exchange['data']['registration_wants']
+      "minOffers" => isset($exchange['data']['registration_offers']) ? $exchange['data']['registration_offers'] : 0,
+      "minNeeds" => isset($exchange['data']['registration_offers']) ? $exchange['data']['registration_wants'] : 0
     ];
 
     $this->code = $exchange['code'];

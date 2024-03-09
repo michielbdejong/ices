@@ -406,7 +406,6 @@ function ces_komunitin_api_social_members_load_collection($exchange, $filters, $
 function ces_komunitin_api_social_members_read($exchange, $member) {
   if (ces_komunitin_api_client_access('komunitin_social_read_all') ||
     ces_bank_user_access('view', $member['user'])) {
-
     return new Member($member, new Group($exchange));
   }
   else {
@@ -644,25 +643,18 @@ function ces_komunitin_api_social_needs_read($exchange, $need) {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
   }
 }
-function ces_komunitin_api_social_needs_read_collection($exchange, $needs)
-{
-  // General access check.
-  if (ces_bank_access('view', 'exchange details', $exchange['id'])) {
-    $group = new Group($exchange);
-    $result = [];
-    foreach ($needs as $need) {
-      // Resource by resource access check.
-      if (ces_offerwant_access('view', $need)) {
-        $category = new Category(ces_category_load($need->category), $group);
-        $member = new Member(_ces_komunitin_api_social_user_member($need->user, $exchange['id']), $group);
-        $result[] =  new Need($need, $member, $group, $category);
-      }
+function ces_komunitin_api_social_needs_read_collection($exchange, $needs) {
+  $group = new Group($exchange);
+  $result = [];
+  foreach ($needs as $need) {
+    // Resource by resource access check.
+    if (ces_offerwant_access('view', $need)) {
+      $category = new Category(ces_category_load($need->category), $group);
+      $member = new Member(_ces_komunitin_api_social_user_member($need->user, $exchange['id']), $group);
+      $result[] =  new Need($need, $member, $group, $category);
     }
-    return $result;
   }
-  else {
-    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
-  }
+  return $result;
 }
 
 /**
@@ -971,22 +963,17 @@ function ces_komunitin_api_social_offers_read($exchange, $offer){
 }
 
 function ces_komunitin_api_social_offers_read_collection($exchange, $offers) {
-  // General access check.
-  if (ces_bank_access('view', 'exchange details', $exchange['id'])) {
-    $group = new Group($exchange);
-    $result = [];
-    foreach ($offers as $offer) {
-      // Resource by resource access check.
-      if (ces_offerwant_access('view', $offer)) {
-        $category = new Category(ces_category_load($offer->category), $group);
-        $member = new Member(_ces_komunitin_api_social_user_member($offer->user, $exchange['id']), $group);
-        $result[] = new Offer($offer, $member, $group, $category);
-      }
+  $group = new Group($exchange);
+  $result = [];
+  foreach ($offers as $offer) {
+    // Resource by resource access check.
+    if (ces_offerwant_access('view', $offer)) {
+      $category = new Category(ces_category_load($offer->category), $group);
+      $member = new Member(_ces_komunitin_api_social_user_member($offer->user, $exchange['id']), $group);
+      $result[] = new Offer($offer, $member, $group, $category);
     }
-    return $result;
-  } else {
-    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
   }
+  return $result;
 }
 
 function ces_komunitin_api_social_offers_create($exchange, $body) {

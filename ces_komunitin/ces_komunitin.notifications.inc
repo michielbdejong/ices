@@ -132,14 +132,20 @@ function ces_komunitin_notifications_entity_change($entity, $type) {
       $category = ces_category_load($entity->category);
       $exchange = ces_bank_get_exchange($category->exchange);
 
-      if ($entity->type == 'offer') {
-        ces_komunitin_event(Event::OFFER_PUBLISHED, $exchange['code'], array(
-          'offer' => ces_komunitin_api_social_get_uuid(ResourceTypes::OFFER, $entity->id),
-        ));
-      } else {
-        ces_komunitin_event(Event::NEED_PUBLISHED, $exchange['code'], array(
-          'need' => ces_komunitin_api_social_get_uuid(ResourceTypes::NEED, $entity->id),
-        ));
+      // Check if account is active before sending notifications.
+      $account_id = _ces_komunitin_api_social_user_account_id($entity->user, $exchange['id']);
+      $bank = new CesBank();
+      $account = $bank->getAccount($account_id);
+      if ($account['state'] == CesBankLocalAccount::STATE_ACTIVE) {
+        if ($entity->type == 'offer') {
+          ces_komunitin_event(Event::OFFER_PUBLISHED, $exchange['code'], array(
+            'offer' => ces_komunitin_api_social_get_uuid(ResourceTypes::OFFER, $entity->id),
+          ));
+        } else {
+          ces_komunitin_event(Event::NEED_PUBLISHED, $exchange['code'], array(
+            'need' => ces_komunitin_api_social_get_uuid(ResourceTypes::NEED, $entity->id),
+          ));
+        }
       }
     }
   }

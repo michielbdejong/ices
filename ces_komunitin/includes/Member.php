@@ -20,6 +20,11 @@ class Member {
   const TYPE_BUSINESS = 'business';
   const TYPE_PUBLIC = 'public';
 
+  const STATE_PENDING = 'pending';
+  const STATE_ACTIVE = 'active';
+  const STATE_SUSPENDED = 'suspended';
+  const STATE_DELETED = 'deleted';
+
 
   public $id;
 
@@ -27,11 +32,12 @@ class Member {
   public $code;
   public $access;
   public $name;
-  public $type; //"personal" | "business" | "public"
+  public $type; // "personal" | "business" | "public"
   public $description;
   public $image;
   public $address;
   public $location;
+  public $state; // "pending" | "active" | "suspended" | "deleted"
 
   public $created;
   public $updated;
@@ -101,6 +107,23 @@ class Member {
 
     $this->description = _ces_komunitin_check_field($user, 'ces_description');
 
+    // State
+    switch ($member['state']) {
+      case CesBankLocalAccount::STATE_ACTIVE:
+        $this->state = self::STATE_ACTIVE;
+        break;
+      case CesBankLocalAccount::STATE_HIDDEN:
+        $this->state = self::STATE_PENDING;
+        break;
+      case CesBankLocalAccount::STATE_LOCKED:
+        $this->state = self::STATE_SUSPENDED;
+        break;
+      case CesBankLocalAccount::STATE_CLOSED:
+      default:
+        $this->state = self::STATE_DELETED;
+        break;
+    }
+
     // Relationships
     $this->account_id = $member['uuid'];
     $this->account_code = $member['name'];
@@ -135,6 +158,7 @@ class MemberSchema extends BaseSchema {
       'code' => $member->code,
       'name' => $member->name,
       'access' => $member->access,
+      'state' => $member->state,
       'type' => $member->type,
       'description' => $member->description,
       'image' => $member->image,

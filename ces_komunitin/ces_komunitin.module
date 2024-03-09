@@ -86,7 +86,11 @@ function ces_komunitin_menu() {
  * Load all libraries required with composer.
  */
 function ces_komunitin_xautoload($adapter) {
-  $adapter->absolute()->composerDir('vendor/composer');
+  // I don't know why composer may require twice the same project and then it
+  // throws  "cannot redeclare" php error. I've seen that only in tests.
+  if (!class_exists('MailerSend\MailerSend')) {
+    $adapter->absolute()->composerDir('vendor/composer');
+  }
 }
 
 /**
