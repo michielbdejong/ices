@@ -55,7 +55,7 @@ class CesInteropCENIPBank extends CesBank {
     );
     $cenip = array(
       'nid' => $record['nid'],
-      'buyer_id' => $record['buyer_id'],
+      'buyer_id' => $record['buyer_id']
     );
     return new CesInteropCENIPOutgoingTransaction(new CesBankBasicTransaction($basic), $cenip);
   }
@@ -265,6 +265,12 @@ class CesInteropCENIPOutgoingTransaction extends CesInteropCENIPTransaction {
    */
   public $buyer_country;
 
+  public function __construct($parent, $record) {
+    parent::__construct($parent, $record);
+    if (!isset($this->txid)) {
+      $this->txid = $this->uuid();
+    }
+  }
   /**
    * Helper function to call the Clearing Central web service.
    */
@@ -300,6 +306,7 @@ class CesInteropCENIPOutgoingTransaction extends CesInteropCENIPTransaction {
     $touser = user_load($toaccuser->user);
 
     $data = array(
+      'txid' => $this->txid,
       'password' => $toexchange->data['cenip_pass'],
       'buyer_nid' => $this->nid,
       'buyer_id' => $this->buyer_id,

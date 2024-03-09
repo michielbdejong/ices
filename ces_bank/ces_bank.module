@@ -1418,14 +1418,16 @@ function ces_bank_menu_alter(&$items) {
   $items['user/%user']['access arguments'] = array('view', 1);
 }
 /**
- * Checks access to bank account.
+ * Checks user access to bank account.
  */
 function ces_bank_user_access($permission, $target, $account = NULL) {
   $bank = new CesBank();
   $accounts = $bank->getUserAccounts($target->uid);
 
   foreach ($accounts as $acc) {
-    if (ces_bank_access($permission, 'exchange accounts', $acc['exchange'], $account)) {
+    // Check either direct access or indirect access through 'exchange accounts' scope.
+    if (ces_bank_access($permission, 'account', $acc['id'], $account)
+    || ces_bank_access($permission, 'exchange accounts', $acc['exchange'], $account)) {
       return TRUE;
     }
   }

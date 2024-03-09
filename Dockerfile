@@ -47,7 +47,9 @@ RUN drush dl -y \
 RUN curl https://codeload.github.com/bshaffer/oauth2-server-php/zip/refs/tags/v1.13.0 --output oauth2-server-php.zip && \
   unzip oauth2-server-php.zip && mv oauth2-server-php-1.13.0 sites/all/libraries/oauth2-server-php && rm oauth2-server-php.zip && \
   git clone --branch master  --depth 1 https://github.com/neomerx/json-api.git sites/all/libraries/json-api && \
-  git clone --branch master  --depth 1 https://github.com/thephpleague/html-to-markdown.git sites/all/libraries/html-to-markdown
+  git clone --branch master  --depth 1 https://github.com/thephpleague/html-to-markdown.git sites/all/libraries/html-to-markdown && \
+  composer require -n php-http/guzzle7-adapter nyholm/psr7 && \
+  composer require -n mailersend/mailersend
 
 #Download theme
 RUN git clone --branch 7.x-1.x https://git.drupalcode.org/sandbox/esteve-1866046.git sites/all/themes/greences

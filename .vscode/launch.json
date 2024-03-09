@@ -8,8 +8,9 @@
             "name": "Listen for XDebug from Docker",
             "type": "php",
             "request": "launch",
-            "port": 9029,
+            "port": 9003,
             "pathMappings": {
+                "/var/www/html/sites/all/modules/ices": "${workspaceRoot}",
                 "/var/www/html/": "${workspaceRoot}/.debug/drupal-7.98",
             },
         },

@@ -172,18 +172,7 @@ class CesBank {
       $account = $s->loadFromRecord($record);
       $account->activate();
       $s->save($account);
-      // Create permission entry for account owner(s).
-      $accountusers = $account->getUsers();
-      foreach ($accountusers as $accountuser) {
-        $perm = array(
-          'permission' => CesBankPermission::PERMISSION_ADMIN,
-          'object' => 'account',
-          'objectid' => $account->id,
-          'scope' => CesBankPermission::SCOPE_USER,
-          'scopeid' => $accountuser->user,
-        );
-        $this->createPermission($perm);
-      }
+
       // Build recipients array.
       $recipients = array();
       $accusers = $account->getUsers();
@@ -606,9 +595,16 @@ class CesBank {
       $account = new CesBankLocalAccount($record);
       $s = new IcesSerializer('CesBankLocalAccount');
       $s->save($account);
-      // saveExtraData() after create account record because we need the new
-      // account id in order to create the CesBankAccountUser record(s).
-      $account->saveExtraData();
+
+      // Create user accounts and permissions.
+      $accountusers = $account->getUsers();
+      foreach ($accountusers as $accountuser) {
+        $accountuser->account = $account->id;
+        $accountuserrecord = $accountuser->getRecord();
+        $this->createAccountUser($accountuserrecord);
+        $accountuser->id = $accountuserrecord['id'];
+      }
+
       $record = $account->getRecord();
       $exchange = $account->getExchange();
       ces_message_send_notify('new_account', array('account' => $account->getRecord()), array($exchange->admin), 1, $send_mail);
@@ -647,7 +643,7 @@ class CesBank {
       $this->updateObject('CesBankAccountUser', $record);
       // Create ces_permission record.
       $perm = array(
-        'permission' => $record['privilege'] ? CesBankPermission::PERMISSION_ADMIN : CesBankPermission::PERMISSION_EDIT,
+        'permission' => !empty($record['privilege']) ? CesBankPermission::PERMISSION_EDIT : CesBankPermission::PERMISSION_ADMIN,
         'object' => 'account',
         'objectid' => $record['account'],
         'scope' => CesBankPermission::SCOPE_USER,
@@ -701,7 +697,7 @@ class CesBank {
         'scopeid' => $record['user']
       ));
       foreach ($permissions as $perm) {
-        $perm->permission = $record['privilege'] ? CesBankPermission::PERMISSION_ADMIN : CesBankPermission::PERMISSION_EDIT;
+        $perm->permission = $record['privilege'] ? CesBankPermission::PERMISSION_USE : CesBankPermission::PERMISSION_ADMIN;
         $s->save($perm);
       }
     }
@@ -815,6 +811,17 @@ class CesBank {
       $accounts[] = $this->getAccount($useracc->account);
     }
     return $accounts;
+  }
+
+  public function getUserAccountsInExchange($uid, $exchange_id) {
+    $exchange_accounts = array();
+    $accounts = $this->getUserAccounts($uid);
+    foreach ($accounts as $account) {
+      if ($account['exchange'] == $exchange_id) {
+        $exchange_accounts[] = $account;
+      }
+    }
+    return $exchange_accounts;
   }
 
   /**
@@ -1748,6 +1755,7 @@ class CesBankExchange extends IcesDBObject {
           'account' => NULL,
           'user' => 0,
           'role' => CesBankAccountUser::ROLE_ACCOUNT_ADMINISTRATOR,
+          'privilege' => 0 // That means admin.
         ),
       ),
     );
@@ -2189,7 +2197,7 @@ class CesBankAccountUser extends IcesDBObject {
   public $id;
   public $user;
   public $account;
-  public $privilege;
+  public $privilege;  // 0 is admin, 1 is user.
   public $role;
   const ROLE_ACCOUNT_ADMINISTRATOR = 0;
 
@@ -3357,9 +3365,6 @@ class CesBankUserPermission {
    *   the $permission parameter over the object ($object, $objectid).
    */
   public function access($permission, $object, $objectid) {
-    if ($this->userid == 1) {
-      return TRUE;
-    }
     if (is_string($permission)) {
       $equiv = array(
         'view' => 10,
@@ -3402,40 +3407,40 @@ class CesBankUserPermission {
   public function &getPermissions() {
     if (!isset(self::$permissions[$this->userid])) {
       $sp = new IcesSerializer('CesBankPermission');
-      if ($this->userid == 1) {
-        $permissions = $sp->loadCollection(array());
-      }
-      else {
-        $permissions = array();
-        // Get permissions directly granted to this user.
-        $userperms = $sp->loadCollection(array('scope' => 'user', 'scopeid' => $this->userid));
-        $permissions = array_merge($permissions, $userperms);
-        // Get permissions granted to user's accounts. Compute exchanges.
-        $sau = new IcesSerializer('CesBankAccountUser');
-        $useraccounts = $sau->loadCollection(array('user' => $this->userid));
-        foreach ($useraccounts as $useraccount) {
+      $permissions = array();
+      // Get permissions directly granted to this user.
+      $userperms = $sp->loadCollection(array('scope' => 'user', 'scopeid' => $this->userid));
+      $permissions = array_merge($permissions, $userperms);
+
+      // Get permissions granted to user's accounts and compute (active) accounts array.
+      $sau = new IcesSerializer('CesBankAccountUser');
+      $sla = new IcesSerializer('CesBankLocalAccount');
+
+      $useraccounts = $sau->loadCollection(array('user' => $this->userid));
+      $accounts = [];
+      foreach ($useraccounts as $useraccount) {
+        $account = $sla->load($useraccount->account);
+        if ($account->state == CesBankLocalAccount::STATE_ACTIVE) {
+          $accounts[] = $account;
           $accountperms = $sp->loadCollection(array('scope' => 'account', 'scopeid' => $useraccount->account));
           $permissions = array_merge($permissions, $accountperms);
-
         }
-        // Compute exchanges.
-        $exchanges = array();
-        $sla = new IcesSerializer('CesBankLocalAccount');
-        foreach ($useraccounts as $useraccount) {
-          $account = $sla->load($useraccount->account);
-          if (!in_array($account->exchange, $exchanges)) {
-            $exchanges[] = $account->exchange;
-          }
-        }
-        // Get permissions granted to user's accounts exchanges.
-        foreach ($exchanges as $exchange) {
-          $exchangeperms = $sp->loadCollection(array('scope' => 'exchange', 'scopeid' => $exchange));
-          $permissions = array_merge($permissions, $exchangeperms);
-        }
-        // Get global permissions.
-        $globalperms = $sp->loadCollection(array('scope' => 'global'));
-        $permissions = array_merge($permissions, $globalperms);
       }
+      // Compute exchanges.
+      $exchanges = array();
+      foreach ($accounts as $account) {
+        if (!in_array($account->exchange, $exchanges)) {
+          $exchanges[] = $account->exchange;
+        }
+      }
+      // Get permissions granted to user's accounts exchanges.
+      foreach ($exchanges as $exchange) {
+        $exchangeperms = $sp->loadCollection(array('scope' => 'exchange', 'scopeid' => $exchange));
+        $permissions = array_merge($permissions, $exchangeperms);
+      }
+      // Get global permissions.
+      $globalperms = $sp->loadCollection(array('scope' => 'global'));
+      $permissions = array_merge($permissions, $globalperms);
       // Set the static variable.
       self::$permissions[$this->userid] = &$permissions;
     }

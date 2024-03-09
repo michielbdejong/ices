@@ -6,11 +6,24 @@ use Neomerx\JsonApi\Schema\Identifier;
 use Neomerx\JsonApi\Schema\Link;
 use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 
+function _ces_komunitin_check_field($entity, $field, $def = null) {
+  if (isset($entity->{$field}) && !empty($entity->{$field}[LANGUAGE_NONE][0]['value'])) {
+    return $entity->{$field}[LANGUAGE_NONE][0]['value'];
+  }
+  else {
+    return $def;
+  }
+}
 
 class Member {
   const TYPE_PERSONAL = 'personal';
   const TYPE_BUSINESS = 'business';
   const TYPE_PUBLIC = 'public';
+
+  const STATE_PENDING = 'pending';
+  const STATE_ACTIVE = 'active';
+  const STATE_SUSPENDED = 'suspended';
+  const STATE_DELETED = 'deleted';
 
 
   public $id;
@@ -19,11 +32,12 @@ class Member {
   public $code;
   public $access;
   public $name;
-  public $type; //"personal" | "business" | "public"
+  public $type; // "personal" | "business" | "public"
   public $description;
   public $image;
   public $address;
   public $location;
+  public $state; // "pending" | "active" | "suspended" | "deleted"
 
   public $created;
   public $updated;
@@ -61,25 +75,16 @@ class Member {
         $this->type = self::TYPE_PUBLIC;
     }
 
-    function check_field($entity, $field, $def = null) {
-      if (isset($entity->{$field}) && !empty($entity->{$field}[LANGUAGE_NONE][0]['value'])) {
-        return $entity->{$field}[LANGUAGE_NONE][0]['value'];
-      }
-      else {
-        return $def;
-      }
-    }
-
     $this->image = $user->picture ? file_create_url($user->picture->uri) : null;
 
     $exchange = $group->exchange;
 
     $this->address = [
-      "streetAddress" => check_field($user, 'ces_address'),
-      "addressLocality" => check_field($user, 'ces_town'),
-      "postalCode" => check_field($user, 'ces_postcode'),
-      "addressRegion" => check_field($user, 'ces_region', $exchange['region']),
-      "addressCountry" => check_field($user, 'ces_country', $exchange['country']),
+      "streetAddress" => _ces_komunitin_check_field($user, 'ces_address'),
+      "addressLocality" => _ces_komunitin_check_field($user, 'ces_town'),
+      "postalCode" => _ces_komunitin_check_field($user, 'ces_postcode'),
+      "addressRegion" => _ces_komunitin_check_field($user, 'ces_region', $exchange['region']),
+      "addressCountry" => _ces_komunitin_check_field($user, 'ces_country', $exchange['country']),
     ];
 
     $this->created = SchemaUtils::encodeDate($user->created);
@@ -95,12 +100,29 @@ class Member {
     }
 
     $this->location = [
-      'name' => check_field($user, 'ces_town'),
+      'name' => _ces_komunitin_check_field($user, 'ces_town'),
       'type' => 'Point',
       'coordinates' => [$lng, $lat]
     ];
 
-    $this->description = check_field($user, 'ces_description');
+    $this->description = _ces_komunitin_check_field($user, 'ces_description');
+
+    // State
+    switch ($member['state']) {
+      case CesBankLocalAccount::STATE_ACTIVE:
+        $this->state = self::STATE_ACTIVE;
+        break;
+      case CesBankLocalAccount::STATE_HIDDEN:
+        $this->state = self::STATE_PENDING;
+        break;
+      case CesBankLocalAccount::STATE_LOCKED:
+        $this->state = self::STATE_SUSPENDED;
+        break;
+      case CesBankLocalAccount::STATE_CLOSED:
+      default:
+        $this->state = self::STATE_DELETED;
+        break;
+    }
 
     // Relationships
     $this->account_id = $member['uuid'];
@@ -136,6 +158,7 @@ class MemberSchema extends BaseSchema {
       'code' => $member->code,
       'name' => $member->name,
       'access' => $member->access,
+      'state' => $member->state,
       'type' => $member->type,
       'description' => $member->description,
       'image' => $member->image,

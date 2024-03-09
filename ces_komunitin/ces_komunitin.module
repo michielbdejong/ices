@@ -1,4 +1,7 @@
 <?php
+
+require_once __DIR__ . '/ces_komunitin.mail.inc';
+
 /**
  * @file
  * Drupal hooks for the ICES komunitin module.
@@ -45,6 +48,20 @@ function ces_komunitin_menu() {
     'file path' => drupal_get_path('module', 'ces_komunitin'),
     'access callback' => TRUE
   );
+  $items['oauth2/reset-password'] = array(
+    'page callback' => 'ces_komunitin_api_auth_reset_password',
+    'type' => MENU_CALLBACK,
+    'file' => 'ces_komunitin.api.auth.inc',
+    'file path' => drupal_get_path('module', 'ces_komunitin'),
+    'access callback' => TRUE
+  );
+  $items['oauth2/resend-validation'] = array(
+    'page callback' => 'ces_komunitin_api_auth_resend_validation_email',
+    'type' => MENU_CALLBACK,
+    'file' => 'ces_komunitin.api.auth.inc',
+    'file path' => drupal_get_path('module', 'ces_komunitin'),
+    'access callback' => TRUE
+  );
   $items['ces/files'] = array(
     'page callback' => 'ces_komunitin_files',
     'type' => MENU_CALLBACK,
@@ -62,6 +79,20 @@ function ces_komunitin_menu() {
   );
   return $items;
 }
+
+/**
+ * Implements hook_xautoload().
+ *
+ * Load all libraries required with composer.
+ */
+function ces_komunitin_xautoload($adapter) {
+  // I don't know why composer may require twice the same project and then it
+  // throws  "cannot redeclare" php error. I've seen that only in tests.
+  if (!class_exists('MailerSend\MailerSend')) {
+    $adapter->absolute()->composerDir('vendor/composer');
+  }
+}
+
 /**
  * Implements hook_libraries_info().
  */
@@ -93,6 +124,8 @@ function ces_komunitin_libraries_info()
 function ces_komunitin_admin_form() {
   $events_user = getenv('NOTIFICATIONS_EVENTS_USERNAME');
   $events_pass = getenv('NOTIFICATIONS_EVENTS_PASSWORD');
+  $mailersend_key = getenv('MAILERSEND_API_KEY');
+
   $form = array();
   $form['ces_komunitin_events_username'] = array(
     '#type' => 'textfield',
@@ -106,6 +139,31 @@ function ces_komunitin_admin_form() {
     '#default_value' => variable_get('ces_komunitin_events_password', $events_pass),
     '#description' => t('The password to authenticate to the Komunitin events service.'),
   );
+  $form['ces_komunitin_app_url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Komunitin app URL'),
+    '#default_value' => variable_get('ces_komunitin_app_url', 'https://komunitin.org'),
+    '#description' => t('The URL of the Komunitin app.'),
+  );
+  $form['ces_komunitin_mailersend_api_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Mailersend API key'),
+    '#default_value' => variable_get('ces_komunitin_mailersend_api_key', $mailersend_key),
+    '#description' => t('The API key to authenticate to the Mailersend service.'),
+  );
+  $form['ces_komunitin_app_mail'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Komunitin app mail'),
+    '#default_value' => variable_get('ces_komunitin_app_mail', 'app@komunitin.org'),
+    '#description' => t('The sender address of mails sent by the Komunitin module.'),
+  );
+  $form['ces_komunitin_app_mail_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Komunitin app mail name'),
+    '#default_value' => variable_get('ces_komunitin_app_mail_name', 'Komunitin app'),
+    '#description' => t('The sender name of mails sent by the Komunitin module.'),
+  );
+
   return system_settings_form($form);
 }
 
@@ -197,3 +255,20 @@ function ces_komunitin_notifications_cron_worker($expired) {
   }
 }
 
+/**
+ * Implements hook_oauth2_server_token().
+ */
+function ces_komunitin_oauth2_server_token($server, $request, $response) {
+  // Activate user in case this is a authorization code request.
+  if ($request->request['client_id'] == 'komunitin-app' && $request->request['grant_type'] === 'authorization_code'
+    && (($access_token = $response->getParameter('access_token')) != NULL)) {
+    // Succesful login by authorization code. This means we can verify user email and hence unblock user.
+    $token = oauth2_server_token_load($access_token);
+    $user = user_load($token->uid);
+    if ($user->status == 0) {
+      $user = user_save($user, ['status' => 1]);
+      watchdog('ces_komunitin', 'Verified email %email', ['%email' => $user->mail]);
+    }
+  }
+
+}

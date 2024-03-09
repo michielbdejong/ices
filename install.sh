@@ -51,9 +51,10 @@ if [ "$DEV" = "TRUE" ]; then
   # Install XDebug extension with PECL
   docker compose exec -T integralces pecl install xdebug-3.1.6
   # Configure XDebug
-  docker compose exec -T integralces sh -c "cd /usr/local/etc/php/conf.d && echo \"\n[XDebug]\n\
+  docker compose exec -T integralces sh -c "echo \"\n[XDebug]\n\
   xdebug.mode = debug\n\
   xdebug.client_host = host.docker.internal\n\
+  xdebug.start_with_request = yes\n\
   \" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
 
   # Enable XDebug

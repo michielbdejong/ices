@@ -1193,6 +1193,12 @@ function ces_interop_cenip() {
   if (empty($description) || !is_numeric($amount)) {
     return ces_interop_cenip_error(CES_INTEROP_CEN_ERR_FAULTY_DATA, $txid);
   }
+
+  // Suport number-only account id.
+  if (is_numeric($buyer_id)) {
+    $buyer_id = $fromexchange['code'] . str_pad($buyer_id, 4, '0', STR_PAD_LEFT);
+  }
+
   // Check buyer acount.
   $fromaccount = $bank->getAccountByName($buyer_id);
   if ($fromaccount === FALSE || $fromaccount['exchange'] != $fromexchange['id']) {
