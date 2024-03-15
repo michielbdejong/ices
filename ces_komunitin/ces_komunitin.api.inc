@@ -342,6 +342,7 @@ function ces_komunitin_api_get_endpoints() {
 }
 function ces_komunitin_get_public_paths() {
   return [
+    'accounting/%/currency' => ['GET'],
     'social/groups' => ['GET'],
     'social/%' => ['GET'],
     'social/users' => ['POST'],
