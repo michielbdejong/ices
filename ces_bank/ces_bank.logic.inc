@@ -39,14 +39,19 @@ class CesBank {
         unset($record['id']);
       }
       $record['state'] = CesBankExchange::STATE_INACTIVE;
-      $this->updateObject('CesBankExchange', $record);
+
+      $exchange = new CesBankExchange($record);
+      $s = new IcesSerializer('CesBankExchange');
+      $s->save($exchange);
+      $record = $exchange->getRecord();
+
       // Create new default category from exchange.
       $category = (object) array(
         'code' => $record['code'],
         'title' => 'general',
         'parent' => 0,
         'description' => 'General category',
-        'exchange' => $record['id'],
+        'exchange' => $exchange->id,
         'context' => 3,
       );
       ces_category_save($category);

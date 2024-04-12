@@ -14,6 +14,15 @@ ces_develop_clean();
 // Create stuff.
 $bank = new CesBank();
 
+// Assign admin user the admin global permission
+$bank->createPermission([
+  'permission' => CesBankPermission::PERMISSION_ADMIN,
+  'object' => 'global',
+  'objectid' => 0,
+  'scope' => CesBankPermission::SCOPE_USER,
+  'scopeid' => 1,
+]);
+
 // Create users.
 $usernames = array('Riemann', 'Euclides', 'Gauss' , 'Noether', 'Fermat');
 $users = array();
