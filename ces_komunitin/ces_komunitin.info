@@ -11,4 +11,4 @@ dependencies[] = login_emailusername
 dependencies[] = libraries
 dependencies[] = xautoload
 
-version = "7.x-1.44"
+version = "7.x-1.45"
