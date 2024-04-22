@@ -396,7 +396,16 @@ function ces_message_send_notify($action, $params, $recipient = array(), $sender
     ces_message_save($notify);
 
     if ($mail) {
-      drupal_mail('ces_message', 'ces_message ' . $action, $user_recipient->mail, $language, $params);
+      // These are the actions for wich Komunitin notifications service already
+      // is implementing mailings.
+      $komunitin_actions = ['account_debited', 'account_credited'];
+
+      $user_settings = ces_user_get_settings($user_recipient);
+      // Send IntegralCES email only for users that have not used Komunitin yet
+      // or for actions that are not yet implemented in Komunitin.
+      if (!($user_settings['komunitin'] && in_array($actions, $komunitin_actions))) {
+        drupal_mail('ces_message', 'ces_message ' . $action, $user_recipient->mail, $language, $params);
+      }
     }
 
     // Invoke hook on ces_komunitin module (if enabled) so it can send the event
