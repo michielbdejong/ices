@@ -1922,7 +1922,7 @@ class CesOffersWantsCategoryEntityController extends DrupalDefaultEntityControll
       module_invoke_all('entity_insert', $category, 'ces_category');
     }
     else {
-      $offerwant->original = entity_load_unchanged('ces_category', $offerwant->id);
+      $category->original = entity_load_unchanged('ces_category', $category->id);
 
       drupal_write_record('ces_category', $category, 'id');
       field_attach_update('ces_category', $category);
