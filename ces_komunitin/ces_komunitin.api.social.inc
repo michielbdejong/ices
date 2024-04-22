@@ -144,17 +144,81 @@ function ces_komunitin_api_social_groups_read_collection($exchanges) {
   return $groups;
 }
 
-function ces_komunitin_api_social_users_read() {
-  // No need to check access since the user is the current user.
-  global $user;
-  $exchange = ces_bank_get_current_exchange();
-  return new User($user, $exchange);
+function ces_komunitin_api_social_users_load($exchange, $id) {
+  if ($id === 'me') {
+    global $user;
+    return $user;
+  } else {
+    $result = ces_komunitin_api_social_get_id($id);
+    if ($result === FALSE || $result->type != ResourceTypes::USER) {
+      ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+    }
+    $user = user_load($result->id);
+    if ($user == NULL) {
+      ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+    }
+    return $user;
+  }
 }
 
-function ces_komunitin_api_social_users_update($body) {
-  require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
-  // No need to check access since the user is the current user.
+// Read the current user
+function ces_komunitin_api_social_users_read($record) {
   global $user;
+  // Users can only be accessed by themselves or by the notifications service.
+  if (ces_komunitin_api_client_access('komunitin_social_read_all') || $user->uid === $record->uid) {
+    $exchange = ces_bank_get_current_exchange($record);
+    return new User($record, $exchange);
+  } else {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+}
+
+function ces_komunitin_api_social_users_load_collection($exchange = FALSE, $filters, $sorts, $pageAfter, $pageSize) {
+  // Only the notifications service can access this endpoint.
+  if (!ces_komunitin_api_client_access('komunitin_social_read_all')) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+  // User list must be filtered by member.
+  if (!isset($filters['members'])) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Members filter is required');
+  }
+  $membersIds = $filters['members'];
+  $members = [];
+  foreach ($membersIds as $id) {
+    $members[] = ces_komunitin_api_social_members_load(FALSE, $id);
+  }
+  $users = array_map(function($member) {
+    return $member['user'];
+  }, $members);
+
+  // Ignore other filters, sorts and pagination
+
+  return $users;
+}
+
+/*
+ * Read some users. By now this is only used by the notifications service and
+ * not by the app.
+ */
+function ces_komunitin_api_social_users_read_collection($users) {
+  if (!ces_komunitin_api_client_access('komunitin_social_read_all')) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+  foreach ($users as $user) {
+    $exchange = ces_bank_get_current_exchange($user);
+    $result[] = new User($user, $exchange);
+  }
+  return $result;
+}
+
+function ces_komunitin_api_social_users_update($userAccount, $body) {
+  require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
+  global $user;
+  // Allow only the user to update itself.
+  if ($user->uid !== $userAccount->uid) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+
   if (!isset($body->data)) {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
   }
@@ -189,7 +253,7 @@ function ces_komunitin_api_social_users_update($body) {
       $user = user_save($user, $edit);
     }
   }
-  return ces_komunitin_api_social_users_read();
+  return ces_komunitin_api_social_users_read($user);
 }
 
 /**
@@ -299,16 +363,21 @@ function ces_komunitin_api_social_users_create($body) {
   return new User($user, $exchange);
 }
 
-function ces_komunitin_api_social_users_settings_read() {
-  // No need to check access since the user is the current user.
+function ces_komunitin_api_social_users_settings_read($record) {
   global $user;
-  $exchange = ces_bank_get_current_exchange();
-  return new UserSettings($user, $exchange);
+  if (ces_komunitin_api_client_access('komunitin_social_read_all') || $user->uid === $record->uid) {
+    $exchange = ces_bank_get_current_exchange($record);
+    return new UserSettings($record, $exchange);
+  } else {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
 }
 
-function ces_komunitin_api_social_users_settings_update($body) {
-  // No need to check access since the user is the current user.
+function ces_komunitin_api_social_users_settings_update($record, $body) {
   global $user;
+  if ($record->uid !== $user->uid) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
   $exchange = ces_bank_get_current_exchange();
   module_load_include('module', 'ces_user');
   $obj = $body->data->attributes;
@@ -319,6 +388,9 @@ function ces_komunitin_api_social_users_settings_update($body) {
   if (isset($obj->notifications)) {
     $settings['notifications'] = (array) $obj->notifications;
   }
+  if (isset($obj->emails)) {
+    $settings['emails'] = (array) $obj->emails;
+  }
   ces_user_set_settings($user, $settings);
   return new UserSettings($user, $exchange);
 }
@@ -328,10 +400,17 @@ function ces_komunitin_api_social_members_load($exchange, $code) {
   $bank = new CesBank();
   if (ces_komunitin_api_social_is_uuid($code)) {
     $id = ces_komunitin_api_social_get_id($code);
+    if ($id->type != ResourceTypes::MEMBER) {
+      ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+    }
     $account = $bank->getAccount($id->id);
   } else {
     // Load by account name.
     $account = $bank->getAccountByName($code);
+
+  }
+  if (empty($account)) {
+    ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
   }
   $uid = _ces_komunitin_api_social_account_user_id($account['id']);
   $account['user'] = user_load($uid);

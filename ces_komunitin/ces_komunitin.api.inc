@@ -68,6 +68,9 @@ function ces_komunitin_api() {
     } else if ($token['user_id'] && ces_komunitin_api_client_access('komunitin_' . $api)) {
         // Login user identified by Authorization header token.
         $user = user_load($token['user_id']);
+        // Flag that this user is using the Komunitin api (then it will receive
+        // komunitin emails, etc from now on).
+        ces_komunitin_api_user_logged_in($user);
     // Authenticated request carrying client credentials for GET request.
     } else if (
       !$token['user_id'] &&
@@ -132,8 +135,6 @@ function ces_komunitin_api() {
       // This case is just for /users/me
       if (isset($endpoint[$resource_id])) {
         $endpoint = $endpoint[$resource_id];
-        // Not need to load resource.
-        $resource_id = FALSE;
       }
       // This is the general case.
       else if (isset($endpoint['%'])) {
@@ -165,8 +166,12 @@ function ces_komunitin_api() {
     $operation = $methods[$request->method];
 
     // Differentiate getting single resource from getting multiple resources.
-    $collection = ($operation == 'read' && (($resource_id === FALSE && $type != 'groups')
-      || ($exchange === FALSE && $type == 'groups')) && isset($endpoint['%']));
+    // Note that groups have resource_id = FALSE but are not a collection when
+    // the exchange is set.
+    $collection = $operation == 'read'
+      && ($type != 'groups' && $resource_id === FALSE
+      || $type == 'groups' && $exchange === FALSE)
+      && isset($endpoint['%']);
 
     if ($collection) {
       $operation = 'read_collection';
@@ -310,11 +315,17 @@ function ces_komunitin_api_get_endpoints() {
         )
       ),
       'users' => array(
-        'operations' => array('create'),
+        'operations' => array('read', 'create'),
         'me' => array(
           'operations' => array('read', 'update'),
           'settings' => array(
             'operations' => array('read', 'update')
+          )
+        ),
+        '%' => array(
+          'operations' => array('read'),
+          'settings' => array(
+            'operations' => array('read')
           )
         )
       ),
@@ -434,4 +445,15 @@ function ces_komunitin_api_check_valid_uuid($uuid) {
 function ces_komunitin_api_client_access($scope) {
   $token = oauth2_server_check_access('komunitin', $scope);
   return !($token instanceof OAuth2\Response);
+}
+
+/**
+ * Save that the user is using the Komunitin API.
+ */
+function ces_komunitin_api_user_logged_in(&$user) {
+  $user_settings = ces_user_get_settings($user);
+  if (empty($user_settings['komunitin'])) {
+    $user_settings['komunitin'] = TRUE;
+    ces_user_set_settings($user, ['komunitin' => TRUE]);
+  }
 }
