@@ -42,11 +42,6 @@ function ces_komunitin_notification_event($action, $exchange_id, $user_recipient
       'account_credit_rejected' => Event::TRANSFER_REJECTED,
     ];
 
-    $data = [
-      'name' => $events[$action],
-      'code' => $code,
-    ];
-
     ces_komunitin_event($events[$action], $code, array(
       'transfer' => $transfer_id,
       'payer' => ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $payer['id']),
