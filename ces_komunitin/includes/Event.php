@@ -15,7 +15,6 @@ class Event {
   public $data;
 
   // Relationships
-  public $transfer; //deprecated
   public $user;
 
   const TRANSFER_COMMITTED = 'TransferCommitted';
@@ -32,16 +31,14 @@ class Event {
    *
    * @param $event The event data as an string-indexed associative array.
    * @param $user The ExternalUser object.
-   * @param $transfer The ExternalTransfer object or null.
    */
-  function __construct($event, ExternalUser $user, $transfer) {
+  function __construct($event, ExternalUser $user) {
     global $base_url;
     $this->id = isset($event['id']) ? $event['id'] : null;
     $this->name = $event['name'];
     $this->source = $base_url;
     $this->time = SchemaUtils::encodeDate(time());
     $this->code = $event['code'];
-    $this->transfer = $transfer;
     $this->user = $user;
     $this->data = $event['data'];
   }
@@ -66,7 +63,7 @@ class Event {
       'data' => $data
     ];
 
-    return new Event($event, $externalUser, null);
+    return new Event($event, $externalUser);
   }
 }
 
@@ -100,13 +97,6 @@ class EventSchema extends BaseSchema {
         self::RELATIONSHIP_LINKS_RELATED => false
       ]
     ];
-    if ($event->transfer !== null) {
-      $relationships['transfer'] = [
-        self::RELATIONSHIP_DATA => $event->transfer,
-        self::RELATIONSHIP_LINKS_SELF => false,
-        self::RELATIONSHIP_LINKS_RELATED => false
-      ];
-    }
     return $relationships;
   }
 }
