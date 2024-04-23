@@ -398,7 +398,9 @@ function ces_message_send_notify($action, $params, $recipient = array(), $sender
     if ($mail) {
       // These are the actions for wich Komunitin notifications service already
       // is implementing mailings.
-      $komunitin_actions = ['account_debited', 'account_credited'];
+      $komunitin_actions = ['account_debited', 'account_credited',
+        'account_debit_rejected', 'account_credit_rejected',
+        'account_debit_pending', 'account_credit_pending'];
 
       $user_settings = ces_user_get_settings($user_recipient);
       // Send IntegralCES email only for users that have not used Komunitin yet
