@@ -1601,10 +1601,6 @@ class CesBankExchange extends IcesDBObject {
    */
   public $uuid_currency;
   /**
-   * Id as a Komunitin group (social api).
-   */
-  public $uuid_group;
-  /**
    * Code.
    */
   public $code;
@@ -1682,9 +1678,6 @@ class CesBankExchange extends IcesDBObject {
     // Create uuids if not set on construct.
     if (empty($this->uuid_currency)) {
       $this->uuid_currency = $this->uuid();
-    }
-    if (empty($this->uuid_group)) {
-      $this->uuid_group = $this->uuid();
     }
   }
 

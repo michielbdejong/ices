@@ -235,7 +235,7 @@ function ces_komunitin_api_social_users_update($userAccount, $body) {
         ces_komunitin_api_send_error(KomunitinApiError::INVALID_PASSWORD);
       }
     }
-    if (!valid_email_address($data->attributes->email)) {
+    if (isset($data->attributes->email) && !valid_email_address($data->attributes->email)) {
       ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Invalid email");
     }
 
