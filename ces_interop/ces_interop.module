@@ -764,7 +764,7 @@ function ces_interop_form_ces_bank_transaction_form_alter(&$form, &$form_state) 
       && $form_state['values']['fromexchange'] == 'cenip') {
       // Add a field for the remote exchange nid.
       $url = variable_get(CES_INTEROP_CEN_CLEARING_CENTRAL_URL, CES_INTEROP_CEN_CLEARING_CENTRAL_URL_DEFAULT);
-      $url .= '/nidsearch.php';
+      $url .= '/v1/nidsearch.php';
       $form['fromcenexchange'] += array(
         '#title' => t('Netork ID'),
         '#description' => t('Enter the identifier of the remote network, for example "cen1234". Click "Search" to find the network identifier you are looking for.'),
