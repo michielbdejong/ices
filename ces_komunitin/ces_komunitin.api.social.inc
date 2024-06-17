@@ -227,7 +227,7 @@ function ces_komunitin_api_social_users_update($userAccount, $body) {
     // Providing password is required for updating email or password.
     $auth_access = ces_komunitin_api_client_access('komunitin_auth');
     if (!$auth_access) {
-      if (!isset($data->attributes->password)) {
+      if (empty($data->attributes->password)) {
         ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "'komunitin_auth' scope or password is required for updating email or password.");
       }
       $password = $data->attributes->password;
@@ -235,17 +235,17 @@ function ces_komunitin_api_social_users_update($userAccount, $body) {
         ces_komunitin_api_send_error(KomunitinApiError::INVALID_PASSWORD);
       }
     }
-    if (isset($data->attributes->email) && !valid_email_address($data->attributes->email)) {
+    if (!empty($data->attributes->email) && !valid_email_address($data->attributes->email)) {
       ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Invalid email");
     }
 
     $edit = [];
     // Update email
-    if (isset($data->attributes->email)) {
+    if (!empty($data->attributes->email)) {
       $edit['mail'] = $data->attributes->email;
     }
     // Update password
-    if (isset($data->attributes->newPassword)) {
+    if (!empty($data->attributes->newPassword)) {
       $edit['pass'] = $data->attributes->newPassword;
     }
     // Update user in database.
