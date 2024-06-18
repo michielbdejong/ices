@@ -33,10 +33,21 @@ use Neomerx\JsonApi\Schema\Link;
 function _ces_komunitin_api_get_base_path() {
   return 'ces/api';
 }
-function ces_komunitin_api_get_base_url() {
+
+function ces_komunitin_api_get_social_api_url() {
   global $base_url;
-  return $base_url . '/' . _ces_komunitin_api_get_base_path();
+  return $base_url . '/' . _ces_komunitin_api_get_base_path() . '/social';
 }
+
+function ces_komunitin_api_get_accounting_api_url($exchange = FALSE) {
+  global $base_url;
+  if ($exchange && $exchange['data']['komunitin_accounting_api_url']) {
+    return $exchange['data']['komunitin_accounting_api_url'];
+  } else {
+    return $base_url . '/' . _ces_komunitin_api_get_base_path() . '/accounting';
+  }
+}
+
 /**
  * Handle Komunitin API call.
  */
@@ -48,7 +59,7 @@ function ces_komunitin_api() {
     $api = reset($path);
 
     // Log in with the token.
-    $token = oauth2_server_check_access('komunitin');
+    $token = ces_komunitin_api_check_auth_token();
     // Broad authorization check. Individual operations may perform additional
     // checks. It is required to provide either:
     //  - user credentials with komunitin_social or komunitin_accounting scope.
@@ -229,7 +240,10 @@ function ces_komunitin_api() {
       foreach ($request->includes as $path => $include) {
         $includes[] = $path;
       }
-      $urlprefix = ces_komunitin_api_get_base_url() . '/' . $api;
+
+      $urlprefix = $api == 'accounting'
+        ? ces_komunitin_api_get_accounting_api_url($exchange)
+        : ces_komunitin_api_get_social_api_url();
 
       $encoder = CustomFactory::newEncoder(array(
         Currency::class => CurrencySchema::class,
@@ -443,8 +457,38 @@ function ces_komunitin_api_check_valid_uuid($uuid) {
  * @return boolean
  */
 function ces_komunitin_api_client_access($scope) {
-  $token = oauth2_server_check_access('komunitin', $scope);
+  $token = ces_komunitin_api_check_auth_token($scope);
   return !($token instanceof OAuth2\Response);
+}
+
+function ces_komunitin_api_check_auth_token($scope = NULL) {
+  // The funciton oauth2_server_check_access() from oauth2_server module does
+  // not work well when ustin JWT tokens and in fact it always rejects
+  // authentication. See https://www.drupal.org/project/oauth2_server/issues/2860106
+  // $token = oauth2_server_check_access('komunitin', $scope);
+
+  // Thats why we reimplement the check here.
+
+  $server = oauth2_server_load('komunitin');
+  $oauth2_server = oauth2_server_start($server);
+
+  $response = new OAuth2\Response();
+  $token = $oauth2_server->getAccessTokenData(OAuth2\Request::createFromGlobals(), $response);
+  // If there's no token, that means validation failed. Stop here.
+  if (!$token) {
+    return $response;
+  }
+
+  // Check scope, if provided
+  // If token doesn't have a scope, it's null/empty, or it's insufficient, throw an error.
+  $scope_util = new Drupal\oauth2_server\Scope($server);
+  if ($scope && (!isset($token["scope"]) || !$token["scope"] || !$scope_util->checkScope($scope, $token["scope"]))) {
+    $response->setError(401, 'insufficient_scope', 'The request requires higher privileges than provided by the access token');
+    $response->addHttpHeaders(array('WWW-Authenticate' => sprintf('%s, realm="%s", scope="%s"', 'bearer', 'Service', $scope)));
+    return $response;
+  }
+
+  return $token;
 }
 
 /**

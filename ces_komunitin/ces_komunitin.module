@@ -77,6 +77,13 @@ function ces_komunitin_menu() {
     'access arguments' => array('administer site configuration'),
     'type' => MENU_NORMAL_ITEM,
   );
+  $items['.well-known/jwks.json'] = array(
+    'page callback' => 'ces_komunitin_api_auth_jwks',
+    'type' => MENU_CALLBACK,
+    'file' => 'ces_komunitin.api.auth.inc',
+    'file path' => drupal_get_path('module', 'ces_komunitin'),
+    'access callback' => TRUE
+  );
   return $items;
 }
 
@@ -263,12 +270,44 @@ function ces_komunitin_oauth2_server_token($server, $request, $response) {
   if ($request->request['client_id'] == 'komunitin-app' && $request->request['grant_type'] === 'authorization_code'
     && (($access_token = $response->getParameter('access_token')) != NULL)) {
     // Succesful login by authorization code. This means we can verify user email and hence unblock user.
-    $token = oauth2_server_token_load($access_token);
-    $user = user_load($token->uid);
+    if ($server->getConfig('use_jwt_access_tokens')) {
+      $jwt = new OAuth2\Encryption\Jwt();
+      $payload = $jwt->decode($access_token, null, false);
+      $user_id = $payload['sub'];
+    } else {
+      $token = oauth2_server_token_load($access_token);
+      $user_id = $token->uid;
+    }
+    $user = user_load($user_id);
     if ($user->status == 0) {
       $user = user_save($user, ['status' => 1]);
       watchdog('ces_komunitin', 'Verified email %email', ['%email' => $user->mail]);
     }
   }
 
+}
+
+/**
+ * Implements hook_user_login().
+ */
+function ces_komunitin_user_login(&$edit, $account) {
+  module_load_include('module', 'ces_bank');
+  $exchange = ces_bank_get_current_exchange($account);
+  if ($exchange) {
+    $url = isset($exchange['data']['komunitin_app_url'])
+      ? $exchange['data']['komunitin_app_url']
+      : FALSE;
+    if ($url) {
+      // Don't redirect exchange admins or site admins.
+      $admin = ces_bank_access('admin', 'exchange', $exchange['id'])
+        || user_access('administer site configuration');
+      if (!$admin) {
+        // Redirect to the Komunitin app.
+        module_load_include('inc', 'user', 'user.pages');
+        user_logout_current_user();
+        header('Location: ' . $url, TRUE, 302);
+        die();
+      }
+    }
+  }
 }

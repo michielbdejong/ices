@@ -172,9 +172,9 @@ class MemberSchema extends BaseSchema {
 
   public function getRelationships($member, ContextInterface $context): iterable {
     assert($member instanceof Member);
-    $accountHref = ces_komunitin_api_get_base_url() . '/accounting/' . $member->group->code . '/accounts/' . $member->account_code;
-    $needsHref = ces_komunitin_api_get_base_url() . '/social/' . $member->group->code . '/needs?filter[member]=' . $member->id;
-    $offersHref = ces_komunitin_api_get_base_url() . '/social/' . $member->group->code . '/offers?filter[member]=' . $member->id;
+    $accountHref = ces_komunitin_api_get_accounting_api_url($member->group->exchange) . '/' . $member->group->code . '/accounts/' . $member->account_code;
+    $needsHref = ces_komunitin_api_get_social_api_url() . '/' . $member->group->code . '/needs?filter[member]=' . $member->id;
+    $offersHref = ces_komunitin_api_get_social_api_url() . '/' . $member->group->code . '/offers?filter[member]=' . $member->id;
     return [
       'group' => [
         self::RELATIONSHIP_DATA => $member->group,

@@ -48,7 +48,7 @@ $net1 = array(
   'admin' => $users['Riemann']->uid,
   'data' => array(
     'registration_offers' => 1,
-    'registration_wants' => 0,
+    'registration_wants' => 0
   ),
 );
 $bank->createExchange($net1);

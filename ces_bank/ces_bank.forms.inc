@@ -304,6 +304,31 @@ function ces_bank_exchange_form($form, &$form_state, $op, $exchange_id = NULL) {
       '#default_value' => $exchange['limitchain'],
     );
   }
+
+  $form['exchange']['komunitin'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Komunitin'),
+    '#description' => t('Settings for Komunitin integration.'),
+  );
+  if (!isset($exchange['data']['komunitin_accounting_api_url'])) {
+    $exchange['data']['komunitin_accounting_api_url'] = '';
+  }
+  $form['exchange']['komunitin']['komunitin_accounting_api_url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Komunitin accounting API URL'),
+    '#description' => t('URL to the Komunitin accounting API.'),
+    '#default_value' => $exchange['data']['komunitin_accounting_api_url'],
+  );
+  if (!isset($exchange['data']['komunitin_app_url'])) {
+    $exchange['data']['komunitin_app_url'] = '';
+  }
+  $form['exchange']['komunitin']['komunitin_app_url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Komunitin app URL'),
+    '#description' => t('Redirect users to this URL.'),
+    '#default_value' => $exchange['data']['komunitin_app_url'],
+  );
+
   switch ($op) {
     case 'activate':
       $value = t('Activate exchange');
@@ -379,6 +404,11 @@ function ces_bank_exchange_form_submit($form, &$form_state) {
     $form_state['values']['data']['default_lang'] = $form_state['values']['default_lang'];
     $form_state['values']['data']['hide_balance'] = $form_state['values']['hide_balance'];
     $form_state['values']['data']['hide_sales'] = $form_state['values']['hide_sales'];
+
+    // Komunitin settings.
+    $form_state['values']['data']['komunitin_accounting_api_url'] = $form_state['values']['komunitin_accounting_api_url'];
+    $form_state['values']['data']['komunitin_app_url'] = $form_state['values']['komunitin_app_url'];
+
     if ($op == 'new') {
       $bank->createExchange($form_state['values']);
       drupal_set_message(t('Exchange %code successfully created. You must wait for the system administrator to set up the exchange before it is operative. You will receive an e-mail notification within the next few days.', array('%code' => $form_state['values']['code'])));

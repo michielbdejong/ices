@@ -16,8 +16,8 @@ while [ $# -gt 0 ]; do
   esac
 done
 # Install Drupal
-echo "Installing site ${ICES_SITE_NAME:-IntegralCES}, with admin password ${ICES_ADMIN_PASSWORD:-integralces}."
-docker compose exec -T integralces drush si standard --db-url="mysql://integralces:${ICES_MYSQL_PASSWORD:-integralces}@db/integralces" --account-name="admin" --account-pass="${ICES_ADMIN_PASSWORD:-integralces}" --site-name="${ICES_SITE_NAME:-IntegralCES}" -y
+echo "Installing site ${ICES_SITE_NAME:-IntegralCES}."
+docker compose exec -T integralces drush si standard --db-url="mysql://integralces:${ICES_MYSQL_PASSWORD:-integralces}@db-integralces/integralces" --account-name="admin" --account-pass="${ICES_ADMIN_PASSWORD:-integralces}" --site-name="${ICES_SITE_NAME:-IntegralCES}" -y
 # Enable modules
 docker compose exec -T integralces drush en -y \
   oauth2_server services image views \
@@ -38,6 +38,10 @@ docker compose exec -T integralces drush vset theme_default greences
 docker compose exec -T integralces drush role-add-perm 'anonymous user' 'use oauth2 server' 
 docker compose exec -T integralces drush role-add-perm 'authenticated user' 'use oauth2 server'
 docker compose exec -T integralces drush ev "variable_set('cors_domains', array('*'=>'<mirror>|GET,POST,PATCH,DELETE,OPTIONS|Content-Type,Authorization|true'));"
+
+# Configure $base_url in settings.php
+docker compose exec -T integralces sh -c "echo \"\n\\\$base_url = '$BASE_URL';\n\" >> sites/default/settings.php"
+
 
 if [ "$DEMO" = "TRUE" ]; then
   docker compose exec -T integralces drush dl -y devel

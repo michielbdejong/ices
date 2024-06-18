@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . "/ces_komunitin.api.inc";
+require_once __DIR__ . '/ces_komunitin.client.inc';
 
 /**
  * Public function to be called to copy a mail notifcation to the notifications
@@ -76,7 +77,7 @@ function ces_komunitin_event($name, $code, $data) {
  */
 function ces_komunitin_send_event($event) {
   // Serialize payload.
-  $urlPrefix = ces_komunitin_api_get_base_url() . '/social';
+  $urlPrefix = ces_komunitin_api_get_social_api_url();
   $content = CustomFactory::newEncoder(array(
     Event::class => EventSchema::class,
     ExternalTransfer::class => ExternalTransferSchema::class,
@@ -91,6 +92,8 @@ function ces_komunitin_send_event($event) {
     $notifications_url = 'https://notifications.komunitin.org';
   }
   $url = $notifications_url . '/events';
+
+  $url = ces_komunitin_client_fix_url($url);
 
   $username = variable_get('ces_komunitin_events_username', getenv('NOTIFICATIONS_EVENTS_USERNAME'));
   $password = variable_get('ces_komunitin_events_password', getenv('NOTIFICATIONS_EVENTS_PASSWORD'));

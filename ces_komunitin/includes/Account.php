@@ -10,7 +10,7 @@ class Account {
   public $code;
   public $balance;
   public $creditLimit;
-  public $debitLimit;
+  public $maximumBalance;
 
   // Relatinships
   public $currency;
@@ -23,17 +23,21 @@ class Account {
     $this->code = $account['name'];
     // Balance
     $decimals = $currency->decimals;
-    $this->balance = round(pow(10, $decimals) * $account['balance']);
+    if (isset($account['balance']) && $account['balance'] !== null) {
+      $this->balance = round(pow(10, $decimals) * $account['balance']);
+    } else {
+      $this->balance = null;
+    }
 
     // Limits. We need to retrieve the info since it doesn't come with account record.
     $bank = new CesBank();
     $limitchain = $bank->getLimitChain($account['limitchain']);
     $this->creditLimit = - 1;
-    $this->debitLimit = -1;
+    $this->maximumBalance = -1;
     foreach($limitchain['limits'] as $limit) {
       if ($limit['block']) { // Don't take in count soft limits.
         if ($limit['classname'] == 'CesBankAbsoluteDebitLimit') {
-          $this->debitLimit = max($this->debitLimit, $limit['value']);
+          $this->maximumBalance = max($this->maximumBalance, $limit['value']);
         } else if ($limit['classname'] == 'CesBankAbsoluteCreditLimit') {
           $this->creditLimit = max($this->creditLimit, $limit['value']);
         }
@@ -62,10 +66,12 @@ class AccountSchema extends BaseSchema {
     assert($account instanceof Account);
     $attributes = [
       'code' => $account->code,
-      'balance' => $account->balance,
       'creditLimit' => $account->creditLimit,
-      'debitLimit' => $account->debitLimit
+      'maximumBalance' => $account->maximumBalance
     ];
+    if ($account->balance != null) {
+      $attributes['balance'] = $account->balance;
+    }
     return $attributes;
   }
 

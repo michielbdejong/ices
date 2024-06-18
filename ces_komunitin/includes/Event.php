@@ -53,7 +53,7 @@ class Event {
   static function create($name, $code, $data) {
     global $user;
     $userId = ces_komunitin_api_social_get_uuid(ResourceTypes::USER, $user->uid);
-    $urlPrefix = ces_komunitin_api_get_base_url() . '/social';
+    $urlPrefix = ces_komunitin_api_get_social_api_url();
     $userHref = $urlPrefix . '/users/' . $userId;
     $externalUser = new ExternalUser($userId, 'users', $userHref);
 

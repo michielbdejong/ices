@@ -175,6 +175,15 @@ class CesBank {
     try {
       $s = new IcesSerializer('CesBankLocalAccount');
       $account = $s->loadFromRecord($record);
+
+      // If this exchange is configured to use the Komunitin accounting API,
+      // create the account in Komunitin.
+      if (!empty($account->getExchange()->data['komunitin_accounting_api_url'])) {
+        module_load_include('inc', 'ces_komunitin', 'ces_komunitin.client');
+        ces_komunitin_client_create_account($account->getRecord());
+      }
+
+      // MArk account as active in DB.
       $account->activate();
       $s->save($account);
 

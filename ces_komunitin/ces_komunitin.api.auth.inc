@@ -81,3 +81,37 @@ function ces_komunitin_auth_one_time_token($client_id, $user, $scope = null) {
   }
   return false;
 }
+
+function bas64url_encode($data) {
+  return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+}
+
+function ces_komunitin_api_auth_jwks() {
+  // Get the public key used by oauth2 module.
+  $keys = oauth2_server_get_keys();
+
+  // Obtain the public key modulus and exponent.
+  $public_key = openssl_pkey_get_public($keys['public_key']);
+  $details = openssl_pkey_get_details($public_key);
+  $modulus = bas64url_encode($details['rsa']['n']);
+  $exponent = bas64url_encode($details['rsa']['e']);
+
+  // Create an arbitrary key id.
+  $kid = substr(hash('sha256', $modulus), 0, 32);
+
+  // Build the JWKS response.
+  $jwks = array(
+    'keys' => array(
+      array(
+        'kty' => 'RSA',
+        'alg' => 'RS256',
+        'use' => 'sig',
+        'kid' => $kid,
+        'n' => $modulus,
+        'e' => $exponent,
+      ),
+    ),
+  );
+  // Output.
+  drupal_json_output($jwks);
+}

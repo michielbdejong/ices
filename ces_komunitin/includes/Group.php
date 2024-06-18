@@ -111,7 +111,7 @@ class GroupSchema extends BaseSchema {
 
   public function getRelationships($group, ContextInterface $context): iterable {
     assert($group instanceof Group);
-    $currencyHref = ces_komunitin_api_get_base_url() . '/accounting/' . $group->code . '/currency';
+    $currencyHref = ces_komunitin_api_get_accounting_api_url($group->exchange) . '/' . $group->code . '/currency';
     return [
       'currency' => [
         self::RELATIONSHIP_DATA => new ExternalCurrency($group->currency_id, 'currencies', $currencyHref),

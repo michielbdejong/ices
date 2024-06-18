@@ -39,7 +39,8 @@ function ces_komunitin_install() {
     'allow_implicit' => TRUE,
     'use_openid_connect' => TRUE,
     // I'd like to use JWT tokens, but it seems that there are some bugs there (for example, /UserInfo endpoint does not work!).
-    'use_crypto_tokens' => FALSE,
+    // Trying JWT, but will need to assess what's working and what's not and fix it.
+    'use_crypto_tokens' => TRUE,
     'require_exact_redirect_uri' => TRUE,
     'grant_types' => array(
       'authorization_code' => 'authorization_code',
@@ -84,7 +85,7 @@ function ces_komunitin_install() {
   $client->server = $server->name;
   $client->client_key = $notifications_client_id;
   $client->client_secret = oauth2_server_hash_client_secret($notifications_client_secret);
-  $client->label = 'notifications-service';
+  $client->label = 'komunitin-notifications';
   $client->redirect_uri = "http://localhost:2028";
   $client->automatic_authorization = FALSE;
   $client->save();
@@ -108,7 +109,7 @@ function ces_komunitin_uninstall() {
     entity_delete('oauth2_server_client', $client->identifier());
   }
 
-  // Delete client notifications-service.
+  // Delete client komunitin-notifications.
   $notifications_client_id = getenv('NOTIFICATIONS_CLIENT_ID');
   if ($client = oauth2_server_client_load('komunitin', $notifications_client_id)) {
     entity_delete('oauth2_server_client', $client->identifier());

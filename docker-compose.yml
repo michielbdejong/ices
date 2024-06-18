@@ -1,6 +1,6 @@
 version: "3.5"
 services:
-  db: 
+  db-itegralces: 
     image: mariadb
     restart: unless-stopped
     environment:
@@ -37,12 +37,13 @@ services:
       - files:/var/www/html/sites/default
       
     environment:
-      - NOTIFICATIONS_CLIENT_ID=${NOTIFICATIONS_CLIENT_ID:-notifications-service}
+      - NOTIFICATIONS_CLIENT_ID=${NOTIFICATIONS_CLIENT_ID:-komunitin-notifications}
       - NOTIFICATIONS_CLIENT_SECRET=${NOTIFICATIONS_CLIENT_SECRET:-komunitin}
-      - NOTIFICATIONS_API_URL=${NOTIFICATIONS_API_URL:-http://notifications:2028}
+      - NOTIFICATIONS_API_URL=${NOTIFICATIONS_API_URL:-http://localhost:2028}
       - NOTIFICATIONS_EVENTS_USERNAME=${NOTIFICATIONS_EVENTS_USERNAME:-integralces}
       - NOTIFICATIONS_EVENTS_PASSWORD=${NOTIFICATIONS_EVENTS_PASSWORD:-komunitin}
       - MAILERSEND_API_KEY=${MAILERSEND_API_KEY:-'mlsn.xxxxxxxxxxxxxx'}
+      - BASE_URL=${BASE_URL:-http://localhost:2029}
     networks:
       - komunitin
     extra_hosts:

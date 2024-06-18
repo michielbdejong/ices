@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__ . '/ces_komunitin.api.social.inc';
 /**
  * Load a transaction ces_bank record. Send error on failure.
  *
@@ -256,7 +256,12 @@ function ces_komunitin_api_accounting_accounts_load($exchange, $code) {
   try {
     // This function may either return FALSE or throw exception.
     $bank = new CesBank();
-    $account = $bank->getAccountByName($code);
+    if (ces_komunitin_api_social_is_uuid($code)) {
+      $account = $bank->getAccountByUuid($code);
+    }
+    else {
+      $account = $bank->getAccountByName($code);
+    }
   } catch (Exception $e) {
     ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
   }
