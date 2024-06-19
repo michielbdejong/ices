@@ -44,8 +44,7 @@ docker compose exec -T integralces sh -c "echo \"\n\\\$base_url = '$BASE_URL';\n
 
 
 if [ "$DEMO" = "TRUE" ]; then
-  docker compose exec -T integralces drush dl -y devel
-  docker compose exec -T integralces drush en -y devel ces_develop simpletest maillog
+  docker compose exec -T integralces drush en -y ces_develop simpletest maillog
   docker compose exec -T integralces drush vset maillog_send 0
   docker compose exec -T integralces drush php-script sites/all/modules/ices/ces_develop/demo.php
   docker compose exec -T integralces chown www-data:www-data -R sites/default
