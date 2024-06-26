@@ -29,24 +29,24 @@ function ces_komunitin_client_fix_url($url) {
  */
 function ces_komunitin_client_fetch($options) {
   $url = ces_komunitin_client_fix_url($options['url']);
-
+  $body = json_encode($options['body']);
   $response = drupal_http_request($url, [
     'method' => $options['method'],
     'headers' => [
       'Content-Type' => 'application/vnd.api+json',
       'Authorization' => 'Bearer ' . $options['token']
     ],
-    'data' => json_encode($options['body'])
+    'data' => $body
   ]);
 
   if ($response->code >= 400) {
-    watchdog('ces_komunitin', 'Error fetching data from Komunitin API: @error', ['@error' => $result->error], WATCHDOG_ERROR);
+    watchdog('ces_komunitin', 'Error fetching data from Komunitin API: @error', ['@error' => $response->error], WATCHDOG_ERROR);
   }
 
   return $response;
 }
 
-function ces_komunitin_client_jsonapi_doc($type, $id, $attributes, $relationships) {
+function ces_komunitin_client_jsonapi_doc($type, $id, $attributes, $relationships, $included = NULL) {
   $data = [
     'data' => [
       'type' => $type,
@@ -55,6 +55,9 @@ function ces_komunitin_client_jsonapi_doc($type, $id, $attributes, $relationship
       'relationships' => $relationships
     ]
   ];
+  if ($included) {
+    $data['included'] = $included;
+  }
   return $data;
 }
 
@@ -75,15 +78,16 @@ function ces_komunitin_client_create_account($record) {
   }
   $uid = _ces_komunitin_api_social_account_user_id($record['id']);
   $uuid = ces_komunitin_api_social_get_uuid(ResourceTypes::USER, $uid);
+  $users = [
+    ['type' => 'users', 'id' => $uuid]
+  ];
   $relationships = [
     'users' => [
-      'data' => [
-        ['type' => 'users', 'id' => $uuid]
-      ]
+      'data' => $users
     ]
   ];
 
-  $data = ces_komunitin_client_jsonapi_doc('accounts', $account->id, $attributes, $relationships);
+  $data = ces_komunitin_client_jsonapi_doc('accounts', $account->id, $attributes, $relationships, $users);
   $code = $exchange['code'];
   $token = ces_komunitin_client_get_admin_token($exchange);
 

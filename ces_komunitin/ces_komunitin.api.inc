@@ -41,7 +41,7 @@ function ces_komunitin_api_get_social_api_url() {
 
 function ces_komunitin_api_get_accounting_api_url($exchange = FALSE) {
   global $base_url;
-  if ($exchange && $exchange['data']['komunitin_accounting_api_url']) {
+  if ($exchange && !empty($exchange['data']['komunitin_accounting_api_url'])) {
     return $exchange['data']['komunitin_accounting_api_url'];
   } else {
     return $base_url . '/' . _ces_komunitin_api_get_base_path() . '/accounting';
