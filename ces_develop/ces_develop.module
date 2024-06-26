@@ -101,9 +101,9 @@ function ces_develop_register_user($name) {
   if (!user_load_by_name($name)) {
     $form_state = array();
     $form_state['values']['name'] = $name;
-    $form_state['values']['mail'] = strtolower($name) . '@integralces.net';
-    $form_state['values']['pass']['pass1'] = 'integralces';
-    $form_state['values']['pass']['pass2'] = 'integralces';
+    $form_state['values']['mail'] = strtolower($name) . '@komunitin.org';
+    $form_state['values']['pass']['pass1'] = 'komunitin';
+    $form_state['values']['pass']['pass2'] = 'komunitin';
     $form_state['values']['ces_firstname'][LANGUAGE_NONE][0]['value'] = $name;
     $form_state['values']['ces_address'][LANGUAGE_NONE][0]['value'] = 'Acropolis';
     $form_state['values']['ces_town'][LANGUAGE_NONE][0]['value'] = 'Athens';
@@ -146,6 +146,6 @@ function ces_develop_register_account($user, $exchange, $i) {
   );
   $bank->createAccount($account);
   $user->status = 1;
-  user_save($user, array('pass' => 'integralces'));
+  user_save($user, array('pass' => 'komunitin'));
   $bank->activateAccount($account);
 }
