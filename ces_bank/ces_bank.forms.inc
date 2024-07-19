@@ -328,6 +328,15 @@ function ces_bank_exchange_form($form, &$form_state, $op, $exchange_id = NULL) {
     '#description' => t('Redirect users to this URL.'),
     '#default_value' => $exchange['data']['komunitin_app_url'],
   );
+  if (!isset($exchange['data']['komunitin_allow_anonymous_member_list'])) {
+    $exchange['data']['komunitin_allow_anonymous_member_list'] = 0;
+  }
+  $form['exchange']['komunitin']['komunitin_allow_anonymous_member_list'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow anonymous member list'),
+    '#description' => t('Allow anonymous users to see the member list (only name and picture but no email, phone, address...). This allows users from other groups to easily select members to make external transactions.'),
+    '#default_value' => $exchange['data']['komunitin_allow_anonymous_member_list'],
+  );
 
   switch ($op) {
     case 'activate':
@@ -408,6 +417,7 @@ function ces_bank_exchange_form_submit($form, &$form_state) {
     // Komunitin settings.
     $form_state['values']['data']['komunitin_accounting_api_url'] = $form_state['values']['komunitin_accounting_api_url'];
     $form_state['values']['data']['komunitin_app_url'] = $form_state['values']['komunitin_app_url'];
+    $form_state['values']['data']['komunitin_allow_anonymous_member_list'] = $form_state['values']['komunitin_allow_anonymous_member_list'];
 
     if ($op == 'new') {
       $bank->createExchange($form_state['values']);

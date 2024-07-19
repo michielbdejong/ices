@@ -76,7 +76,7 @@ function ces_komunitin_api() {
         ces_komunitin_api_send_error($error_code);
       }
     // Authenticated request carrying user credentials.
-    } else if ($token['user_id'] && ces_komunitin_api_client_access('komunitin_' . $api)) {
+    } else if (!empty($token['user_id']) && ces_komunitin_api_client_access('komunitin_' . $api)) {
         // Login user identified by Authorization header token.
         $user = user_load($token['user_id']);
         // Flag that this user is using the Komunitin api (then it will receive
@@ -84,7 +84,7 @@ function ces_komunitin_api() {
         ces_komunitin_api_user_logged_in($user);
     // Authenticated request carrying client credentials for GET request.
     } else if (
-      !$token['user_id'] &&
+      empty($token['user_id']) &&
       ces_komunitin_api_client_access('komunitin_' . $api . '_read_all') &&
       $request->method == 'GET'
     ) {
@@ -254,6 +254,7 @@ function ces_komunitin_api() {
         SignupSettings::class => SignupSettingsSchema::class,
         Contact::class => ContactSchema::class,
         Member::class => MemberSchema::class,
+        MinimalMember::class => MinimalMemberSchema::class,
         Offer::class => OfferSchema::class,
         Need::class => NeedSchema::class,
         Category::class => CategorySchema::class,
@@ -371,6 +372,7 @@ function ces_komunitin_get_public_paths() {
     'social/groups' => ['GET'],
     'social/%' => ['GET'],
     'social/users' => ['POST'],
+    'social/members' => ['GET'], // only public for certain groups
   ];
 }
 /**

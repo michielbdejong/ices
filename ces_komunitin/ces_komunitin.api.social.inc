@@ -132,6 +132,11 @@ function ces_komunitin_api_social_groups_load_collection($exchange, $filters, $s
     ->range($pageAfter, $pageSize);
 
   $exchanges = $query->execute()->fetchAll(PDO::FETCH_ASSOC);
+
+  // Maybe there's a more elegant way to overcome this by calling a load function in integralces.
+  foreach ($exchanges as &$exchange) {
+    $exchange['data'] = unserialize($exchange['data']);
+  }
   return $exchanges;
 }
 
@@ -493,12 +498,19 @@ function ces_komunitin_api_social_members_read($exchange, $member) {
 }
 
 function ces_komunitin_api_social_members_read_collection($exchange, array $members) {
+  global $user;
+
   $client_access = ces_komunitin_api_client_access('komunitin_social_read_all');
-  if ($client_access || ces_bank_access('view', 'exchange accounts', $exchange['id'])) {
+  $user_access = ces_bank_access('view', 'exchange accounts', $exchange['id']);
+  $anonymous_access = !$user_access && !empty($exchange['data']['komunitin_allow_anonymous_member_list']);
+
+  if ($client_access || $anonymous_access || $user_access) {
     $group = new Group($exchange);
     $result = [];
     foreach ($members as $member) {
-      if ($client_access || ces_bank_user_access('view', $member['user'])) {
+      if ($anonymous_access) {
+        $result[] = new MinimalMember($member, $group);
+      } else {
         $result[] = new Member($member, $group);
       }
     }

@@ -56,8 +56,8 @@ class Member {
     $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $member['id']);
     // Use drupal username as komunitin user code.
     $this->code = $member['name'];
-    // Only group memebrs can access member details.
-    $this->access = "group";
+
+    $this->access = "group";// This is not really used
     $this->name = ces_user_get_name($user);
 
     // Member type.
@@ -214,5 +214,30 @@ class MemberSchema extends BaseSchema {
   protected function getSelfSubUrl($resource): string {
     assert($resource instanceof Member);
     return '/' . $resource->group->code . $this->getResourcesSubUrl() . '/' . $resource->code;
+  }
+}
+
+class MinimalMember extends Member {}
+
+class MinimalMemberSchema extends MemberSchema {
+  public function getAttributes($member, ContextInterface $context): iterable {
+    assert($member instanceof Member);
+    $attributes = [
+      'name' => $member->name,
+      'image' => $member->image,
+    ];
+    return $attributes;
+  }
+
+  public function getRelationships($member, ContextInterface $context): iterable {
+    assert($member instanceof Member);
+    $fullRelationships = parent::getRelationships($member, $context);
+
+    $relationships = [
+      'group' => $fullRelationships['group'],
+      'account' => $fullRelationships['account'],
+    ];
+
+    return $relationships;
   }
 }

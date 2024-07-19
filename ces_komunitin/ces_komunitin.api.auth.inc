@@ -87,6 +87,7 @@ function bas64url_encode($data) {
 }
 
 function ces_komunitin_api_auth_jwks() {
+  drupal_page_is_cacheable(FALSE);
   // Get the public key used by oauth2 module.
   $keys = oauth2_server_get_keys();
 

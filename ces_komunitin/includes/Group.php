@@ -34,6 +34,10 @@ class Group {
   // Helper
   public $exchange;
 
+  // Permissions
+  public $allowAnonymousMemberList;
+  public $userAccess;
+
 
   function __construct($exchange)
   {
@@ -79,6 +83,9 @@ class Group {
     $this->signupSettings = new SignupSettings($exchange);
 
     $this->exchange = $exchange;
+
+    $this->allowAnonymousMemberList = !empty($exchange['data']['komunitin_allow_anonymous_member_list']);
+    $this->userAccess = ces_bank_access('view', 'exchange details', $exchange['id']);
   }
 }
 
@@ -128,23 +135,23 @@ class GroupSchema extends BaseSchema {
       ],
       'members' => [
         self::RELATIONSHIP_LINKS_SELF => false,
-        self::RELATIONSHIP_LINKS_RELATED => true,
+        self::RELATIONSHIP_LINKS_RELATED => $group->userAccess || $group->allowAnonymousMemberList,
         self::RELATIONSHIP_META => ['count' => $group->membersCount]
       ],
       'categories' => [
-        self::RELATIONSHIP_DATA => $group->categories,
+        self::RELATIONSHIP_DATA => $group->userAccess ? $group->categories : null,
         self::RELATIONSHIP_LINKS_SELF => false,
-        self::RELATIONSHIP_LINKS_RELATED => false,
+        self::RELATIONSHIP_LINKS_RELATED => $group->userAccess,
         self::RELATIONSHIP_META => ['count' => count($group->categories)]
       ],
       'offers' => [
         self::RELATIONSHIP_LINKS_SELF => false,
-        self::RELATIONSHIP_LINKS_RELATED => true,
+        self::RELATIONSHIP_LINKS_RELATED => $group->userAccess,
         self::RELATIONSHIP_META => ['count' => $group->offersCount]
       ],
       'needs' => [
         self::RELATIONSHIP_LINKS_SELF => false,
-        self::RELATIONSHIP_LINKS_RELATED => true,
+        self::RELATIONSHIP_LINKS_RELATED => $group->userAccess,
         self::RELATIONSHIP_META => ['count' => $group->needsCount]
       ],
       'signup-settings' => [
