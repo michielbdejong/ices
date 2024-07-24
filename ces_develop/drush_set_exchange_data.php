@@ -22,6 +22,7 @@ $options = [
   'registration_wants' => intval(drush_get_option('registration_wants', 0)),
   'komunitin_accounting_api_url' => drush_get_option('komunitin_accounting_api_url', ""),
   'komunitin_app_url' => drush_get_option('komunitin_app_url', ""),
+  'komunitin_allow_anonymous_member_list' => drush_get_option('komunitin_allow_anonymous_member_list', 0),
 ];
 
 print_r($options);
