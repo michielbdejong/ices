@@ -25,6 +25,8 @@ class Event {
   const OFFER_PUBLISHED = 'OfferPublished';
   const OFFER_EXPIRED = 'OfferExpired';
   const MEMBER_JOINED = 'MemberJoined';
+  const MEMBER_REQUESTED = 'MemberRequested';
+  const GROUP_ACTIVATED = 'GroupActivated';
 
   /**
    * @deprecated Use Event::create instead.

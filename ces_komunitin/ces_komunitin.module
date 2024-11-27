@@ -152,6 +152,24 @@ function ces_komunitin_admin_form() {
     '#default_value' => variable_get('ces_komunitin_app_url', 'https://komunitin.org'),
     '#description' => t('The URL of the Komunitin app.'),
   );
+  $form['ces_komunitin_accounting_url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Komunitin Accounting API URL'),
+    '#default_value' => variable_get('ces_komunitin_accounting_url', 'https://accounting.komunitin.org'),
+    '#description' => t('The URL of the Komunitin Accounting api.'),
+  );
+  $form['ces_komunitin_accounting_url_internal'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Komunitin Accounting API Internal URL'),
+    '#default_value' => variable_get('ces_komunitin_accounting_url_internal', 'https://accounting.komunitin.org'),
+    '#description' => t('The URL of the Komunitin Accounting API to make calls from this server.'),
+  );
+  $form['ces_komunitin_notifications_url_internal'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Komunitin Notifications API Internal URL'),
+    '#default_value' => variable_get('ces_komunitin_notifications_url_internal', 'https://notifications.komunitin.org'),
+    '#description' => t('The URL of the Komunitin Notifications API to make calls from this server.'),
+  );
   $form['ces_komunitin_mailersend_api_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Mailersend API key'),
@@ -294,13 +312,16 @@ function ces_komunitin_user_login(&$edit, $account) {
   module_load_include('module', 'ces_bank');
   $exchange = ces_bank_get_current_exchange($account);
   if ($exchange) {
-    $url = isset($exchange['data']['komunitin_app_url'])
-      ? $exchange['data']['komunitin_app_url']
+    $redirect = isset($exchange['data']['komunitin_redirect'])
+      ? $exchange['data']['komunitin_redirect']
       : FALSE;
-    if ($url) {
+    if ($redirect) {
+      $url = variable_get('ces_komunitin_app_url', 'https://komunitin.org');
+
       // Don't redirect exchange admins or site admins.
       $admin = ces_bank_access('admin', 'exchange', $exchange['id'])
         || user_access('administer site configuration');
+
       if (!$admin) {
         // Redirect to the Komunitin app.
         module_load_include('inc', 'user', 'user.pages');
@@ -309,5 +330,7 @@ function ces_komunitin_user_login(&$edit, $account) {
         die();
       }
     }
+
+
   }
 }

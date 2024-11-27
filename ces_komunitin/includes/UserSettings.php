@@ -11,7 +11,7 @@ class UserSettings {
   public $id;
   public $settings;
 
-  function __construct($user, $exchange) {
+  function __construct($user) {
     $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::USER_SETTINGS, $user->uid);
     module_load_include('module', 'ces_user');
     $this->settings = ces_user_get_settings($user);

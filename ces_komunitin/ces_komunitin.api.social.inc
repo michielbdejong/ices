@@ -4,7 +4,7 @@ class ResourceTypes {
   const USER = "user";
   const USER_SETTINGS = "user-settings";
   const GROUP = "group";
-  const SIGNUP_SETTINGS = "signup-settings";
+  const GROUP_SETTINGS = "group-settings";
   const MEMBER = "member";
   const NEED = "need";
   const OFFER = "offer";
@@ -21,10 +21,18 @@ class ResourceTypes {
   const FACEBOOK = "facebook";
   const TWITTER = "twitter";
 
-  const ALL_TYPES = [self::USER, self::USER_SETTINGS, self::GROUP, self::SIGNUP_SETTINGS,
+  const ALL_TYPES = [self::USER, self::USER_SETTINGS, self::GROUP, self::GROUP_SETTINGS,
     self::MEMBER, self::NEED, self::OFFER, self::CATEGORY, self::FILE,
     self::EMAIL, self::PHONE, self::WEBSITE, self::WHATSAPP, self::TELEGRAM,
     self::INSTAGRAM, self::FACEBOOK, self::TWITTER];
+}
+
+function _ces_komunitin_api_social_type_code($type) {
+  $type = substr($type, 0, 6);
+  while (strlen($type) < 6) {
+    $type .= ' ';
+  }
+  return $type;
 }
 
 function ces_komunitin_api_social_get_uuid($type, $id) {
@@ -38,10 +46,7 @@ function ces_komunitin_api_social_get_uuid($type, $id) {
   // TTTTTTTT-TTTT-4RRR-ARRR-IIIIIIIIIIII
 
   //1. $type to 6 chars length:
-  $type = substr($type, 0, 6);
-  while (strlen($type) < 6) {
-    $type .= ' ';
-  }
+  $type = _ces_komunitin_api_social_type_code($type);
   $type = bin2hex($type);
 
   //2. random bits. Not really random but tied to the current installation,
@@ -63,10 +68,10 @@ function ces_komunitin_api_social_get_id($uuid) {
   }
   // Recover type.
   try {
-    $type = substr($uuid, 0, 8) . substr($uuid, 9, 4);
-    $type = trim(hex2bin($type));
+    $type_code = substr($uuid, 0, 8) . substr($uuid, 9, 4);
+    $type_code = hex2bin($type_code);
     foreach (ResourceTypes::ALL_TYPES as $item) {
-      if (substr($item, strlen($type)) == $type) { //item.startswith(type).
+      if (_ces_komunitin_api_social_type_code($item) == $type_code) {
         $type = $item;
       }
     }
@@ -108,9 +113,8 @@ function ces_komunitin_api_social_groups_read($exchange) {
 
 function ces_komunitin_api_social_groups_load_collection($exchange, $filters, $sorts, $pageAfter, $pageSize) {
 
-  $query = db_select('ces_exchange', 'e')
-    ->fields('e')
-    ->condition('e.state', 1);
+  $query = db_select('ces_exchange', 'e')->fields('e');
+  $only_active = true;
 
   foreach ($filters as $field => $values) {
     if ($field == 'search') {
@@ -124,10 +128,19 @@ function ces_komunitin_api_social_groups_load_collection($exchange, $filters, $s
           ->condition('e.currencyname', '%' . $escaped . '%', 'LIKE')
           ->condition('e.currenciesname', '%' . $escaped . '%', 'LIKE')
           ->condition('e.town', '%' . $escaped . '%', 'LIKE')
-       );
+        );
       }
+    } else if ($field == 'code') {
+      $code = reset($values);
+      $query->condition('e.code', $code);
+      $only_active = false;
     }
   }
+
+  if ($only_active) {
+    $query->condition('e.state', 1);
+  }
+
   $query->orderBy('e.name', 'ASC')
     ->range($pageAfter, $pageSize);
 
@@ -147,6 +160,247 @@ function ces_komunitin_api_social_groups_read_collection($exchanges) {
     $groups[] = ces_komunitin_api_social_groups_read($exchange);
   }
   return $groups;
+}
+
+/**
+ * Validate group create/update
+ */
+function _ces_komunitin_api_social_groups_validate($body, $new) {
+  $edit = [];
+  if (!isset($body->data)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+  }
+  $data = $body->data;
+  if (!empty($data->attributes)) {
+    $attrs = $data->attributes;
+    // Name.
+    if ($new && !isset($attrs->name)) {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Name is required");
+    }
+    if (isset($attrs->name)) {
+      if (strlen($attrs->name) < 3) {
+        ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Name too short");
+      }
+      $edit['name'] = $attrs->name;
+    }
+
+    // Code.
+    if ($new && !isset($attrs->code)) {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Code is required");
+    }
+    if (isset($attrs->code)) {
+      if (strlen($attrs->code) !== 4 || !preg_match('/^[a-zA-Z0-9]+$/', $attrs->code)) {
+        ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Invalid code");
+      }
+      $edit['code'] = $attrs->code;
+    }
+
+    // Description.
+    if ($new && !isset($attrs->description)) {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Description is required");
+    }
+    if (isset($attrs->description)) {
+      $edit['description'] = $attrs->description;
+    }
+
+    // Position
+    if (isset($attrs->location) && !empty($attrs->location->coordinates)) {
+      $edit['lng'] = $attrs->location->coordinates[0];
+      $edit['lat'] = $attrs->location->coordinates[1];
+    }
+
+    // Address
+    if (isset($attrs->address)) {
+      $edit['town'] = $attrs->address->addressLocality;
+      $edit['region'] = $attrs->address->addressRegion;
+      $edit['country'] = $attrs->address->addressCountry;
+    }
+
+    // Image
+    if (!empty($attrs->image)) {
+      $files = _ces_komunitin_api_social_validate_files([$attrs->image], variable_get('ces_komunitin_picture_path', 'ces_komunitin_pictures'));
+      $edit['image'] = $files['files'][0];
+      $edit['uploaded'] = $files['uploaded'];
+    }
+  }
+
+  return $edit;
+}
+
+function ces_komunitin_api_social_groups_update($exchange, $body) {
+  if (!ces_bank_access('edit', 'exchange', $exchange['id'])) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+
+  $edit = _ces_komunitin_api_social_groups_validate($body, FALSE);
+
+  // Check code
+  if (isset($edit['code']) && $edit['code'] != $exchange['code']) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN. "Code cannot be changed");
+  }
+
+  // main fields
+  if (isset($edit['name'])) {
+    $exchange['name'] = $edit['name'];
+    $exchange['shortname'] = $edit['name'];
+  }
+
+  if (isset($edit['lng'])) {
+    $exchange['lng'] = $edit['lng'];
+  }
+  if (isset($edit['lat'])) {
+    $exchange['lat'] = $edit['lat'];
+  }
+  if (isset($edit['country'])) {
+    $exchange['country'] = $edit['country'];
+  }
+  if (isset($edit['region'])) {
+    $exchange['region'] = $edit['region'];
+  }
+  if (isset($edit['town'])) {
+    $exchange['town'] = $edit['town'];
+  }
+  // fields saved in "data" column
+  $data = $exchange['data'];
+  if (isset($edit['image'])) {
+    $data['image'] = $edit['image'];
+  }
+  if (isset($edit['description'])) {
+    $data['description'] = $edit['description'];
+  }
+
+  $admin = user_load($exchange['admin']);
+  $contacts = _ces_komunitin_api_social_get_included_contacts($body, $admin->email);
+  if ($contacts !== null && count($contacts) > 0) {
+    $data['contacts'] = $contacts;
+  }
+
+  $exchange['data'] = $data;
+
+  $bank = new CesBank();
+  $bank->updateExchange($exchange);
+
+  // Reload exchange to reflect what actually was saved.
+  $exchange = ces_bank_get_exchange($exchange['id']);
+  return ces_komunitin_api_social_groups_read($exchange);
+}
+
+function ces_komunitin_api_social_groups_create($body) {
+  // This is a public endpoint.
+  $edit = _ces_komunitin_api_social_groups_validate($body, TRUE);
+  // Check code
+  if (isset($edit['code'])) {
+    $existing = ces_bank_get_exchange_by_name($edit['code']);
+    if ($existing) {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Code already in use");
+    }
+  }
+
+  $adminUuid = $body->data->relationships->admins->data[0]->id;
+  $adminId = ces_komunitin_api_social_get_id($adminUuid)->id;
+
+  $admin = user_load($adminId);
+  $lang = user_preferred_language($admin)->language;
+
+  $currency = _ces_komunitin_api_social_get_included_resource($body, 'currency');
+  $contacts = _ces_komunitin_api_social_get_included_contacts($body, $admin->mail);
+
+  $exchange = [
+    'name' => $edit['name'],
+    'shortname' => $edit['name'],
+    'code' => $edit['code'],
+    'description' => $edit['description'],
+    'lng' => $edit['lng'],
+    'lat' => $edit['lat'],
+    'country' => $edit['country'],
+    'region' => $edit['region'],
+    'town' => $edit['town'],
+    'admin' => $adminId,
+    'currencysymbol' => $currency->attributes->symbol,
+    'currencyname' => $currency->attributes->name,
+    'currenciesname' => $currency->attributes->namePlural,
+    'currencyvalue' => $currency->attributes->rate->n / $currency->attributes->rate->d,
+    'currencyscale' => $currency->attributes->decimals,
+
+    'data' => [
+      'image' => isset($edit['image']) ? $edit['image'] : null,
+      'description' => $edit['description'],
+      'default_lang' => $lang,
+      'komunitin_redirect' => TRUE,
+      'komunitin_accounting' => TRUE,
+      'komunitin_allow_anonymous_member_list' => FALSE,
+      'contacts' => $contacts,
+    ],
+  ];
+
+  if (isset($contacts[Contact::TYPE_WEBSITE])) {
+    $exchange['website'] = $contacts[Contact::TYPE_WEBSITE];
+    unset($contacts[Contact::TYPE_WEBSITE]);
+  } else {
+    $exchange['website'] = '';
+  }
+
+  $bank = new CesBank();
+  $bank->createExchange($exchange);
+
+  // Reload exchange.
+  $exchange = ces_bank_get_exchange($exchange['id']);
+  return ces_komunitin_api_social_groups_read($exchange);
+}
+
+
+function ces_komunitin_api_social_groups_settings_read($exchange) {
+  // Public endpoint. Should we restrict it to members?
+  return new GroupSettings($exchange);
+}
+
+function ces_komunitin_api_social_groups_settings_update($exchange, $body) {
+  if (!ces_bank_access('edit', 'exchange', $exchange['id'])) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+
+  if (!isset($body->data) || !isset($body->data->attributes)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+  }
+
+  $attrs = $body->data->attributes;
+  $data = $exchange['data'];
+
+  /*
+    requireAcceptTerms: boolean;
+    terms: string;
+    minOffers: number;
+    minNeeds: number;
+  */
+
+  if (isset($attrs->requireAcceptTerms)) {
+    $data['require_terms'] = $attrs->requireAcceptTerms === true;
+  }
+
+  if (isset($attrs->terms)) {
+    $data['terms_text']['value'] = $attrs->terms;
+    $data['terms_text']['format'] = 'plain_text';
+  }
+
+  if (isset($attrs->minOffers)) {
+    $data['registration_offers'] = $attrs->minOffers;
+  }
+
+  if (isset($attrs->minNeeds)) {
+    $data['registration_wants'] = $attrs->minNeeds;
+  }
+
+  if (isset($attrs->allowAnonymousMemberList)) {
+    $data['komunitin_allow_anonymous_member_list'] = $attrs->allowAnonymousMemberList === true;
+  }
+
+  $exchange['data'] = $data; //?
+
+  $bank = new CesBank();
+  $bank->updateExchange($exchange);
+
+  return ces_komunitin_api_social_groups_settings_read($exchange);
+
 }
 
 function ces_komunitin_api_social_users_load($exchange, $id) {
@@ -170,23 +424,20 @@ function ces_komunitin_api_social_users_load($exchange, $id) {
 function ces_komunitin_api_social_users_read($record) {
   global $user;
   // Users can only be accessed by themselves or by the notifications service.
-  if (ces_komunitin_api_client_access('komunitin_social_read_all') || $user->uid === $record->uid) {
-    $exchange = ces_bank_get_current_exchange($record);
-    return new User($record, $exchange);
+  $exchange = ces_bank_get_current_exchange($record);
+  if (ces_komunitin_api_client_access('komunitin_social_read_all') || $user->uid === $record->uid || $user->uid === $exchange['admin']) {
+    return new User($record, !empty($exchange) ? new Group($exchange) : NULL);
   } else {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
   }
 }
 
 function ces_komunitin_api_social_users_load_collection($exchange = FALSE, $filters, $sorts, $pageAfter, $pageSize) {
-  // Only the notifications service can access this endpoint.
-  if (!ces_komunitin_api_client_access('komunitin_social_read_all')) {
-    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
-  }
   // User list must be filtered by member.
   if (!isset($filters['members'])) {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Members filter is required');
   }
+
   $membersIds = $filters['members'];
   $members = [];
   foreach ($membersIds as $id) {
@@ -206,12 +457,13 @@ function ces_komunitin_api_social_users_load_collection($exchange = FALSE, $filt
  * not by the app.
  */
 function ces_komunitin_api_social_users_read_collection($users) {
-  if (!ces_komunitin_api_client_access('komunitin_social_read_all')) {
-    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
-  }
-  foreach ($users as $user) {
-    $exchange = ces_bank_get_current_exchange($user);
-    $result[] = new User($user, $exchange);
+  global $user; // Logged in user.
+  $canReadAll = ces_komunitin_api_client_access('komunitin_social_read_all');
+  foreach ($users as $record) {
+    $exchange = ces_bank_get_current_exchange($record);
+    if ($canReadAll || $user->uid === $exchange['admin'] || $user->uid === $record->uid) {
+      $result[] = new User($record, new Group($exchange));
+    }
   }
   return $result;
 }
@@ -278,6 +530,9 @@ function ces_komunitin_api_social_users_create($body) {
   if (!valid_email_address($attributes->email)) {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Invalid email");
   }
+  if (strlen($attributes->password) < 8) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Password too short");
+  }
   $user = null;
   if ($user = user_load_by_mail($attributes->email)) {
     // Email already in use.
@@ -290,28 +545,35 @@ function ces_komunitin_api_social_users_create($body) {
     // 2.  The user is inactive. In this case we'll update this user and resend
     // the validation email.
   }
-  if (strlen($attributes->password) < 8) {
-    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Password too short");
+
+  // Member included resource.
+  $language = language_default();
+
+  $has_member = isset($body->data->relationships) && isset($body->data->relationships->members) && isset($body->data->relationships->members->data) && count($body->data->relationships->members->data) === 1;
+  if ($has_member) {
+    $members = _ces_komunitin_api_social_get_included_resources($body, "members");
+    $member = reset($members);
+
+    if (empty($member->attributes->name)) {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Missing member name");
+    }
+    if (!isset($member->relationships) || !isset($member->relationships->group) || !isset($member->relationships->group->data) || !isset($member->relationships->group->data->id)) {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Missing member group");
+    }
+    $exchange_id = ces_komunitin_api_social_get_id($member->relationships->group->data->id);
+    $exchange = ces_bank_get_exchange($exchange_id->id);
+    if ($exchange == NULL) {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Invalid member group");
+    }
+    if (isset($exchange['data']['default_lang'])) {
+      $language = $exchange['data']['default_lang'];
+    }
   }
-  if (!isset($body->data->relationships) || !isset($body->data->relationships->members) || !isset($body->data->relationships->members->data) || count($body->data->relationships->members->data) !== 1) {
-    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Missing member");
-  }
-  $member = $body->data->relationships->members->data[0];
-  if (empty($member->attributes->name)) {
-    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Missing member name");
-  }
-  if (!isset($member->relationships) || !isset($member->relationships->group) || !isset($member->relationships->group->data) || !isset($member->relationships->group->data->id)) {
-    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Missing member group");
-  }
-  $exchange_id = ces_komunitin_api_social_get_id($member->relationships->group->data->id);
-  $exchange = ces_bank_get_exchange($exchange_id->id);
-  if ($exchange == NULL) {
-    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Invalid member group");
-  }
-  $language = isset($exchange['data']['default_lang']) ? $exchange['data']['default_lang'] : language_default();
-  if (isset($body->data->relationships->settings)) {
-    $settings = $body->data->relationships->settings->data;
-    if (!empty($settings) && !empty($settings->attributes)) {
+
+  $has_settings = isset($body->data->relationships) && !empty($body->data->relationships->settings);
+  if ($has_settings) {
+    $settings = _ces_komunitin_api_social_get_included_resource($body, "settings");
+    if (isset($settings->attributes->language)) {
       $language = $settings->attributes->language;
     }
   }
@@ -319,7 +581,9 @@ function ces_komunitin_api_social_users_create($body) {
   // All right! Create the user.
   require_once __DIR__ . '/ces_komunitin.api.auth.inc';
 
-  $name = trim($member->attributes->name);
+  // The name is in the member resource for regular users, and in the attributes
+  // for the admin user before creating the associated member and group.
+  $name = $has_member ? $member->attributes->name : $attributes->name;
   // 1. Get free username.
   $username = ces_offerswants_slugify(substr($name, 0, 20));
   $error = user_validate_name($username);
@@ -352,27 +616,29 @@ function ces_komunitin_api_social_users_create($body) {
   }
 
   // 3. Create account (if not exists).
-  $bank = new CesBank();
-  $accounts = $bank->getUserAccountsInExchange($user->uid, $exchange['id']);
-  if (empty($accounts)) {
-    // Create account.
-    $account = $bank->getDefaultAccount($exchange['id']);
-    $account['users'][0]['user'] = $user->uid;
-    $bank->createAccount($account, FALSE); // Do not send default email.
+  if ($has_member) {
+    $bank = new CesBank();
+    $accounts = $bank->getUserAccountsInExchange($user->uid, $exchange['id']);
+    if (empty($accounts)) {
+      // Create account.
+      $account = $bank->getDefaultAccount($exchange['id']);
+      $account['users'][0]['user'] = $user->uid;
+      $bank->createAccount($account, FALSE); // Do not send default email.
+    }
   }
 
   // Send validation email.
-  ces_komunitin_send_validation_email($user->uid, $exchange['code']);
+  ces_komunitin_send_validation_email($user->uid, $has_member ? $exchange['code'] : NULL);
 
   // Return newly created user.
-  return new User($user, $exchange);
+  return new User($user, $has_member ? new Group($exchange) : NULL);
 }
 
 function ces_komunitin_api_social_users_settings_read($record) {
   global $user;
-  if (ces_komunitin_api_client_access('komunitin_social_read_all') || $user->uid === $record->uid) {
-    $exchange = ces_bank_get_current_exchange($record);
-    return new UserSettings($record, $exchange);
+  $exchange = ces_bank_get_current_exchange($record);
+  if (ces_komunitin_api_client_access('komunitin_social_read_all') || $user->uid === $record->uid || $user->uid === $exchange['admin']) {
+    return new UserSettings($record);
   } else {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
   }
@@ -380,10 +646,13 @@ function ces_komunitin_api_social_users_settings_read($record) {
 
 function ces_komunitin_api_social_users_settings_update($record, $body) {
   global $user;
-  if ($record->uid !== $user->uid) {
+  $exchange = ces_bank_get_current_exchange($record);
+
+  // Own user or exchange admin.
+  if (!($user->uid === $record->uid || $user->uid === $exchange['admin'])) {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
   }
-  $exchange = ces_bank_get_current_exchange();
+
   module_load_include('module', 'ces_user');
   $obj = $body->data->attributes;
   $settings = [];
@@ -396,8 +665,8 @@ function ces_komunitin_api_social_users_settings_update($record, $body) {
   if (isset($obj->emails)) {
     $settings['emails'] = (array) $obj->emails;
   }
-  ces_user_set_settings($user, $settings);
-  return new UserSettings($user, $exchange);
+  ces_user_set_settings($record, $settings);
+  return new UserSettings($record);
 }
 
 function ces_komunitin_api_social_members_load($exchange, $code) {
@@ -426,8 +695,6 @@ function ces_komunitin_api_social_members_load_collection($exchange, $filters, $
   $query = db_select('ces_account', 'a')
     ->fields('a')
     ->condition('a.exchange', $exchange['id'])
-    // discard inactive accounts (new, blocked or closed).
-    ->condition('a.state', 1)
     // discard virtual accounts.
     ->condition('a.kind', 5, '<');
   $query->join('ces_accountuser', 'au', 'a.id = au.account');
@@ -440,6 +707,20 @@ function ces_komunitin_api_social_members_load_collection($exchange, $filters, $
   // Join users table
   $query->join('users', 'u', 'u.uid = au.user');
   $query->fields('u', array('uid'));
+
+  // Filter out inactive accounts by default
+  if (!isset($filters['state'])) {
+    $filters['state'] = ['active'];
+  }
+
+  $addCondition = function($query, $field, $values) {
+    if (count($values) == 1) {
+      $query->condition($field, $values[0]);
+    }
+    else  {
+      $query->condition($field, $values, 'IN');
+    }
+  };
 
   foreach($filters as $field => $values) {
     if ($field == 'search') {
@@ -459,15 +740,25 @@ function ces_komunitin_api_social_members_load_collection($exchange, $filters, $
       }
     }
     else if ($field == 'account') {
-      if (count($values) == 1) {
-        $query->condition('a.uuid', $values[0]);
-      }
-      else  {
-        $query->condition('a.uuid', $values, 'IN');
-      }
+      $addCondition($query, 'a.uuid', $values);
+    }
+    else if ($field == 'code') {
+      $addCondition($query, 'a.name', $values);
+    }
+    else if ($field == 'state') {
+      $statesTranslation = [
+        Member::STATE_PENDING => CesBankLocalAccount::STATE_HIDDEN,
+        Member::STATE_ACTIVE => CesBankLocalAccount::STATE_ACTIVE,
+        Member::STATE_SUSPENDED => CesBankLocalAccount::STATE_LOCKED,
+        Member::STATE_DELETED => CesBankLocalAccount::STATE_CLOSED,
+      ];
+      $values = array_map(function($state) use ($statesTranslation) {
+        return $statesTranslation[$state];
+      }, $values);
+      $addCondition($query, 'a.state', $values);
     }
     else {
-      ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED, "Filtering other than 'account' or 'search' is not supported.");
+      ces_komunitin_api_send_error(KomunitinApiError::NOT_IMPLEMENTED, "Filtering other than ['code', 'state', 'account', 'search'] is not supported.");
     }
   }
 
@@ -588,32 +879,20 @@ function ces_komunitin_api_social_members_update($exchange, $member, $body) {
     }
     // Update user in database.
     $user = user_save($user, $edit);
+
+    // Check user activation.
+    if (isset($attributes->state)) {
+      $state = $attributes->state;
+      if ($state == Member::STATE_ACTIVE && $member['state'] == CesBankLocalAccount::STATE_HIDDEN) {
+        // Activate user.
+        $bank = new CesBank();
+        $bank->activateAccount($member);
+      }
+    }
   }
-  if (!empty($data->relationships) && !empty($data->relationships->contacts)) {
-    if (!isset($body->included) || !isset($data->relationships->contacts->data)) {
-      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Missing included or related contacts.");
-    }
-    $included = $body->included;
-    $contacts = [];
-    foreach ($data->relationships->contacts->data as $related) {
-      // Get the id of the related contact.
-      $id = $related->id;
-      // Find the id in the included array.
-      $contact = NULL;
-      foreach ($included as $item) {
-        if ($item->type == "contacts" &&  $item->id == $id) {
-          $contact = $item;
-          break;
-        }
-      }
-      // We could support not modified contacts that are present in the relationship
-      // but not in the included array, but it is not necessary for the actual
-      // app usage of the API.
-      if ($contact == NULL) {
-        ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Contact not found in included.");
-      }
-      $contacts[$contact->attributes->type] = $contact->attributes->name;
-    }
+
+  $contacts = _ces_komunitin_api_social_get_included_contacts($body);
+  if ($contacts !== NULL) {
     // Update contacts.
     ces_user_set_contacts($user, $contacts);
   }
@@ -623,21 +902,248 @@ function ces_komunitin_api_social_members_update($exchange, $member, $body) {
   return ces_komunitin_api_social_members_read($exchange, $member);
 }
 
-function ces_komunitin_api_social_categories_load_collection($exchange, $filters, $sorts) {
-  // 3 means categories for both offers and wants.
-  return ces_offerswants_get_categories(3, $exchange['id']);
+/**
+ * return null if no contacts relationship is present. Otherwise return an
+ * associative array type=>value with the contacts from the included array
+ * defined in the relationship.
+ */
+function _ces_komunitin_api_social_get_included_contacts($body, $excludeEmail = NULL) {
+  $resources = _ces_komunitin_api_social_get_included_resources($body, "contacts", "contacts");
+  if ($resources === NULL) {
+    return NULL;
+  }
+  $contacts = [];
+  foreach ($resources as $contact) {
+    if ($excludeEmail !== NULL && $contact->attributes->type === ResourceTypes::EMAIL && $contact->attributes->name === $excludeEmail) {
+      continue;
+    }
+    $contacts[$contact->attributes->type] = $contact->attributes->name;
+  }
+  return $contacts;
 }
 
-function ces_komunitin_api_social_categories_read_collection($exchange, $categories) {
+function _ces_komunitin_api_social_get_included_resource($body, $relationship) {
+  $data = $body->data;
+  if (empty($data->relationships) || empty($data->relationships->$relationship)) {
+    return NULL;
+  }
+  if (!isset($body->included) || !isset($data->relationships->$relationship->data)
+    || !isset($data->relationships->$relationship->data->id) || !isset($data->relationships->$relationship->data->type)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Missing included or related $relationship.");
+  }
+
+  $included = $body->included;
+  $related = $data->relationships->$relationship->data;
+
+  $id = $related->id;
+  $type = $related->type;
+
+  // Find the id in the included array.
+  foreach ($included as $item) {
+    if ($item->type == $type &&  $item->id == $id) {
+      return $item;
+    }
+  }
+  ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "$type $id not found in included array.");
+}
+
+function _ces_komunitin_api_social_get_included_resources($body, $relationship) {
+  $data = $body->data;
+  if (empty($data->relationships) || empty($data->relationships->$relationship)) {
+    return NULL;
+  }
+  if (!isset($body->included) || !isset($data->relationships->$relationship->data)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Missing included or related $relationship.");
+  }
+  $included = $body->included;
+  $resources = [];
+  foreach ($data->relationships->$relationship->data as $related) {
+    // Get the id of the related resource.
+    $id = $related->id;
+    $type = $related->type;
+    // Find the id in the included array.
+    $resource = NULL;
+    foreach ($included as $item) {
+      if ($item->type == $type &&  $item->id == $id) {
+        $resource = $item;
+        break;
+      }
+    }
+    // We throw error when the resource is not found in the included array. We
+    // could support not modified resources that are present in the relationship
+    // but not in the included array, but it is not necessary for the actual
+    // app usage of the API.
+    if ($resource == NULL) {
+      ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "$type $id not found in included array.");
+    }
+    $resources[] = $resource;
+  }
+  return $resources;
+}
+
+function ces_komunitin_api_social_members_delete($exchange, $member) {
+  if (!ces_bank_access('admin', 'account', $member['id'])) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+
+  if ($member['state'] == CesBankLocalAccount::STATE_CLOSED) {
+    // Already deleted.
+    return;
+  }
+
+  // If this exchange is configured to use the Komunitin accounting API,
+  // delete the account in Komunitin.
+  if ($member['state'] != CesBankLocalAccount::STATE_HIDDEN) {
+    if (!empty($exchange['data']['komunitin_accounting'])) {
+      module_load_include('inc', 'ces_komunitin', 'ces_komunitin.client');
+      ces_komunitin_client_delete_account($member);
+    }
+  }
+
+  // Delete the member. THis is using legacy code that is not very clean,
+  // but anyway this service will all be replaced hopefully sooner than later.
+
+  $bank = new CesBank();
+  $checks = $bank->deleteAccountsCheck([$member['id']]);
+  $check = $checks['accounts'][0];
+
+  // Account.
+  if ($check['num_transactions'] > 0) {
+    // Can't delete the account as it has transactions, just mark it as closed.
+    $member['state'] = CesBankLocalAccount::STATE_CLOSED;
+    $bank->updateAccount($member);
+  } else {
+    // Completely delete the account.
+    $bank->deleteAccount($member['id']);
+  }
+
+  // User(s)
+  $users_cancel = array();
+  foreach ($check['account_users'] as $user) {
+    if ($user['user_action'] == 'delete' || $user['user_action'] == 'cancel') {
+      $users_cancel[] = array(
+        'uid' => $user['uid'],
+        'action' => $user['user_action'],
+      );
+    }
+  }
+  if (!empty($users_cancel)) {
+    $bank->deleteUsers($users_cancel);
+  }
+}
+
+function _ces_komunitin_api_social_categories_load_extras($category) {
+  $data = json_decode($category->description);
+
+  $category->description = $data !== null ? $data->description : '';
+  $category->icon = $data !== null ? $data->icon : null;
+}
+function _ces_komunitin_api_social_categories_save_extras($category) {
+  $data = new StdClass();
+  $data->description = $category->description;
+  $data->icon = $category->icon;
+  $category->description = json_encode($data);
+}
+
+function ces_komunitin_api_social_categories_load($exchange, $id) {
+  $parsed = ces_komunitin_api_social_get_id($id);
+  if ($parsed->type != ResourceTypes::CATEGORY) {
+    ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+  }
+  $category = ces_category_load($parsed->id);
+  _ces_komunitin_api_social_categories_load_extras($category);
+  if ($category == NULL) {
+    ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+  }
+  return $category;
+}
+
+function ces_komunitin_api_social_categories_read($exchange, $category) {
   if (ces_bank_access('view', 'exchange details', $exchange['id'])) {
     $group = new Group($exchange);
-    $return = array_map(function ($category) use ($group) {
-      return new Category($category, $group);
-    }, $categories);
-    return $return;
+    return new Category($category, $group);
   } else {
     ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
   }
+}
+
+function ces_komunitin_api_social_categories_create($exchange, $body) {
+  if (!ces_bank_access('edit', 'exchange details', $exchange['id'])) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+  if (!isset($body->data) || !isset($body->data->attributes)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+  }
+  $attributes = $body->data->attributes;
+  if (empty(trim($attributes->name))) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Name is required");
+  }
+  if (empty(trim($attributes->icon))) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, "Icon is required");
+  }
+  $category = (object) [
+    'title' => trim($attributes->name),
+    'description' => isset($attributes->description) ? trim($attributes->description) : '',
+    'icon' => $attributes->icon,
+    'exchange' => $exchange['id'],
+    'context' => 3, // 3 means categories for both offers and wants.
+    'parent' => 0 // Flat hierarchy for komunitin categories.
+  ];
+  _ces_komunitin_api_social_categories_save_extras($category);
+
+  $category = ces_category_save($category);
+
+  return ces_komunitin_api_social_categories_read($exchange, $category);
+}
+
+function ces_komunitin_api_social_categories_update($exchange, $category, $body) {
+  if (!ces_bank_access('edit', 'exchange details', $exchange['id'])) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+  if (!isset($body->data) || !isset($body->data->attributes)) {
+    ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST);
+  }
+  $attributes = $body->data->attributes;
+  if (isset($attributes->name)) {
+    $category->title = trim($attributes->name);
+  }
+  if (isset($attributes->description)) {
+    $category->description = trim($attributes->description);
+  }
+  if (isset($attributes->icon)) {
+    $category->icon = $attributes->icon;
+  }
+  _ces_komunitin_api_social_categories_save_extras($category);
+  ces_category_save($category);
+
+  return ces_komunitin_api_social_categories_read($exchange, $category);
+}
+
+function ces_komunitin_api_social_categories_delete($exchange, $category) {
+  if (!ces_bank_access('edit', 'exchange details', $exchange['id'])) {
+    ces_komunitin_api_send_error(KomunitinApiError::FORBIDDEN);
+  }
+  ces_category_delete($category->id);
+}
+
+function ces_komunitin_api_social_categories_load_collection($exchange, $filters, $sorts) {
+  // 3 means categories for both offers and wants.
+  $categories = ces_offerswants_get_categories(3, $exchange['id']);
+  foreach ($categories as $category) {
+    _ces_komunitin_api_social_categories_load_extras($category);
+  }
+
+  return $categories;
+}
+
+function ces_komunitin_api_social_categories_read_collection($exchange, $categories) {
+  // Public access to categories endpoint (it is required to create offers and
+  // wants at signup).
+  $group = new Group($exchange);
+  $return = array_map(function ($category) use ($group) {
+    return new Category($category, $group);
+  }, $categories);
+  return $return;
 }
 
 /*
@@ -765,6 +1271,75 @@ function _ces_komunitin_api_social_get_file_by_url($url) {
     return NULL;
   }
 }
+
+/**
+ * Validates and permanently saves uploaded images.
+ *
+ * @param $files array of temporary file urls.
+ * @param $directory directory where to save the images.
+ *
+ * return [
+ *  'files' => All file ids
+ *  'uploaded' => Uploaded file objects
+ * ]
+ */
+function _ces_komunitin_api_social_validate_files($urls, $directory) {
+  $files = [];
+  $uploaded = [];
+  if (isset($urls) && is_array($urls)) {
+    foreach ($urls as $url) {
+      $file = _ces_komunitin_api_social_get_file_by_url($url);
+      if ($file == NULL) {
+        ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Invalid image ' . $url);
+      } else {
+        if (!$file->status) {
+          $info = image_get_info($file->uri);
+          if ($info) {
+            $directory = file_default_scheme() . '://' . $directory;
+            // Prepare the pictures directory.
+            file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+            $destination = file_stream_wrapper_uri_normalize($directory . '/' . sha1_file($file->uri) . '.' . $info['extension']);
+            if (($file = file_move($file, $destination, FILE_EXISTS_RENAME)) !== FALSE) {
+              $file->status = FILE_STATUS_PERMANENT;
+              $file = file_save($file);
+              $uploaded[] = $file;
+            }
+          }
+        }
+        $files[] = $file->fid;
+      }
+    }
+  }
+  return [
+    'files' => $files,
+    'uploaded' => $uploaded
+  ];
+}
+
+/**
+ * @param $oldFiles array of file ids from existing record or null for create operations.
+ * @param $newFiles array of file ids given by _ces_komunitin_api_social_offersneeds_validate()
+ * @param $uploaded array of file objects given by _ces_komunitin_api_social_offersneeds_validate()
+ * @param $module module name using the file
+ * @param $type type of the object using the file
+ * @param $id id of the object using the file
+ */
+function _ces_komuntin_social_update_files($oldFiles, $newFiles, $uploaded, $module, $type, $id) {
+  if (!empty($oldFiles)) {
+    $deletedFiles = array_diff($oldFiles, $newFiles);
+    foreach ($deletedFiles as $fid) {
+      if (($file = file_load($fid)) !== FALSE) {
+        file_usage_delete($file, $module, $type, $id);
+        file_delete($file);
+      }
+    }
+  }
+
+  foreach ($uploaded as $file) {
+    file_usage_add($file, $module, $type, $id);
+  }
+}
+
 /**
  * Validate fields common to offers and needs in create and update operations.
  */
@@ -829,34 +1404,10 @@ function _ces_komunitin_api_social_offersneeds_validate($exchange, $body, $new, 
   }
 
   // images
-  $images = [];
-  $uploaded = [];
-  if (isset($attributes->images) && is_array($attributes->images)) {
-    foreach ($attributes->images as $url) {
-      $file = _ces_komunitin_api_social_get_file_by_url($url);
-      if ($file == NULL) {
-        ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Invalid image ' . $url);
-      } else {
-        if (!$file->status) {
-          $info = image_get_info($file->uri);
-          if ($info) {
-            $directory = file_default_scheme() . '://' . variable_get('ces_offerswants_picture_path', 'ces_offerswants_pictures');
-            // Prepare the pictures directory.
-            file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
-            $destination = file_stream_wrapper_uri_normalize($directory . '/' . sha1_file($file->uri) . '.' . $info['extension']);
-            if (($file = file_move($file, $destination, FILE_EXISTS_RENAME)) !== FALSE) {
-              $file->status = FILE_STATUS_PERMANENT;
-              $file = file_save($file);
-              $uploaded[] = $file;
-            }
-          }
-        }
-        $images[] = $file->fid;
-      }
-    }
-  }
-  $validated['image'] = implode(',',$images);
-  $validated['uploaded'] = $uploaded;
+  $files = _ces_komunitin_api_social_validate_files($attributes->images, variable_get('ces_offerswants_picture_path', 'ces_offerswants_pictures'));
+
+  $validated['image'] = implode(',',$files['files']);
+  $validated['uploaded'] = $files['uploaded'];
 
   // category
   if ($new && (!isset($data->relationships) || !isset($data->relationships->category) || !isset($data->relationships->category->data))) {
@@ -941,9 +1492,8 @@ function _ces_komunitin_api_social_offersneeds_create($exchange, $body, $type) {
   $o = ces_offerwant_save($o);
 
   // Mark uploaded files.
-  foreach ($data['uploaded'] as $file) {
-    file_usage_add($file, 'ces_offerswants', 'ces_offerwant', $o->id);
-  }
+  $newFiles = explode(',', $data['image']);
+  _ces_komuntin_social_update_files(null, $newFiles, $data['uploaded'], 'ces_offerswants', 'ces_offerwant', $o->id);
 
   return $o;
 }
@@ -971,21 +1521,10 @@ function _ces_komunitin_api_social_offersneeds_update($exchange, $o, $body, $typ
   $o->modified = REQUEST_TIME;
 
   if (isset($data['image'])) {
-    // Delete old files.
+    // Otherwise don't update the images.
     $oldFiles = strlen($o->image) > 0 ? explode(',', $o->image) : [];
     $newFiles = strlen($data['image']) > 0 ? explode(',', $data['image']) : [];
-    $deletedFiles = array_diff($oldFiles, $newFiles);
-    foreach ($deletedFiles as $fid) {
-      if (($file = file_load($fid)) !== FALSE) {
-        file_usage_delete($file, 'ces_offerswants', 'ces_offerwant', $o->id);
-        file_delete($file);
-      }
-    }
-    // Add new files.
-    $o->image = $data['image'];
-    foreach ($data['uploaded'] as $file) {
-      file_usage_add($file, 'ces_offerswants', 'ces_offerwant', $o->id);
-    }
+    _ces_komuntin_social_update_files($oldFiles, $newFiles, $data['uploaded'], 'ces_offerswants', 'ces_offerwant', $o->id);
   }
 
   // type specific data
@@ -1307,4 +1846,6 @@ function ces_komunitin_api_social_create_title($text, $size = 50) {
   }
   return $text;
 }
+
+
 

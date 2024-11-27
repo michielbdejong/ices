@@ -17,19 +17,22 @@ class User {
   public $members;
   public $settings;
 
-  function __construct($user, $exchange) {
+  function __construct($user, Group $group = NULL) {
     $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::USER, $user->uid);
     $this->email = $user->mail;
-
-    $bank = new CesBank();
-    $accounts = $bank->getUserAccounts($user->uid);
-    $this->members = [];
-    $group = new Group($exchange);
-    foreach($accounts as $account) {
-      $account['user'] = $user;
-      $this->members[] = new Member($account, $group);
+    if (!empty($group)) {
+      $bank = new CesBank();
+      $accounts = $bank->getUserAccounts($user->uid);
+      $this->members = [];
+      foreach($accounts as $account) {
+        $account['user'] = $user;
+        $this->members[] = new Member($account, $group);
+      }
+    } else {
+      $this->members = NULL;
     }
-    $this->settings = new UserSettings($user, $exchange);
+
+    $this->settings = new UserSettings($user);
   }
 }
 
@@ -55,17 +58,22 @@ class UserSchema extends BaseSchema
 
   public function getRelationships($user, ContextInterface $context): iterable {
     assert($user instanceof User);
-    return [
-      'members' => [
+    $relationships = [];
+    if (!empty($user->members)) {
+      $relationships['members'] = [
         self::RELATIONSHIP_DATA => $user->members,
         self::RELATIONSHIP_LINKS_SELF => false,
         self::RELATIONSHIP_LINKS_RELATED => false
-      ],
-      'settings' => [
+      ];
+    }
+    if (!empty($user->settings)) {
+      $relationships['settings'] = [
         self::RELATIONSHIP_DATA => $user->settings,
         self::RELATIONSHIP_LINKS_SELF => false,
         self::RELATIONSHIP_LINKS_RELATED => false
-      ]
-    ];
+      ];
+    }
+
+    return $relationships;
   }
 }

@@ -57,8 +57,14 @@ function ces_komunitin_send_validation_email($uid, $group) {
   $base = variable_get('ces_komunitin_app_url', 'https://komunitin.org');
   $token = ces_komunitin_auth_one_time_token('komunitin-app', $user);
   $lang = user_preferred_language($user);
+  if ($group) {
+    $url = $base . '/groups/' . $group . '/signup-member?token=' . $token;
+  } else {
+    $url = $base . '/groups/new?token=' . $token;
+  }
+
   drupal_mail('ces_komunitin', 'signup_validate_email', $user->mail, $lang, [
-    'url' => $base . '/groups/' . $group . '/signup-member?token=' . $token,
+    'url' => $url,
     'to_name' => ces_user_get_name($user),
   ]);
 }

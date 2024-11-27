@@ -48,7 +48,7 @@ class CesBank {
       // Create new default category from exchange.
       $category = (object) array(
         'code' => $record['code'],
-        'title' => 'general',
+        'title' => 'General',
         'parent' => 0,
         'description' => 'General category',
         'exchange' => $exchange->id,
@@ -92,6 +92,12 @@ class CesBank {
       $s = new IcesSerializer('CesBankExchange');
       // Activate exchange.
       $exchange = $s->loadFromRecord($record);
+
+      if (!empty($exchange->data['komunitin_accounting'])) {
+        module_load_include('inc', 'ces_komunitin', 'ces_komunitin.client');
+        $exchange->uuid_currency = ces_komunitin_client_create_currency($exchange->getRecord());
+      }
+
       $exchange->activate();
       $s->save($exchange);
       // Create permission records. By the moment they are static,but they could
@@ -152,7 +158,6 @@ class CesBank {
       );
       $account['name'] = $exchange->code . '0000';
       $this->createAccount($account);
-
       ces_message_send_notify('exchange_activated', array('exchange' => $exchange->getRecord()), array($exchange->admin), $user->uid);
       $this->activateAccount($account);
       $record = $exchange->getRecord();
@@ -178,12 +183,12 @@ class CesBank {
 
       // If this exchange is configured to use the Komunitin accounting API,
       // create the account in Komunitin.
-      if (!empty($account->getExchange()->data['komunitin_accounting_api_url'])) {
+      if (!empty($account->getExchange()->data['komunitin_accounting'])) {
         module_load_include('inc', 'ces_komunitin', 'ces_komunitin.client');
         ces_komunitin_client_create_account($account->getRecord());
       }
 
-      // MArk account as active in DB.
+      // Mark account as active in DB.
       $account->activate();
       $s->save($account);
 
@@ -1009,8 +1014,8 @@ class CesBank {
    * @param array $users
    *   Uid: user id.
    *   'action':
-   *     delete -> delete oferswants, comments and user.
-   *     cancel -> hide offerswants, delete comments, cancel user.
+   *     delete -> delete oferswants, delete comments and user.
+   *     cancel -> delete offerswants, delete comments, cancel user.
    */
   public function deleteUsers(array $users) {
     $module_offerswants = module_exists('ces_offerswants');
@@ -1021,39 +1026,31 @@ class CesBank {
         if ($module_offerswants && $table_offerwant) {
           $userloaded = user_load($user['uid']);
           $username = ces_bank_get_full_username($userloaded);
-          if ($user['action'] == 'delete') {
-            $offerswants = db_delete('ces_offerwant')
-              ->condition('user', $user['uid'])
-              ->execute();
-            if ($offerswants > 0) {
-              drupal_set_message(t('%offrs offers and wants of user %usr have been deleted.',
-                array('%offrs' => $offerswants, '%usr' => $username)), 'status');
-            }
+
+          $offerswants = db_delete('ces_offerwant')
+            ->condition('user', $user['uid'])
+            ->execute();
+          $offercomments = db_delete('ces_offercomment')
+            ->condition('uid', $user['uid'])
+            ->execute();
+
+          if ($offerswants > 0) {
+            drupal_set_message(t('%offrs offers and wants of user %usr have been deleted.',
+              array('%offrs' => $offerswants, '%usr' => $username)), 'status');
           }
-          if ($user['action'] == 'cancel') {
-            $offerswants = db_update('ces_offerwant')
-              ->condition('user', $user['uid'])
-              ->fields(array('state' => 0))
-              ->execute();
-            if ($offerswants > 0) {
-              drupal_set_message(t('%offrs offers and wants of user %usr have been hidden.',
-                array('%offrs' => $offerswants, '%usr' => $username)), 'status');
-            }
-          }
-          if ($table_offercomment) {
-            $offercomments = db_delete('ces_offercomment')
-              ->condition('uid', $user['uid'])
-              ->execute();
-            if ($offercomments > 0) {
-              drupal_set_message(t('%offrcomm offer comments and ratings of user %usr have been deleted.',
-                array('%offrcomm' => $offercomments, '%usr' => $username)), 'status');
-            }
+
+          if ($offercomments > 0) {
+            drupal_set_message(t('%offrcomm offer comments and ratings of user %usr have been deleted.',
+              array('%offrcomm' => $offercomments, '%usr' => $username)), 'status');
           }
         }
         $arg_cancel_user = ($user['action'] == 'delete') ? 'user_cancel_delete' : 'user_cancel_block_unpublish';
         user_cancel(array(), $user['uid'], $arg_cancel_user);
+        user_save($userloaded, ['mail' => 'deleted@deleted.org']);
       }
     }
+    // Drupal's user_cancel function asynchronously adds the user deletion job
+    // to the batch queue. We process it synchronously here.
     $batch =& batch_get();
     $batch['progressive'] = FALSE;
     batch_process();

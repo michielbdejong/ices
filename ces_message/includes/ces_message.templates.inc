@@ -300,7 +300,9 @@ function ces_message_template_add() {
 function ces_message_template_form($form, &$form_state, $entity) {
   if (!$entity->exchange_id) {
     $exchange = ces_bank_get_current_exchange();
-    $entity->exchange_id = $exchange['id'];
+    if ($exchange !== FALSE) {
+      $entity->exchange_id = $exchange['id'];
+    }
   }
 
   $form['language'] = array(

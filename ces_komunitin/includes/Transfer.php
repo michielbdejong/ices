@@ -93,8 +93,8 @@ class Transfer {
     $this->state = self::$states[$bank->getTransactionState($transaction)];
 
     // Amount
-    $decimals = $currency->decimals;
-    $this->amount = round(pow(10, $decimals) * $bank->getTransactionAmount($transaction, $exchange));
+    $scale = $currency->scale;
+    $this->amount = round(pow(10, $scale) * $bank->getTransactionAmount($transaction, $exchange));
 
     // Meta
     $this->meta = $transaction['concept'];

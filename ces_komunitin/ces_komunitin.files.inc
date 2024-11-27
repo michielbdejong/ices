@@ -7,7 +7,7 @@ define('MAX_FILE_SIZE', 1000000);
  * Handler for /ces/files endpoint
  */
 function ces_komunitin_files() {
-  $token = oauth2_server_check_access('komunitin', 'komunitin_social');
+  $token = ces_komunitin_api_check_auth_token('komunitin_social');
   if (($token instanceof OAuth2\Response) || !$token['user_id']) {
     ces_komunitin_api_send_error(KomunitinApiError::UNAUTHORIZED);
   }

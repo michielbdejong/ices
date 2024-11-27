@@ -7,13 +7,14 @@ require_once dirname(__FILE__) . '/includes/KomunitinApiError.php';
 require_once dirname(__FILE__) . '/includes/CustomFactory.php';
 // Accounting API objects
 require_once dirname(__FILE__) . '/includes/Currency.php';
+require_once dirname(__FILE__) . '/includes/CurrencySettings.php';
 require_once dirname(__FILE__) . '/includes/Account.php';
 require_once dirname(__FILE__) . '/includes/AccountSettings.php';
 require_once dirname(__FILE__) . '/includes/Transfer.php';
 
 // Social API objects
 require_once dirname(__FILE__) . '/includes/Group.php';
-require_once dirname(__FILE__) . '/includes/SignupSettings.php';
+require_once dirname(__FILE__) . '/includes/GroupSettings.php';
 require_once dirname(__FILE__) . '/includes/Contact.php';
 require_once dirname(__FILE__) . '/includes/Member.php';
 require_once dirname(__FILE__) . '/includes/Offer.php';
@@ -41,11 +42,18 @@ function ces_komunitin_api_get_social_api_url() {
 
 function ces_komunitin_api_get_accounting_api_url($exchange = FALSE) {
   global $base_url;
-  if ($exchange && !empty($exchange['data']['komunitin_accounting_api_url'])) {
-    return $exchange['data']['komunitin_accounting_api_url'];
+  if ($exchange && !empty($exchange['data']['komunitin_accounting'])) {
+    return variable_get('ces_komunitin_accounting_url', 'https://accounting.komunitin.org');
   } else {
     return $base_url . '/' . _ces_komunitin_api_get_base_path() . '/accounting';
   }
+}
+
+function ces_komunitin_api_random_uuid() {
+  $data = random_bytes(16);
+  $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
+  $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+  return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
 
 /**
@@ -104,7 +112,14 @@ function ces_komunitin_api() {
     else {
       $endpoints = $endpoints[$api];
     }
+
+    // $attribute is the last element of the path, but we define it here since we
+    // need to use it in the next block (for group settings).
+    $attribute = FALSE;
+
+    // Group code.
     $code = next($path);
+
     // TODO: better $endpoints structure would simplify that.
     if ($api == 'social' && ($code == 'groups' || $code == 'users')) {
       // This is an exception: usually this path element should be the group or
@@ -126,10 +141,16 @@ function ces_komunitin_api() {
       if ($type === FALSE) {
         $type = 'groups';
       }
-      if (!isset($endpoints[$type])) {
+      // Frmat exception for group settings.
+      if ($type == 'settings') {
+        $type = 'groups';
+        $attribute = 'settings';
+        $endpoint = $endpoints['groups']['%']['settings'];
+      } else if (!isset($endpoints[$type])) {
         ces_komunitin_api_send_error(KomunitinApiError::NOT_FOUND);
+      } else {
+        $endpoint = $endpoints[$type];
       }
-      $endpoint = $endpoints[$type];
     }
 
     // Method
@@ -141,7 +162,6 @@ function ces_komunitin_api() {
     );
 
     $resource_id = next($path);
-    $attribute = FALSE;
     if ($resource_id !== FALSE) {
       // This case is just for /users/me
       if (isset($endpoint[$resource_id])) {
@@ -247,11 +267,12 @@ function ces_komunitin_api() {
 
       $encoder = CustomFactory::newEncoder(array(
         Currency::class => CurrencySchema::class,
+        CurrencySettings::class => CurrencySettingsSchema::class,
         Account::class => AccountSchema::class,
         AccountSettings::class => AccountSettingsSchema::class,
         Transfer::class => TransferSchema::class,
         Group::class => GroupSchema::class,
-        SignupSettings::class => SignupSettingsSchema::class,
+        GroupSettings::class => GroupSettingsSchema::class,
         Contact::class => ContactSchema::class,
         Member::class => MemberSchema::class,
         MinimalMember::class => MinimalMemberSchema::class,
@@ -324,8 +345,11 @@ function ces_komunitin_api_get_endpoints() {
     ),
     'social' => array(
       'groups' => array(
-        'operations' => array('read'),
+        'operations' => array('read', 'update', 'create'),
         '%' => array(
+          'settings' => array(
+            'operations' => array('read', 'update')
+          ),
           'operations' => array('read')
         )
       ),
@@ -340,14 +364,14 @@ function ces_komunitin_api_get_endpoints() {
         '%' => array(
           'operations' => array('read'),
           'settings' => array(
-            'operations' => array('read')
+            'operations' => array('read', 'update')
           )
         )
       ),
       'members' => array(
         'operations' => array('read'),
         '%' => array(
-          'operations' => array('read', 'update')
+          'operations' => array('read', 'update', 'delete')
         )
       ),
       'needs' => array(
@@ -361,7 +385,13 @@ function ces_komunitin_api_get_endpoints() {
         '%' => array(
           'operations' => array('read', 'update', 'delete')
         )
-      )
+      ),
+      'categories' => array(
+        'operations' => array('read', 'create'),
+        '%' => array(
+          'operations' => array('read', 'update', 'delete')
+        )
+      ),
     )
   );
   return $endpoints;

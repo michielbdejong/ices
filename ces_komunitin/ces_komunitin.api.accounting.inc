@@ -51,13 +51,19 @@ function ces_komunitin_api_accounting_transfers_create($exchange, $body) {
   $data = $body->data;
 
   // 1.2 type & id.
-  if ($data->type !== 'transfers') {
+  if (isset($data->type) && $data->type !== 'transfers') {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_REQUEST, 'Bad type');
   }
-  $id = strtolower($data->id);
-  if (!ces_komunitin_api_check_valid_uuid($id)) {
-    ces_komunitin_api_send_error(KomunitinApiError::INVALID_ID);
+
+  if (isset($data->id)) {
+    $id = strtolower($data->id);
+    if (!ces_komunitin_api_check_valid_uuid($id)) {
+      ces_komunitin_api_send_error(KomunitinApiError::INVALID_ID);
+    }
+  } else {
+    $id = ces_komunitin_api_random_uuid();
   }
+
   $bank = new CesBank();
   $duplicated = $bank->getTransactionByUuid($id);
   if (!empty($duplicated)) {
@@ -80,7 +86,9 @@ function ces_komunitin_api_accounting_transfers_create($exchange, $body) {
   if (!is_int($attributes->amount) || $attributes->amount <= 0) {
     ces_komunitin_api_send_error(KomunitinApiError::BAD_AMOUNT);
   }
-  $amount = $attributes->amount / pow(10, $exchange['currencyscale']);
+  $currency = new Currency($exchange);
+  $scale = $currency->scale;
+  $amount = $attributes->amount / pow(10, $scale);
 
   // 1.3.3 State
   $state = $attributes->state ?? Transfer::STATE_NEW;

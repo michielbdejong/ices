@@ -17,6 +17,7 @@ class Group {
   public $website;
   public $access;
   public $location;
+  public $address;
 
   public $created;
   public $updated;
@@ -25,7 +26,8 @@ class Group {
   public $currency_id;
   public $contacts;
   public $categories;
-  public $signupSettings;
+  public $groupSettings;
+  public $admins;
 
   public $membersCount;
   public $needsCount;
@@ -41,6 +43,8 @@ class Group {
 
   function __construct($exchange)
   {
+    $this->exchange = $exchange;
+
     $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::GROUP, $exchange['id']);
 
     $this->code = $exchange['code'];
@@ -52,15 +56,25 @@ class Group {
     $this->created = SchemaUtils::encodeDate($exchange['created']);
     $this->updated = SchemaUtils::encodeDate($exchange['modified']);
 
-    // Fields not yet provided by IntegralCES!
-    // Todo: implement these fields: image, description and location for an
-    // exchange, and also other means of contact beyond email!
-    $this->description = '';
-    $this->image = null;
+    $this->description = $exchange['data']['description'] ?? '';
+
+    if (!empty($exchange['data']['image'])) {
+      $file = file_load($exchange['data']['image']);
+      $this->image = file_create_url($file->uri);
+    }
+    else {
+      $this->image = null;
+    }
+
     $this->location = [
       'name' => $exchange['town'],
       'type' => 'Point',
       'coordinates' => [$exchange['lng'], $exchange['lat']]
+    ];
+    $this->address = [
+      'addressLocality' => $exchange['town'],
+      'addressCountry' => $exchange['country'],
+      'addressRegion' => $exchange['region'],
     ];
 
     // Relationships.
@@ -69,20 +83,25 @@ class Group {
     $admin = user_load($exchange['admin']);
     $this->contacts = [new Contact($admin, Contact::TYPE_EMAIL, $admin->mail, $this->code)];
 
+    $contacts = $exchange['data']['contacts'] ?? [];
+    foreach ($contacts as $type => $value) {
+      $this->contacts[] = new Contact($admin, $type, $value, $this->code);
+    }
+
     // Load categories for this group.
     $categories = ces_komunitin_api_social_categories_load_collection($exchange, null, null);
     $this->categories = array_map(function($category) {
       return new Category($category, $this);
     }, $categories);
 
+    $this->admins = [new User($admin, $this)];
+
     $this->currency_id = $exchange['uuid_currency'];
     $this->membersCount = ces_komunitin_api_social_members_count($exchange);
     $this->needsCount = ces_komunitin_api_social_needs_count($exchange);
     $this->offersCount = ces_komunitin_api_social_offers_count($exchange);
 
-    $this->signupSettings = new SignupSettings($exchange);
-
-    $this->exchange = $exchange;
+    $this->groupSettings = new GroupSettings($exchange);
 
     $this->allowAnonymousMemberList = !empty($exchange['data']['komunitin_allow_anonymous_member_list']);
     $this->userAccess = ces_bank_access('view', 'exchange details', $exchange['id']);
@@ -107,6 +126,7 @@ class GroupSchema extends BaseSchema {
       'name' => $group->name,
       'description' => $group->description,
       'image' => $group->image,
+      'address' => $group->address,
       'website' => $group->website,
       'access' => $group->access,
       'location' => $group->location,
@@ -154,8 +174,13 @@ class GroupSchema extends BaseSchema {
         self::RELATIONSHIP_LINKS_RELATED => $group->userAccess,
         self::RELATIONSHIP_META => ['count' => $group->needsCount]
       ],
-      'signup-settings' => [
-        self::RELATIONSHIP_DATA => $group->signupSettings,
+      'settings' => [
+        self::RELATIONSHIP_DATA => $group->groupSettings,
+        self::RELATIONSHIP_LINKS_SELF => false,
+        self::RELATIONSHIP_LINKS_RELATED => false
+      ],
+      'admins' => [
+        self::RELATIONSHIP_DATA => $group->admins,
         self::RELATIONSHIP_LINKS_SELF => false,
         self::RELATIONSHIP_LINKS_RELATED => false
       ]

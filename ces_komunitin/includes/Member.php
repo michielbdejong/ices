@@ -20,10 +20,10 @@ class Member {
   const TYPE_BUSINESS = 'business';
   const TYPE_PUBLIC = 'public';
 
-  const STATE_PENDING = 'pending';
-  const STATE_ACTIVE = 'active';
-  const STATE_SUSPENDED = 'suspended';
-  const STATE_DELETED = 'deleted';
+  public const STATE_PENDING = 'pending';
+  public const STATE_ACTIVE = 'active';
+  public const STATE_SUSPENDED = 'suspended';
+  public const STATE_DELETED = 'deleted';
 
 
   public $id;
@@ -125,9 +125,15 @@ class Member {
     }
 
     // Relationships
-    $this->account_id = $member['uuid'];
-    $this->account_code = $member['name'];
+
+    // Account: only if created
+    if ($this->state != self::STATE_PENDING) {
+      $this->account_id = $member['uuid'];
+      $this->account_code = $member['name'];
+    }
+    // Group
     $this->group = $group;
+    // COntacts.
     $this->contacts = [];
     // email
     $contacts = ces_user_get_contacts($user);
@@ -172,22 +178,14 @@ class MemberSchema extends BaseSchema {
 
   public function getRelationships($member, ContextInterface $context): iterable {
     assert($member instanceof Member);
-    $accountHref = ces_komunitin_api_get_accounting_api_url($member->group->exchange) . '/' . $member->group->code . '/accounts/' . $member->account_id;
+
     $needsHref = ces_komunitin_api_get_social_api_url() . '/' . $member->group->code . '/needs?filter[member]=' . $member->id;
     $offersHref = ces_komunitin_api_get_social_api_url() . '/' . $member->group->code . '/offers?filter[member]=' . $member->id;
-    return [
+    $relationships = [
       'group' => [
         self::RELATIONSHIP_DATA => $member->group,
         self::RELATIONSHIP_LINKS_SELF => false,
         self::RELATIONSHIP_LINKS_RELATED => false
-      ],
-      'account' => [
-        self::RELATIONSHIP_DATA => new ExternalAccount($member->account_id, 'accounts', $accountHref),
-        self::RELATIONSHIP_LINKS_SELF => false,
-        // Override default related link
-        self::RELATIONSHIP_LINKS => [
-          LinkInterface::RELATED => new Link(false, $accountHref, false)
-        ],
       ],
       'contacts' => [
         self::RELATIONSHIP_DATA => $member->contacts,
@@ -209,6 +207,27 @@ class MemberSchema extends BaseSchema {
         self::RELATIONSHIP_META => ['count' => $member->offersCount]
       ],
     ];
+
+
+    if ($member->account_id) {
+      $accountHref = ces_komunitin_api_get_accounting_api_url($member->group->exchange) . '/' . $member->group->code . '/accounts/' . $member->account_id;
+      $relationships['account'] = [
+        self::RELATIONSHIP_DATA => new ExternalAccount($member->account_id, 'accounts', $accountHref),
+        self::RELATIONSHIP_LINKS_SELF => false,
+        // Override default related link
+        self::RELATIONSHIP_LINKS => [
+          LinkInterface::RELATED => new Link(false, $accountHref, false)
+        ],
+      ];
+    } else {
+      $relationships['account'] = [
+        self::RELATIONSHIP_DATA => null,
+        self::RELATIONSHIP_LINKS_SELF => false,
+        self::RELATIONSHIP_LINKS_RELATED => false
+      ];
+    }
+
+    return $relationships;
   }
 
   protected function getSelfSubUrl($resource): string {

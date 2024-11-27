@@ -197,7 +197,7 @@ function ces_bank_exchange_form($form, &$form_state, $op, $exchange_id = NULL) {
     $lang_options[$lang->language] = $lang->native;
   }
   asort($lang_options);
-  if (!isset($exchange['data']['default_lang'])) {
+  if (!isset($exchange['data']['default_lang']) || !is_string($exchange['data']['default_lang'])) {
     global $language;
     $exchange['data']['default_lang'] = $language->language;
   }
@@ -310,24 +310,27 @@ function ces_bank_exchange_form($form, &$form_state, $op, $exchange_id = NULL) {
     '#title' => t('Komunitin'),
     '#description' => t('Settings for Komunitin integration.'),
   );
-  if (!isset($exchange['data']['komunitin_accounting_api_url'])) {
-    $exchange['data']['komunitin_accounting_api_url'] = '';
+
+  if (!isset($exchange['data']['komunitin_redirect'])) {
+    $exchange['data']['komunitin_redirect'] = 0;
   }
-  $form['exchange']['komunitin']['komunitin_accounting_api_url'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Komunitin accounting API URL'),
-    '#description' => t('URL to the Komunitin accounting API.'),
-    '#default_value' => $exchange['data']['komunitin_accounting_api_url'],
+  $form['exchange']['komunitin']['komunitin_redirect'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Redirect to Komunitin app'),
+    '#description' => t('Redirect users to Komunitin app after login.'),
+    '#default_value' => $exchange['data']['komunitin_redirect'],
   );
-  if (!isset($exchange['data']['komunitin_app_url'])) {
-    $exchange['data']['komunitin_app_url'] = '';
+
+  if (!isset($exchange['data']['komunitin_accounting'])) {
+    $exchange['data']['komunitin_accounting'] = 0;
   }
-  $form['exchange']['komunitin']['komunitin_app_url'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Komunitin app URL'),
-    '#description' => t('Redirect users to this URL.'),
-    '#default_value' => $exchange['data']['komunitin_app_url'],
+  $form['exchange']['komunitin']['komunitin_accounting'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use accounting API'),
+    '#description' => t('Use external accounting api for this exchange.'),
+    '#default_value' => $exchange['data']['komunitin_accounting'],
   );
+
   if (!isset($exchange['data']['komunitin_allow_anonymous_member_list'])) {
     $exchange['data']['komunitin_allow_anonymous_member_list'] = 0;
   }
@@ -415,8 +418,8 @@ function ces_bank_exchange_form_submit($form, &$form_state) {
     $form_state['values']['data']['hide_sales'] = $form_state['values']['hide_sales'];
 
     // Komunitin settings.
-    $form_state['values']['data']['komunitin_accounting_api_url'] = $form_state['values']['komunitin_accounting_api_url'];
-    $form_state['values']['data']['komunitin_app_url'] = $form_state['values']['komunitin_app_url'];
+    $form_state['values']['data']['komunitin_redirect'] = $form_state['values']['komunitin_redirect'];
+    $form_state['values']['data']['komunitin_accounting'] = $form_state['values']['komunitin_accounting'];
     $form_state['values']['data']['komunitin_allow_anonymous_member_list'] = $form_state['values']['komunitin_allow_anonymous_member_list'];
 
     if ($op == 'new') {
@@ -1525,7 +1528,7 @@ function ces_bank_account_delete_confirm_form_submit($form, &$form_state) {
     case 'close':
       try {
         $account = $bank->getAccount($check['aid']);
-        $account['state'] = 2;
+        $account['state'] = 3;
         $bank->updateAccount($account);
         drupal_set_message(t('The account %account has been closed.',
           array('%account' => $check['name'])), 'status');

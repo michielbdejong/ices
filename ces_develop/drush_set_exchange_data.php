@@ -4,7 +4,7 @@
  * This script is to be called using drush scr command.
  *
  * It takes arguments of the form of
- * --code=XYZW komunitin_accounting_api_url
+ * --code=XYZW komunitin_accounting=1 komunitin_redirect=1 registration_offers=1 registration_wants=0 komunitin_allow_anonymous_member_list=0
  *
  * And saves them to the data field of the exchange with the given code.
  */
@@ -20,8 +20,8 @@ if (!$code) {
 $options = [
   'registration_offers' => intval(drush_get_option('registration_offers', 0)),
   'registration_wants' => intval(drush_get_option('registration_wants', 0)),
-  'komunitin_accounting_api_url' => drush_get_option('komunitin_accounting_api_url', ""),
-  'komunitin_app_url' => drush_get_option('komunitin_app_url', ""),
+  'komunitin_redirect' => drush_get_option('komunitin_redirect', 0),
+  'komunitin_accounting' => drush_get_option('komunitin_accounting', 0),
   'komunitin_allow_anonymous_member_list' => drush_get_option('komunitin_allow_anonymous_member_list', 0),
 ];
 

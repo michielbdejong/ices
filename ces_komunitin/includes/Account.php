@@ -22,11 +22,11 @@ class Account {
     // Account number ABCD0123
     $this->code = $account['name'];
     // Balance
-    $decimals = $currency->decimals;
+    $scale = $currency->scale;
     if (isset($account['balance']) && $account['balance'] !== null) {
-      $this->balance = round(pow(10, $decimals) * $account['balance']);
+      $this->balance = round(pow(10, $scale) * $account['balance']);
     } else {
-      $this->balance = null;
+      $this->balance = 0;
     }
 
     // Limits. We need to retrieve the info since it doesn't come with account record.
@@ -67,11 +67,9 @@ class AccountSchema extends BaseSchema {
     $attributes = [
       'code' => $account->code,
       'creditLimit' => $account->creditLimit,
-      'maximumBalance' => $account->maximumBalance
+      'maximumBalance' => $account->maximumBalance,
+      'balance' => $account->balance
     ];
-    if ($account->balance != null) {
-      $attributes['balance'] = $account->balance;
-    }
     return $attributes;
   }
 

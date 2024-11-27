@@ -25,9 +25,9 @@ class Category {
     $this->id = ces_komunitin_api_social_get_uuid(ResourceTypes::CATEGORY, $category->id);
     $this->code = $category->code;
     $this->name = $category->title;
-    $this->cpa = [''];
-    $this->description = $category->description;
-    $this->icon = null;
+    $this->cpa = null;
+    $this->description = $category->description;;
+    $this->icon = $category->icon;
     $this->access = 'group';
 
     $this->group = $group;

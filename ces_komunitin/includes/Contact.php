@@ -8,6 +8,7 @@ class Contact {
 
   public const TYPE_EMAIL = "email";
   public const TYPE_PHONE = "phone";
+  public const TYPE_WEBSITE = "website";
 
   public $groupCode;
 

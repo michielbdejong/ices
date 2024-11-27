@@ -25,7 +25,7 @@ require_once __DIR__ . '/ces_komunitin.client.inc';
  */
 function ces_komunitin_notification_event($action, $exchange_id, $user_recipient_id, $params, $sender_id = false) {
   // Both account_credited and account_debited actions are called after a
-  // transaction is committed.
+  // transaction is committed, so we only need to use one of them.
   if ($action == 'account_credited' || $action == 'account_debit_pending' || $action == 'account_credit_rejected') {
     // Create Event object.
     $exchange = ces_bank_get_exchange($exchange_id);
@@ -48,6 +48,14 @@ function ces_komunitin_notification_event($action, $exchange_id, $user_recipient
       'payer' => ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $payer['id']),
       'payee' => ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $payee['id']),
     ));
+  } else if ($action == 'new_account') {
+    // Account request.
+    $exchange = ces_bank_get_exchange($exchange_id);
+    $code = $exchange['code'];
+    $member = $params['account'];
+    ces_komunitin_event(Event::MEMBER_REQUESTED, $code, array(
+      'member' => ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $member['id'])
+    ));
 
   } else if ($action == 'account_activated') {
     $exchange = ces_bank_get_exchange($exchange_id);
@@ -56,6 +64,10 @@ function ces_komunitin_notification_event($action, $exchange_id, $user_recipient
     ces_komunitin_event(Event::MEMBER_JOINED, $code, array(
       'member' => ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $member['id'])
     ));
+  } else if ($action == 'exchange_activated') {
+    $exchange = ces_bank_get_exchange($exchange_id);
+    $code = $exchange['code'];
+    ces_komunitin_event(Event::GROUP_ACTIVATED, $code, array());
   }
 }
 
@@ -86,14 +98,8 @@ function ces_komunitin_send_event($event) {
     ->encodeData($event);
 
   // Send payload to notifications service.
-  $notifications_url = getenv('NOTIFICATIONS_API_URL');
-  if (empty($notifications_url)) {
-    watchdog('ces_komunitin', 'Missing NOTIFICATIONS_API_URL environment variable.', [], WATCHDOG_WARNING);
-    $notifications_url = 'https://notifications.komunitin.org';
-  }
+  $notifications_url = variable_get('ces_komunitin_notifications_url_internal', 'https://notifications.komunitin.org');
   $url = $notifications_url . '/events';
-
-  $url = ces_komunitin_client_fix_url($url);
 
   $username = variable_get('ces_komunitin_events_username', getenv('NOTIFICATIONS_EVENTS_USERNAME'));
   $password = variable_get('ces_komunitin_events_password', getenv('NOTIFICATIONS_EVENTS_PASSWORD'));
