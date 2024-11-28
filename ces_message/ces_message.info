@@ -13,4 +13,4 @@ features[ctools][] = "views:views_default:3.0"
 
 ; Views include
 files[] = views/ces_message.views.inc
-version = "7.x-1.45"
+version = "7.x-1.47"
