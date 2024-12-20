@@ -281,31 +281,25 @@ function generate_sql($exchange_id, $csv) {
     );
     $SQLS['trades']['sql'] = "
         SELECT
-            ct.id AS 'ID',
-            af.name AS 'Seller',
-            at.name AS 'Buyer',
+            transfer.id AS 'ID',
+            account_to.name AS 'Seller',
+            account_from.name AS 'Buyer',
             '' AS 'RemoteExchange',
             '' AS 'RemoteBuyer',
             '' AS 'RecordID',
-            ct.created AS 'DateEntered',
-            au.name AS 'EnteredBy',
-            ct.amount AS 'Amount',
+            transfer.created AS 'DateEntered',
+            '' AS 'EnteredBy',
+            transfer.amount AS 'Amount',
             '' AS 'Levy',
             '' AS 'LevyRate',
-            ct.concept AS 'Description'
+            transfer.concept AS 'Description'
 
-        FROM ces_transaction ct
+        FROM ces_transaction transfer
+        LEFT JOIN ces_account account_from ON transfer.fromaccount = account_from.id
+        LEFT JOIN ces_account account_to ON transfer.toaccount = account_to.id
 
-        INNER JOIN users u ON ct.user = u.uid
-        INNER JOIN ces_accountuser cau ON cau.user = u.uid
-
-        INNER JOIN ces_account af ON af.id = ct.toaccount
-        INNER JOIN ces_account at ON at.id = ct.fromaccount
-        INNER JOIN ces_account au ON au.id = cau.account
-
-
-        WHERE af.exchange = ". $exchange_id . "
-            OR at.exchange = " . $exchange_id;
+        WHERE account_from.exchange = ". $exchange_id . "
+            OR account_to.exchange = " . $exchange_id;
 
     /**
      * offers.csv
