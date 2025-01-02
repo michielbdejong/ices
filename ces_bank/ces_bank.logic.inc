@@ -2128,6 +2128,12 @@ class CesBankLocalAccount extends IcesDBObject implements CesBankAccountInterfac
    *   transaction is not accepted.
    */
   public function checkTransaction(CesBankTransactionInterface &$transaction) {
+    // Check if this exchange is using the Komunitin accounting api.
+    $exchange = $this->getExchange();
+    if (!empty($exchange->data['komunitin_accounting'])) {
+      return array('This exchange is using the Komunitin accounting API, use the Komunitin API to manage transactions.');
+    }
+
     if ($this->state == CesBankLocalAccount::STATE_ACTIVE) {
       return $this->getLimitChain()->checkTransaction($this, $transaction);
     }
