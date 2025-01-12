@@ -19,17 +19,17 @@ done
 echo "Installing site ${ICES_SITE_NAME:-IntegralCES}."
 docker compose exec -T integralces drush si standard --db-url="mysql://integralces:${ICES_MYSQL_PASSWORD:-integralces}@db-integralces/integralces" --account-name="admin" --account-pass="${ICES_ADMIN_PASSWORD:-integralces}" --site-name="${ICES_SITE_NAME:-IntegralCES}" -y
 # Enable modules
-docker compose exec -T integralces drush en -y \
+docker compose exec -T integralces drush en -y --choice=1\
   oauth2_server services image views \
   token libraries services_views \
   cors login_emailusername smtp bounce geolocation \
   locale
-docker compose exec -T integralces drush en -y \
+docker compose exec -T integralces drush en -y  --choice=1\
   ices ces_bank ces_blog ces_interop ces_message ces_offerswants ces_qr ces_rest ces_statistics ces_summaryblock ces_user ces_komunitin \
   greences
 
 # Language
-docker compose exec -T integralces drush dl drush_language -y
+docker compose exec -T integralces drush dl drush_language -y --choice=1
 docker compose exec -T integralces drush language-add ca
 docker compose exec -T integralces drush language-add es
 
@@ -44,7 +44,7 @@ docker compose exec -T integralces sh -c "echo \"\n\\\$base_url = '$BASE_URL';\n
 
 
 if [ "$DEMO" = "TRUE" ]; then
-  docker compose exec -T integralces drush en -y ces_develop simpletest maillog
+  docker compose exec -T integralces drush en -y ces_develop simpletest maillog  --choice=1
   docker compose exec -T integralces drush vset maillog_send 0
   docker compose exec -T integralces drush php-script sites/all/modules/ices/ces_develop/demo.php
   docker compose exec -T integralces chown www-data:www-data -R sites/default
