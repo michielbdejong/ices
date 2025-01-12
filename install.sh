@@ -20,7 +20,7 @@ echo "Installing site ${ICES_SITE_NAME:-IntegralCES}."
 docker compose exec -T integralces drush si standard --db-url="mysql://integralces:${ICES_MYSQL_PASSWORD:-integralces}@db-integralces/integralces" --account-name="admin" --account-pass="${ICES_ADMIN_PASSWORD:-integralces}" --site-name="${ICES_SITE_NAME:-IntegralCES}" -y
 # Download modules with specific versions to avoid prompts.
 docker compose exec -T integralces drush dl -y \
-  xautoload-7.x-5.9 ctools-7.x-1.21 drush_language-7.x-1.6-rc3 entityreference-7.x-1.9 entity-7.x-1.11 
+  xautoload-7.x-5.9 ctools-7.x-1.21 entityreference-7.x-1.9 entity-7.x-1.11 
 # Enable modules
 docker compose exec -T integralces drush en -y \
   oauth2_server services image views \
@@ -32,6 +32,8 @@ docker compose exec -T integralces drush en -y \
   greences
 
 # Language 
+docker compose exec -T integralces drush dl -y drush_language-7.x-1.6-rc3
+docker compose exec -T integralces drush en -y drush_language
 docker compose exec -T integralces drush language-add ca
 docker compose exec -T integralces drush language-add es
 
