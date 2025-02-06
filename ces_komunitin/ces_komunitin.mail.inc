@@ -69,9 +69,28 @@ function _ces_komunitin_mail_html_template($paragraphs, $action, $url, $langcode
 }
 
 function ces_komunitin_mail_alter(&$message) {
-  // Disable send drupal system mails for komunitin users.
-
-
+  // Don't send drupal system mails for komunitin users.
+  $to = $message['to'];
+  // Get the list of email addresses from the 'to' string.
+  $addresses = [];
+  preg_match_all('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $to, $matches);
+  if (!empty($matches[0])) {
+    $addresses = $matches[0];
+  }
+  $newto = [];
+  // Check which addresses are komunitin users.
+  foreach ($addresses as $address) {
+    $user = user_load_by_mail($address);
+    $settings = ces_user_get_settings($user);
+    if (empty($settings['komunitin'])) {
+      $newto[] = $address;
+    }
+  }
+  if (!empty($newto)) {
+    $message['to'] = implode(', ', $newto);
+  } else {
+    $message['send'] = FALSE;
+  }
 }
 
 

@@ -11,7 +11,7 @@
             "port": 9003,
             "pathMappings": {
                 "/var/www/html/sites/all/modules/ices": "${workspaceRoot}",
-                "/var/www/html/": "${workspaceRoot}/.debug/drupal-7.98",
+                "/var/www/html/": "${workspaceRoot}/.debug/drupal",
             },
         },
     ]
