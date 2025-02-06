@@ -927,7 +927,7 @@ function ces_user_build_settings_data($data, $settings) {
 }
 
 function ces_user_set_settings(&$user, $settings) {
-  $edit = ces_user_build_settings($user->data, $settings);
+  $edit = ces_user_build_settings_data($user->data, $settings);
   $user = user_save($user, $edit);
 }
 

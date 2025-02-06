@@ -45,8 +45,8 @@ function ces_komunitin_notification_event($action, $exchange_id, $user_recipient
 
     ces_komunitin_event($events[$action], $code, array(
       'transfer' => $transfer_id,
-      'payer' => ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $payer['id']),
-      'payee' => ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $payee['id']),
+      'payer' => $payer['uuid'],
+      'payee' => $payee['uuid'],
     ));
   } else if ($action == 'new_account') {
     // Account request.

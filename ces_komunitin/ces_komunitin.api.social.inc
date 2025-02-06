@@ -600,7 +600,7 @@ function ces_komunitin_api_social_users_create($body) {
   }
   // We set the komunitin flag to avoid the system to send the Druapl's welcome
   // email.
-  $edit = ces_user_build_settings([], ['komunitin' => TRUE]);
+  $edit = ces_user_build_settings_data([], ['komunitin' => TRUE]);
 
   // 2. Create user.
   $user = user_save($user, [

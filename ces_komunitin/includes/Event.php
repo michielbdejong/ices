@@ -29,6 +29,22 @@ class Event {
   const GROUP_ACTIVATED = 'GroupActivated';
   const GROUP_REQUESTED = 'GroupRequested';
 
+  const SOCIAL_EVENTS = [
+    self::NEED_PUBLISHED,
+    self::NEED_EXPIRED,
+    self::OFFER_PUBLISHED,
+    self::OFFER_EXPIRED,
+    self::MEMBER_JOINED,
+    self::MEMBER_REQUESTED,
+    self::GROUP_ACTIVATED,
+    self::GROUP_REQUESTED
+  ];
+  const ACCOUNTING_EVENTS = [
+    self::TRANSFER_COMMITTED,
+    self::TRANSFER_PENDING,
+    self::TRANSFER_REJECTED
+  ];
+
   /**
    * @deprecated Use Event::create instead.
    *
@@ -39,7 +55,16 @@ class Event {
     global $base_url;
     $this->id = isset($event['id']) ? $event['id'] : null;
     $this->name = $event['name'];
-    $this->source = $base_url;
+    
+    // Use the API base url in the source field.
+    if (in_array($event['name'], self::SOCIAL_EVENTS)) {
+      $this->source = $base_url . '/ces/api/social';
+    } else if (in_array($event['name'], self::ACCOUNTING_EVENTS)) {
+      $this->source = $base_url . '/ces/api/accounting';
+    } else {
+      $this->source = $base_url;
+    }
+    
     $this->time = SchemaUtils::encodeDate(time());
     $this->code = $event['code'];
     $this->user = $user;
