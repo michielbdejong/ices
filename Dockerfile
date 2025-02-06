@@ -39,10 +39,10 @@ WORKDIR /var/www/html
 
 # Download modules
 RUN drush dl -y \
-  oauth2_server services image views \
-  token libraries services_views \
-  cors login_emailusername smtp bounce geolocation \
-  ices
+  oauth2_server-7.x-1.7 services-7.x-3.29 image-7.x-1.x-dev views-7.x-3.29 \
+  token-7.x-1.9 libraries-7.x-2.5 services_views-7.x-1.4 \
+  cors-7.x-1.3 login_emailusername-7.x-1.2 smtp-7.x-1.9 bounce-7.x-1.8 geolocation-7.x-1.7 \
+  ices-7.x-1.x-dev
 # Download libraries
 RUN curl https://codeload.github.com/bshaffer/oauth2-server-php/zip/refs/tags/v1.13.0 --output oauth2-server-php.zip && \
   unzip oauth2-server-php.zip && mv oauth2-server-php-1.13.0 sites/all/libraries/oauth2-server-php && rm oauth2-server-php.zip && \
