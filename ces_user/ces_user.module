@@ -860,7 +860,12 @@ function ces_user_get_settings($user) {
   return $settings;
 }
 
-function ces_user_set_settings(&$user, $settings) {
+/**
+ * @param $data: the user data array
+ * @return $edit the user edit array with the settings encoded in the
+ * ['language'] key and in the ['data']['ces_user_settings'] key.
+ */
+function ces_user_build_settings_data($data, $settings) {
   $edit = array();
   // Set language in drupal core.
   if (isset($settings['language'])) {
@@ -870,7 +875,7 @@ function ces_user_set_settings(&$user, $settings) {
   // Set notifications settings in user->data. We use a compressed encoding to
   // save space in the data field.
 
-  $edit['data'] = $user->data;
+  $edit['data'] = $data;
   if (!isset($edit['data']['ces_user_settings'])) {
     $edit['data']['ces_user_settings'] = array();
   }
@@ -918,8 +923,12 @@ function ces_user_set_settings(&$user, $settings) {
     $edit['data']['ces_user_settings']['e'] = $estr;
   }
 
-  $user = user_save($user, $edit);
+  return $edit;
+}
 
+function ces_user_set_settings(&$user, $settings) {
+  $edit = ces_user_build_settings($user->data, $settings);
+  $user = user_save($user, $edit);
 }
 
 function ces_user_get_contacts($user) {

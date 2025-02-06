@@ -56,7 +56,6 @@ function ces_komunitin_notification_event($action, $exchange_id, $user_recipient
     ces_komunitin_event(Event::MEMBER_REQUESTED, $code, array(
       'member' => ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $member['id'])
     ));
-
   } else if ($action == 'account_activated') {
     $exchange = ces_bank_get_exchange($exchange_id);
     $code = $exchange['code'];
@@ -64,6 +63,11 @@ function ces_komunitin_notification_event($action, $exchange_id, $user_recipient
     ces_komunitin_event(Event::MEMBER_JOINED, $code, array(
       'member' => ces_komunitin_api_social_get_uuid(ResourceTypes::MEMBER, $member['id'])
     ));
+  } else if ($action == 'new_exchange') {
+    // Exchange request.
+    $exchange = ces_bank_get_exchange($exchange_id);
+    $code = $exchange['code'];
+    ces_komunitin_event(Event::GROUP_REQUESTED, $code, array());
   } else if ($action == 'exchange_activated') {
     $exchange = ces_bank_get_exchange($exchange_id);
     $code = $exchange['code'];

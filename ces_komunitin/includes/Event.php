@@ -27,6 +27,7 @@ class Event {
   const MEMBER_JOINED = 'MemberJoined';
   const MEMBER_REQUESTED = 'MemberRequested';
   const GROUP_ACTIVATED = 'GroupActivated';
+  const GROUP_REQUESTED = 'GroupRequested';
 
   /**
    * @deprecated Use Event::create instead.

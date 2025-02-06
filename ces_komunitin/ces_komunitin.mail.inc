@@ -9,7 +9,6 @@
  * Implements hook_mail().
  */
 function ces_komunitin_mail($key, &$message, $params) {
-  // TODO: send as system@komunitin.org.
   $langcode = $message['language']->language;
   $message['headers']['Content-Type'] = 'text/html; charset=UTF-8;';
   switch ($key) {
@@ -67,6 +66,12 @@ function _ces_komunitin_mail_html_template($paragraphs, $action, $url, $langcode
   . '</table>'
   . '</body>';
   return $body;
+}
+
+function ces_komunitin_mail_alter(&$message) {
+  // Disable send drupal system mails for komunitin users.
+
+
 }
 
 
