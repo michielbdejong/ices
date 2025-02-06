@@ -12,6 +12,7 @@ current_version=$(grep 'version = ' ices.info | sed 's/version = //')
 echo "Current version: $current_version"
 echo "Bumping version..."
 new_version=$(echo "$current_version" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+new_version="$new_version\""
 
 
 # Write the new version number to /ices.info and all .info files in the ces_* folters.
@@ -30,5 +31,6 @@ echo "Committed changes to git."
 # create a git tag
 git tag -a "$new_version" -m "Bump version $new_version"
 echo "Created git tag $new_version"
+
 
 
