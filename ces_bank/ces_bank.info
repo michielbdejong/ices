@@ -8,4 +8,4 @@ dependencies[] = ces_offerswants
 configure = ces/admin/ces
 core = 7.x
 package = ices
-version = "7.x-1.48
+version = "7.x-1.48"
