@@ -69,7 +69,12 @@ function _ces_komunitin_mail_html_template($paragraphs, $action, $url, $langcode
 }
 
 function ces_komunitin_mail_alter(&$message) {
-  // Don't send drupal system mails for komunitin users.
+  // Don't send drupal system mails for komunitin users 
+  // (unless mail was sent by the komunitin module).
+  if ($message['module'] == 'ces_komunitin') {
+    return;
+  }
+  
   $to = $message['to'];
   // Get the list of email addresses from the 'to' string.
   $addresses = [];
