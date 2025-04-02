@@ -25,7 +25,7 @@ $permission = [
 $bank->createPermission($permission);
 
 // Create users.
-$usernames = array('Riemann', 'Euclides', 'Gauss' , 'Noether', 'Fermat');
+$usernames = array('Riemann', 'Euclides', 'Gauss' , 'Noether', 'ClearingCentralVostro', 'Fermat');
 $users = array();
 foreach ($usernames as $name) {
   $users[$name] = ces_develop_register_user($name);
@@ -87,7 +87,7 @@ for ($i = 0; $i < 3; $i++) {
   $name = $usernames[$i];
   $accounts[$name] = ces_develop_register_account($users[$name], $net1, $i + 1);
 }
-for ($i = 0; $i < 3; $i++) {
+for ($i = 0; $i < 4; $i++) {
   $name = $usernames[$i + 2];
   $accounts[$name] = ces_develop_register_account($users[$name], $net2, $i + 1);
 }
